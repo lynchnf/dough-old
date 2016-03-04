@@ -1,1 +1,4 @@
-# dough
+dough
+=====
+
+Personal finance software.
