@@ -7,8 +7,8 @@ insert into TRAN (ID,VERSION,ACCT_ID,NAME,FITID) values (8909,2,2401,'save jma',
 insert into PAYEE (ID,VERSION,NAME) values (748,4,'read dxk');
 insert into PAYEE (ID,VERSION,NAME) values (255,4,'save jog');
 
-insert into PAYABLE (ID, VERSION,ACCT_ID,MEMO) values (5376,1,3317,'read ice');
-insert into PAYABLE (ID, VERSION,ACCT_ID,MEMO) values (1897,4,2401,'save ehm');
+insert into PAYABLE (ID,VERSION,PAYEE_ID,MEMO) values (5376,1,748,'read ice');
+insert into PAYABLE (ID,VERSION,PAYEE_ID,MEMO) values (1897,4,255,'save ehm');
 
-insert into ACCT (ID,VERSION,FID,OFX_ACCT_ID,CRON_EXPRESSION,NBR_EST_TO_CREATE,EST_AMOUNT) values (6962,6,'1688','1212','0 0 0 20 * ?',2,38.59);
-insert into PAYABLE (ID,VERSION,ACCT_ID,EST_DUE_DATE,EST_AMOUNT) values (4577,1,6962,'2016-02-20',38.59);
+insert into PAYEE (ID,VERSION,CRON_EXPRESSION,NBR_EST_TO_CREATE,EST_AMOUNT) values (6962,6,'0 0 0 20 * ?',2,38.59);
+insert into PAYABLE (ID,VERSION,PAYEE_ID,EST_DUE_DATE,EST_AMOUNT) values (4577,1,6962,'2016-02-20',38.59);

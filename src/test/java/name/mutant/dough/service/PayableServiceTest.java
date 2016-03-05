@@ -1,7 +1,7 @@
 package name.mutant.dough.service;
 
-import name.mutant.dough.domain.Acct;
 import name.mutant.dough.domain.Payable;
+import name.mutant.dough.domain.Payee;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +22,7 @@ public class PayableServiceTest {
     private static final String READ_PAYABLE_MEMO = "read ice";
     private static final Long SAVE_PAYABLE_ID = Long.valueOf(1897);
     private static final String SAVE_PAYABLE_MEMO = "save ehm";
-    private static final Long SCHEDULE_ACCT_ID = new Long(6962);
+    private static final Long SCHEDULE_PAYEE_ID = new Long(6962);
     private static final String SCHEDULE_CRON_EXPRESSION = "0 0 0 20 * ?";
     private static final String SCHEDULE_EST_AMOUNT = "38.59";
     private static final String SCHEDULE_TODAY = "2016-02-15";
@@ -55,9 +55,9 @@ public class PayableServiceTest {
         payable2.setId(payable1.getId());
         payable2.setVersion(payable1.getVersion());
 
-        Long acctId = payable1.getAcct().getId();
-        Acct newAcct = AcctService.readAcct(acctId);
-        payable2.setAcct(newAcct);
+        Long payeeId = payable1.getPayee().getId();
+        Payee payee = PayeeService.readPayee(payeeId);
+        payable2.setPayee(payee);
 
         String newMemo = StringUtils.replace(SAVE_PAYABLE_MEMO, "save", "changed");
         payable2.setMemo(newMemo);
@@ -71,14 +71,14 @@ public class PayableServiceTest {
     @Test
     public void testCreateEstimatedPayables() throws Exception {
         // Verify our account exists and has the schedule values we expect.
-        Acct acct1 = AcctService.readAcct(SCHEDULE_ACCT_ID);
-        assertNotNull(acct1);
-        assertEquals(SCHEDULE_CRON_EXPRESSION, acct1.getCronExpression());
-        assertEquals(SCHEDULE_EST_DUE_DATE.length, acct1.getNbrEstToCreate().intValue());
-        assertEquals(SCHEDULE_EST_AMOUNT, acct1.getEstAmount().toPlainString());
+        Payee payee1 = PayeeService.readPayee(SCHEDULE_PAYEE_ID);
+        assertNotNull(payee1);
+        assertEquals(SCHEDULE_CRON_EXPRESSION, payee1.getCronExpression());
+        assertEquals(SCHEDULE_EST_DUE_DATE.length, payee1.getNbrEstToCreate().intValue());
+        assertEquals(SCHEDULE_EST_AMOUNT, payee1.getEstAmount().toPlainString());
 
         // Verify a payable already exists in the "future" and has the due date we expect.
-        List<Payable> payables1 = PayableService.readAllPayablesForAcct(SCHEDULE_ACCT_ID);
+        List<Payable> payables1 = PayableService.readAllPayablesForPayee(SCHEDULE_PAYEE_ID);
         assertNotNull(payables1);
         assertEquals(1, payables1.size());
         Payable existingPayable = payables1.iterator().next();
@@ -91,10 +91,10 @@ public class PayableServiceTest {
 
         // Fake "today" to make this easier to test.
         Date today = DATE_FORMAT.parse(SCHEDULE_TODAY);
-        PayableService.createEstimatedPayables(SCHEDULE_ACCT_ID, today);
+        PayableService.createEstimatedPayables(SCHEDULE_PAYEE_ID, today);
 
         // Verify we now have 2 payables.
-        List<Payable> payables2 = PayableService.readAllPayablesForAcct(SCHEDULE_ACCT_ID);
+        List<Payable> payables2 = PayableService.readAllPayablesForPayee(SCHEDULE_PAYEE_ID);
         assertNotNull(payables2);
         assertEquals(SCHEDULE_EST_DUE_DATE.length, payables2.size());
 

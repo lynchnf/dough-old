@@ -36,11 +36,7 @@ public class Acct implements Serializable {
     private AcctType type;
     private Date beginDate;
     private BigDecimal beginBalance;
-    private String cronExpression;
-    private Integer nbrEstToCreate;
-    private BigDecimal estAmount;
     private List<Tran> trans = new ArrayList<>();
-    private List<Payable> payables = new ArrayList<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -146,33 +142,6 @@ public class Acct implements Serializable {
         this.beginBalance = beginBalance;
     }
 
-    @Column(name = "CRON_EXPRESSION", length = 20)
-    public String getCronExpression() {
-        return cronExpression;
-    }
-
-    public void setCronExpression(String cronExpression) {
-        this.cronExpression = cronExpression;
-    }
-
-    @Column(name = "NBR_EST_TO_CREATE")
-    public Integer getNbrEstToCreate() {
-        return nbrEstToCreate;
-    }
-
-    public void setNbrEstToCreate(Integer nbrEstToCreate) {
-        this.nbrEstToCreate = nbrEstToCreate;
-    }
-
-    @Column(name = "EST_AMOUNT", precision = 9, scale = 2)
-    public BigDecimal getEstAmount() {
-        return estAmount;
-    }
-
-    public void setEstAmount(BigDecimal estAmount) {
-        this.estAmount = estAmount;
-    }
-
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "acct")
     public List<Tran> getTrans() {
         return trans;
@@ -180,14 +149,5 @@ public class Acct implements Serializable {
 
     public void setTrans(List<Tran> trans) {
         this.trans = trans;
-    }
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "acct")
-    public List<Payable> getPayables() {
-        return payables;
-    }
-
-    public void setPayables(List<Payable> payables) {
-        this.payables = payables;
     }
 }

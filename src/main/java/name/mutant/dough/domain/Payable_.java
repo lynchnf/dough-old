@@ -9,7 +9,7 @@ import java.util.Date;
 public class Payable_ {
     public static volatile SingularAttribute<Payable, Long> id;
     public static volatile SingularAttribute<Payable, Integer> version;
-    public static volatile SingularAttribute<Payable, Acct> acct;
+    public static volatile SingularAttribute<Payable, Payee> payee;
     public static volatile SingularAttribute<Payable, Date> estDueDate;
     public static volatile SingularAttribute<Payable, BigDecimal> estAmount;
     public static volatile SingularAttribute<Payable, Date> actDueDate;

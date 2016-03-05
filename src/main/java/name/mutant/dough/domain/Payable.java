@@ -22,7 +22,7 @@ public class Payable implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long id;
     private Integer version;
-    private Acct acct;
+    private Payee payee;
     private Date estDueDate;
     private BigDecimal estAmount;
     private Date actDueDate;
@@ -52,13 +52,13 @@ public class Payable implements Serializable {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ACCT_ID", nullable = false)
-    public Acct getAcct() {
-        return acct;
+    @JoinColumn(name = "PAYEE_ID", nullable = false)
+    public Payee getPayee() {
+        return payee;
     }
 
-    public void setAcct(Acct acct) {
-        this.acct = acct;
+    public void setPayee(Payee payee) {
+        this.payee = payee;
     }
 
     @Column(name = "EST_DUE_DATE")

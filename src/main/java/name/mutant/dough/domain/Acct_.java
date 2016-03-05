@@ -19,9 +19,5 @@ public abstract class Acct_ {
     public static volatile SingularAttribute<Acct, AcctType> type;
     public static volatile SingularAttribute<Acct, Date> beginDate;
     public static volatile SingularAttribute<Acct, BigDecimal> beginBalance;
-    public static volatile SingularAttribute<Acct, String> cronExpression;
-    public static volatile SingularAttribute<Acct, Integer> nbrEstToCreate;
-    public static volatile SingularAttribute<Acct, BigDecimal> estAmount;
     public static volatile ListAttribute<Acct, Tran> trans;
-    public static volatile ListAttribute<Acct, Payable> payables;
 }

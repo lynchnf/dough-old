@@ -1,16 +1,21 @@
 package name.mutant.dough.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "PAYEE")
@@ -24,6 +29,7 @@ public class Payee implements Serializable {
     private String cronExpression;
     private Integer nbrEstToCreate;
     private BigDecimal estAmount;
+    private List<Payable> payables = new ArrayList<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -99,5 +105,14 @@ public class Payee implements Serializable {
 
     public void setEstAmount(BigDecimal estAmount) {
         this.estAmount = estAmount;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "payee")
+    public List<Payable> getPayables() {
+        return payables;
+    }
+
+    public void setPayables(List<Payable> payables) {
+        this.payables = payables;
     }
 }

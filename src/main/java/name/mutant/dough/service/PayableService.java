@@ -1,9 +1,9 @@
 package name.mutant.dough.service;
 
 import name.mutant.dough.DoughException;
-import name.mutant.dough.domain.Acct;
 import name.mutant.dough.domain.Payable;
 import name.mutant.dough.domain.Payable_;
+import name.mutant.dough.domain.Payee;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.quartz.CronExpression;
@@ -58,32 +58,32 @@ public class PayableService extends BaseService {
         return doInTransaction(function);
     }
 
-    public static List<Payable> readAllPayablesForAcct(Long acctId) throws DoughException {
+    public static List<Payable> readAllPayablesForPayee(Long payeeId) throws DoughException {
         DaoFunction<List<Payable>> function = new DaoFunction<List<Payable>>() {
             public List<Payable> doFunction(EntityManager entityManager) throws Exception {
                 List<Payable> payables = new ArrayList<>();
-                Acct acct = AcctService.readAcct(acctId);
-                for (Payable payable : acct.getPayables()) {
+                Payee payee = PayeeService.readPayee(payeeId);
+                for (Payable payable : payee.getPayables()) {
                     payables.add(payable);
                 }
                 return payables;
             }
 
             public String getErrorMessage() {
-                return "Error reading all payables for acct id=\"" + acctId + "\".";
+                return "Error reading all payables for payee id=\"" + payeeId + "\".";
             }
         };
         return doWithEntityManager(function);
     }
 
-    private static List<Payable> readPayablesByAcctAndEstDueDate(Long acctId, Date estDueDate) throws DoughException {
+    private static List<Payable> readPayablesByPayeeAndEstDueDate(Long payeeId, Date estDueDate) throws DoughException {
         DaoFunction<List<Payable>> function = new DaoFunction<List<Payable>>() {
-            private String message = "Error reading all payables for acct id=\"" + acctId + "\", estimated due date=\"" + estDueDate + "\",";
+            private String message = "Error reading all payables for payee id=\"" + payeeId + "\", estimated due date=\"" + estDueDate + "\",";
 
             public List<Payable> doFunction(EntityManager entityManager) throws Exception {
-                Acct acct = AcctService.readAcct(acctId);
-                if (acct == null) {
-                    String message = "Acct not found for acctId=\"" + acctId + "\".";
+                Payee payee = PayeeService.readPayee(payeeId);
+                if (payee == null) {
+                    String message = "Payee not found for id=\"" + payeeId + "\".";
                     throw new DoughException(message);
                 }
 
@@ -91,9 +91,9 @@ public class PayableService extends BaseService {
                 CriteriaQuery<Payable> cq = cb.createQuery(Payable.class);
                 Root<Payable> payable = cq.from(Payable.class);
                 cq.select(payable);
-                Predicate acctEquals = cb.equal(payable.get(Payable_.acct), acct);
+                Predicate payeeEquals = cb.equal(payable.get(Payable_.payee), payee);
                 Predicate estDueDateEquals = cb.equal(payable.get(Payable_.estDueDate), estDueDate);
-                cq.where(acctEquals, estDueDateEquals);
+                cq.where(payeeEquals, estDueDateEquals);
                 TypedQuery<Payable> query = entityManager.createQuery(cq);
                 List<Payable> resultList = query.getResultList();
                 return resultList;
@@ -106,31 +106,31 @@ public class PayableService extends BaseService {
         return doWithEntityManager(function);
     }
 
-    public static void createEstimatedPayables(Long acctId, Date afterDate) throws DoughException {
+    public static void createEstimatedPayables(Long payeeId, Date afterDate) throws DoughException {
         DaoFunction<Void> function = new DaoFunction<Void>() {
             public Void doFunction(EntityManager entityManager) throws Exception {
-                Acct acct = AcctService.readAcct(acctId);
-                acct.getPayables().size(); // Instantiate payables list.
-                CronExpression cronExpression = new CronExpression(acct.getCronExpression());
+                Payee payee = PayeeService.readPayee(payeeId);
+                payee.getPayables().size(); // Instantiate payables list.
+                CronExpression cronExpression = new CronExpression(payee.getCronExpression());
                 Date nextDueDate = afterDate;
-                for (int i = 0; i < acct.getNbrEstToCreate(); i++) {
+                for (int i = 0; i < payee.getNbrEstToCreate(); i++) {
                     nextDueDate = cronExpression.getNextValidTimeAfter(nextDueDate);
-                    List<Payable> nextPayables = PayableService.readPayablesByAcctAndEstDueDate(acctId, nextDueDate);
+                    List<Payable> nextPayables = PayableService.readPayablesByPayeeAndEstDueDate(payeeId, nextDueDate);
                     if (nextPayables == null || nextPayables.isEmpty()) {
                         Payable newPayable = new Payable();
-                        newPayable.setAcct(acct);
+                        newPayable.setPayee(payee);
                         newPayable.setEstDueDate(nextDueDate);
-                        newPayable.setEstAmount(acct.getEstAmount());
+                        newPayable.setEstAmount(payee.getEstAmount());
                         newPayable.setPaid(false);
-                        acct.getPayables().add(newPayable);
+                        payee.getPayables().add(newPayable);
                     }
                 }
-                AcctService.saveAcct(acct);
+                PayeeService.savePayee(payee);
                 return null;
             }
 
             public String getErrorMessage() {
-                return "Error creating estimated payables for acct id=\"" + acctId + "\" after=\"" + afterDate + "\".";
+                return "Error creating estimated payables for payee id=\"" + payeeId + "\" after=\"" + afterDate + "\".";
             }
         };
         doInTransaction(function);
