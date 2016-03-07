@@ -6,6 +6,16 @@ insert into TRAN (ID,VERSION,ACCT_ID,NAME,FITID) values (8909,2,2401,'save jma',
 
 insert into PAYEE (ID,VERSION,NAME) values (748,4,'read dxk');
 insert into PAYEE (ID,VERSION,NAME) values (255,4,'save jog');
+insert into PAYEE (ID,VERSION,NAME) values (3562,4,'filter ahq');
+insert into PAYEE (ID,VERSION,NAME) values (9217,6,'filter tna');
+insert into PAYEE (ID,VERSION,NAME) values (5165,1,'filter ddk');
+insert into PAYEE (ID,VERSION,NAME) values (923,4,'filter wli');
+insert into PAYEE (ID,VERSION,NAME) values (1860,3,'filter agy');
+insert into PAYEE (ID,VERSION,NAME) values (3119,3,'filter tqi');
+insert into PAYEE (ID,VERSION,NAME) values (6414,6,'filter gsi');
+insert into PAYEE (ID,VERSION,NAME) values (6861,6,'filter lvy');
+insert into PAYEE (ID,VERSION,NAME) values (8818,2,'filter leo');
+insert into PAYEE (ID,VERSION,NAME) values (376,4,'filter bue');
 
 insert into PAYABLE (ID,VERSION,PAYEE_ID,MEMO) values (5376,1,748,'read ice');
 insert into PAYABLE (ID,VERSION,PAYEE_ID,MEMO) values (1897,4,255,'save ehm');

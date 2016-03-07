@@ -23,8 +23,8 @@ public class Payee implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long id;
     private Integer version;
-    private String acctNbr;
     private String name;
+    private String acctNbr;
     private PayeeType type;
     private String cronExpression;
     private Integer nbrEstToCreate;
@@ -52,15 +52,6 @@ public class Payee implements Serializable {
         this.version = version;
     }
 
-    @Column(name = "ACCT_NBR", length = 20)
-    public String getAcctNbr() {
-        return acctNbr;
-    }
-
-    public void setAcctNbr(String acctNbr) {
-        this.acctNbr = acctNbr;
-    }
-
     @Column(name = "NAME", length = 255)
     public String getName() {
         return name;
@@ -68,6 +59,15 @@ public class Payee implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Column(name = "ACCT_NBR", length = 20)
+    public String getAcctNbr() {
+        return acctNbr;
+    }
+
+    public void setAcctNbr(String acctNbr) {
+        this.acctNbr = acctNbr;
     }
 
     @Column(name = "TYPE")
