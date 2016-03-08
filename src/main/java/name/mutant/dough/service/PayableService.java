@@ -5,7 +5,6 @@ import name.mutant.dough.domain.Payable;
 import name.mutant.dough.domain.Payable_;
 import name.mutant.dough.domain.Payee;
 import name.mutant.dough.domain.Payee_;
-import name.mutant.dough.service.filter.request.OrderByDirection;
 import name.mutant.dough.service.filter.request.PayableFilterRequest;
 import name.mutant.dough.service.filter.request.PayableOrderByField;
 import name.mutant.dough.service.filter.response.PayableFilterResponse;
@@ -19,7 +18,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -243,5 +241,4 @@ public class PayableService extends BaseService {
         };
         return doWithEntityManager(function);
     }
-
 }

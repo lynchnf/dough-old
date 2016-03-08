@@ -3,7 +3,8 @@ package name.mutant.dough.service;
 import name.mutant.dough.DoughException;
 import name.mutant.dough.domain.Payee;
 import name.mutant.dough.domain.Payee_;
-import name.mutant.dough.service.filter.request.*;
+import name.mutant.dough.service.filter.request.PayeeFilterRequest;
+import name.mutant.dough.service.filter.request.PayeeOrderByField;
 import name.mutant.dough.service.filter.response.PayeeFilterResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,8 +14,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
@@ -119,5 +118,4 @@ public class PayeeService extends BaseService {
         };
         return doWithEntityManager(function);
     }
-
 }
