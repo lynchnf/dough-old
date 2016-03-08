@@ -71,10 +71,19 @@ public class PayeeServiceTest {
         request.setWhereNameLike("filter"); // select only names containing "filter"
 
         PayeeFilterResponse response = PayeeService.filterPayees(request);
-        // List<Payee> resultList = response.getResultList(); // DEBUG
-        // for (int i = 0; i < resultList.size(); i++) { // DEBUG
-        // System.out.println("resultList[" + i + "]=\"" + resultList.get(i).getId() + "\", \"" + resultList.get(i).getName() + "\""); // DEBUG
-        // } // DEBUG
+/*
+        List<Payee> resultList = response.getResultList(); // DEBUG
+        for (int i = 0; i < resultList.size(); i++) { // DEBUG
+            System.out.println("resultList[" + i + "]=\"" +
+                    resultList.get(i).getId() + "\", \"" +
+                    resultList.get(i).getName() + "\", \"" +
+                    resultList.get(i).getAcctNbr() + "\", \"" +
+                    resultList.get(i).getType() + "\", \"" +
+                    resultList.get(i).getCronExpression() + "\", \"" +
+                    resultList.get(i).getNbrEstToCreate() + "\", \"" +
+                    resultList.get(i).getEstAmount() + "\""); // DEBUG
+        } // DEBUG
+*/
 
         // There should be ten records with names containing "filter".
         assertEquals(Long.valueOf(10), response.getCount());

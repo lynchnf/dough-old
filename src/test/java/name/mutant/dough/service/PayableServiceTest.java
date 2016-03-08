@@ -131,6 +131,21 @@ public class PayableServiceTest {
         request.setWherePaid(Boolean.FALSE); // select only unpaid
 
         PayableFilterResponse response = PayableService.filterPayables(request);
+/*
+        List<Payable> resultList = response.getResultList(); // DEBUG
+        for (int i = 0; i < resultList.size(); i++) { // DEBUG
+            System.out.println("resultList[" + i + "]=\"" +
+                    resultList.get(i).getId() + "\", \"" +
+                    resultList.get(i).getPayee().getName() + "\", \"" +
+                    df.format(resultList.get(i).getEstDueDate()) + "\", \"" +
+                    resultList.get(i).getEstAmount() + "\", \"" +
+                    (resultList.get(i).getActDueDate() == null ? null :
+                            df.format(resultList.get(i).getActDueDate())) + "\", \"" +
+                    resultList.get(i).getActAmount() + "\", \"" +
+                    resultList.get(i).getMemo() + "\", \"" +
+                    resultList.get(i).isPaid() + "\""); // DEBUG
+        } // DEBUG
+*/
 
         // There should be ten unpaid records with names containing "filter".
         assertEquals(Long.valueOf(10), response.getCount());
@@ -158,7 +173,7 @@ public class PayableServiceTest {
         request.setWhereDueDateBefore(df.parse("2016-02-01")); // ... and Feb 1st.
 
         PayableFilterResponse response = PayableService.filterPayables(request);
-
+/*
         List<Payable> resultList = response.getResultList(); // DEBUG
         for (int i = 0; i < resultList.size(); i++) { // DEBUG
             System.out.println("resultList[" + i + "]=\"" +
@@ -172,6 +187,7 @@ public class PayableServiceTest {
                     resultList.get(i).getMemo() + "\", \"" +
                     resultList.get(i).isPaid() + "\""); // DEBUG
         } // DEBUG
+*/
 
         // There should be three records in January with names containing "filter".
         assertEquals(Long.valueOf(3), response.getCount());
