@@ -1,6 +1,7 @@
 package name.mutant.dough.service;
 
 import name.mutant.dough.DoughException;
+import name.mutant.dough.service.filter.request.OrderByDirection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,6 +9,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -97,6 +106,29 @@ public abstract class BaseService {
             }
         };
         return doWithEntityManager(function2);
+    }
+
+    protected static void attachWhereToQueries(Collection<Predicate> whereCollection, CriteriaQuery<?> cq, CriteriaQuery<?> cq2) {
+        if (!whereCollection.isEmpty()) {
+            Predicate[] whereArray = new Predicate[whereCollection.size()];
+            whereArray = whereCollection.toArray(whereArray);
+            cq.where(whereArray);
+            cq2.where(whereArray);
+        }
+    }
+
+    protected static void attachOrderByToQuery(CriteriaBuilder cb, List<Expression<?>> orderByPathList, OrderByDirection orderByDirection, CriteriaQuery<?> cq) {
+        List<Order> orderByList = new ArrayList<>();
+        for (Expression<?> orderByPath : orderByPathList) {
+            Order orderBy;
+            if (orderByDirection == OrderByDirection.DESC) {
+                orderBy = cb.desc(orderByPath);
+            } else {
+                orderBy = cb.asc(orderByPath);
+            }
+            orderByList.add(orderBy);
+        }
+        cq.orderBy(orderByList);
     }
 
     public static EntityManagerFactory getEntityManagerFactory() {

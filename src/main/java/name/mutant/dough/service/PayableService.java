@@ -199,12 +199,7 @@ public class PayableService extends BaseService {
                     Predicate paid = cb.equal(payable.get(Payable_.paid), request.getWherePaid());
                     whereCollection.add(paid);
                 }
-                if (!whereCollection.isEmpty()) {
-                    Predicate[] whereArray = new Predicate[whereCollection.size()];
-                    whereArray = whereCollection.toArray(whereArray);
-                    cq.where(whereArray);
-                    cq2.where(whereArray);
-                }
+                attachWhereToQueries(whereCollection, cq, cq2);
 
                 // Order by ...
                 List<Expression<?>> orderByPathList = new ArrayList<>();
@@ -220,17 +215,7 @@ public class PayableService extends BaseService {
                 // Always order by id.
                 orderByPathList.add(payable.get(Payable_.id));
                 // Ascending or Descending?
-                List<Order> orderByList = new ArrayList<>();
-                for (Expression<?> orderByPath : orderByPathList) {
-                    Order orderBy = null;
-                    if (request.getOrderByDirection() == OrderByDirection.DESC) {
-                        orderBy = cb.desc(orderByPath);
-                    } else {
-                        orderBy = cb.asc(orderByPath);
-                    }
-                    orderByList.add(orderBy);
-                }
-                cq.orderBy(orderByList);
+                attachOrderByToQuery(cb, orderByPathList, request.getOrderByDirection(), cq);
 
                 PayableFilterResponse response = new PayableFilterResponse();
 
@@ -258,4 +243,5 @@ public class PayableService extends BaseService {
         };
         return doWithEntityManager(function);
     }
+
 }

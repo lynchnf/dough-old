@@ -86,32 +86,17 @@ public class PayeeService extends BaseService {
                     Predicate typeEq = cb.equal(payee.get(Payee_.type), request.getWhereTypeEq());
                     whereCollection.add(typeEq);
                 }
-                if (!whereCollection.isEmpty()) {
-                    Predicate[] whereArray = new Predicate[whereCollection.size()];
-                    whereArray = whereCollection.toArray(whereArray);
-                    cq.where(whereArray);
-                    cq2.where(whereArray);
-                }
+                attachWhereToQueries(whereCollection, cq, cq2);
 
                 // Order by ...
-                List<Path<?>> orderByPathList = new ArrayList<>();
+                List<Expression<?>> orderByPathList = new ArrayList<>();
                 if (request.getOrderByField() == PayeeOrderByField.NAME) {
                     orderByPathList.add(payee.get(Payee_.name));
                 }
                 // Always order by id.
                 orderByPathList.add(payee.get(Payee_.id));
                 // Ascending or Descending?
-                List<Order> orderByList = new ArrayList<>();
-                for (Path<?> orderByPath : orderByPathList) {
-                    Order orderBy = null;
-                    if (request.getOrderByDirection() == OrderByDirection.DESC) {
-                        orderBy = cb.desc(orderByPath);
-                    } else {
-                        orderBy = cb.asc(orderByPath);
-                    }
-                    orderByList.add(orderBy);
-                }
-                cq.orderBy(orderByList);
+                attachOrderByToQuery(cb, orderByPathList, request.getOrderByDirection(), cq);
 
                 PayeeFilterResponse response = new PayeeFilterResponse();
 
@@ -134,4 +119,5 @@ public class PayeeService extends BaseService {
         };
         return doWithEntityManager(function);
     }
+
 }
