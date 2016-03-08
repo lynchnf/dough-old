@@ -2,6 +2,10 @@ package name.mutant.dough.service;
 
 import name.mutant.dough.domain.Payable;
 import name.mutant.dough.domain.Payee;
+import name.mutant.dough.service.filter.request.OrderByDirection;
+import name.mutant.dough.service.filter.request.PayableFilterRequest;
+import name.mutant.dough.service.filter.request.PayableOrderByField;
+import name.mutant.dough.service.filter.response.PayableFilterResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -13,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -27,6 +32,10 @@ public class PayableServiceTest {
     private static final String SCHEDULE_EST_AMOUNT = "38.59";
     private static final String SCHEDULE_TODAY = "2016-02-15";
     private static final String[] SCHEDULE_EST_DUE_DATE = {"2016-02-20", "2016-03-20"};
+    private static final Long[] FILTER_PAYABLE_1_ID = {Long.valueOf(8074), Long.valueOf(6690), Long.valueOf(1485)};
+    private static final String[] FILTER_PAYABLE_1_NAME = {"filter nxp", "filter zqh", "filter fvh"};
+    private static final Long[] FILTER_PAYABLE_2_ID = {Long.valueOf(339), Long.valueOf(7745), Long.valueOf(6212)};
+    private static final String[] FILTER_PAYABLE_2_NAME = {"filter wzm", "filter abd", "filter iyp"};
 
     @Before
     public void setUp() throws Exception {
@@ -107,6 +116,71 @@ public class PayableServiceTest {
                 assertEquals(SCHEDULE_EST_DUE_DATE[1], DATE_FORMAT.format(payable.getEstDueDate()));
                 assertEquals(SCHEDULE_EST_AMOUNT, payable.getEstAmount().toPlainString());
             }
+        }
+    }
+
+    @Test
+    public void testFilterPayables1() throws Exception {
+        // Set up our filter request.
+        PayableFilterRequest request = new PayableFilterRequest();
+        request.setMax(3); // three records per page
+        request.setFirst(3); // show second page
+        request.setOrderByField(PayableOrderByField.DUE_DATE); // sort by due date
+        request.setOrderByDirection(OrderByDirection.ASC); // sort fowards
+        request.setWhereMemoLike("filter"); // select only memos containing "filter"
+        request.setWherePaid(Boolean.FALSE); // select only unpaid
+
+        PayableFilterResponse response = PayableService.filterPayables(request);
+
+        // There should be ten unpaid records with names containing "filter".
+        assertEquals(Long.valueOf(10), response.getCount());
+
+        // We should fetch the fourth to sixth records in due date order.
+        assertEquals(FILTER_PAYABLE_1_ID.length, response.getResultList().size());
+        for (int i = 0; i < response.getResultList().size(); i++) {
+            assertEquals(FILTER_PAYABLE_1_ID[i], response.getResultList().get(i).getId());
+            assertEquals(FILTER_PAYABLE_1_NAME[i], response.getResultList().get(i).getMemo());
+            assertFalse(response.getResultList().get(i).isPaid());
+        }
+    }
+
+    @Test
+    public void testFilterPayables2() throws Exception {
+        // Set up our filter request.
+        PayableFilterRequest request = new PayableFilterRequest();
+        request.setMax(-1); // Get all records
+
+        request.setOrderByField(PayableOrderByField.PAYEE_NAME); // sort by payee name
+        request.setOrderByDirection(OrderByDirection.ASC); // sort fowards
+        request.setWhereMemoLike("filter"); // select only memos containing "filter"
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        request.setWhereDueDateAfter(df.parse("2015-12-31")); // due date between Dec 31st.
+        request.setWhereDueDateBefore(df.parse("2016-02-01")); // ... and Feb 1st.
+
+        PayableFilterResponse response = PayableService.filterPayables(request);
+
+        List<Payable> resultList = response.getResultList(); // DEBUG
+        for (int i = 0; i < resultList.size(); i++) { // DEBUG
+            System.out.println("resultList[" + i + "]=\"" +
+                    resultList.get(i).getId() + "\", \"" +
+                    resultList.get(i).getPayee().getName() + "\", \"" +
+                    df.format(resultList.get(i).getEstDueDate()) + "\", \"" +
+                    resultList.get(i).getEstAmount() + "\", \"" +
+                    (resultList.get(i).getActDueDate() == null ? null :
+                            df.format(resultList.get(i).getActDueDate())) + "\", \"" +
+                    resultList.get(i).getActAmount() + "\", \"" +
+                    resultList.get(i).getMemo() + "\", \"" +
+                    resultList.get(i).isPaid() + "\""); // DEBUG
+        } // DEBUG
+
+        // There should be three records in January with names containing "filter".
+        assertEquals(Long.valueOf(3), response.getCount());
+
+        // We should fetch the records in payee name order.
+        assertEquals(FILTER_PAYABLE_2_ID.length, response.getResultList().size());
+        for (int i = 0; i < response.getResultList().size(); i++) {
+            assertEquals(FILTER_PAYABLE_2_ID[i], response.getResultList().get(i).getId());
+            assertEquals(FILTER_PAYABLE_2_NAME[i], response.getResultList().get(i).getMemo());
         }
     }
 }

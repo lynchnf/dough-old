@@ -86,11 +86,11 @@ public class Payable implements Serializable {
         return actDueDate;
     }
 
-    @Column(name = "ACT_AMOUNT", precision = 9, scale = 2)
     public void setActDueDate(Date actDueDate) {
         this.actDueDate = actDueDate;
     }
 
+    @Column(name = "ACT_AMOUNT", precision = 9, scale = 2)
     public BigDecimal getActAmount() {
         return actAmount;
     }

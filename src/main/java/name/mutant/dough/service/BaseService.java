@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.util.ResourceBundle;
 
 /**
  * This abstract class extends the service classes so that their methods can do data access stuff without <em>you</em>
@@ -29,9 +30,9 @@ import javax.persistence.Persistence;
  * @see DaoFunction
  */
 public abstract class BaseService {
-    private static final String PERSISTENCE_UNIT_NAME = "dough.test.pu";
     private static final Logger LOG = LogManager.getLogger();
-    private static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+    private static ResourceBundle appBundle = ResourceBundle.getBundle("application");
+    private static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(appBundle.getString("persistence.unit.name"));
     private static ThreadLocal<EntityManager> currentEntityManager = new ThreadLocal<>();
 
     protected static <T> T doWithEntityManager(DaoFunction<T> function) throws DoughException {
