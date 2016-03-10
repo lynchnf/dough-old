@@ -451,7 +451,8 @@ public class OfxService extends BaseService {
         acct.setFid(ofxInst.getFid());
         acct.setOfxBankId(ofxAcct.getBankId());
         acct.setOfxAcctId(ofxAcctId);
-        acct.setType(ofxAcct.getType());
+        AcctType type = ofxAcct.getType() == null ? AcctType.CC : ofxAcct.getType();
+        acct.setType(type);
         acct.setBeginBalance(BigDecimal.ZERO);
         return acct;
     }
