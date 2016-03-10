@@ -28,7 +28,9 @@ public class Payable implements Serializable {
     private Date actDueDate;
     private BigDecimal actAmount;
     private String memo;
-    private Boolean paid;
+    private Date paidDate;
+    private BigDecimal paidAmount;
+    private String confirmCode;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -108,12 +110,31 @@ public class Payable implements Serializable {
         this.memo = memo;
     }
 
-    @Column(name = "PAID")
-    public Boolean isPaid() {
-        return paid;
+    @Column(name = "PAID_DATE")
+    @Temporal(TemporalType.DATE)
+    public Date getPaidDate() {
+        return paidDate;
     }
 
-    public void setPaid(Boolean paid) {
-        this.paid = paid;
+    public void setPaidDate(Date paidDate) {
+        this.paidDate = paidDate;
+    }
+
+    @Column(name = "PAID_AMOUNT", precision = 9, scale = 2)
+    public BigDecimal getPaidAmount() {
+        return paidAmount;
+    }
+
+    public void setPaidAmount(BigDecimal paidAmount) {
+        this.paidAmount = paidAmount;
+    }
+
+    @Column(name = "CONFIRM_CODE", length = 20)
+    public String getConfirmCode() {
+        return confirmCode;
+    }
+
+    public void setConfirmCode(String confirmCode) {
+        this.confirmCode = confirmCode;
     }
 }

@@ -130,7 +130,6 @@ public class PayableService extends BaseService {
                         newPayable.setPayee(payee);
                         newPayable.setEstDueDate(nextDueDate);
                         newPayable.setEstAmount(payee.getEstAmount());
-                        newPayable.setPaid(false);
                         payee.getPayables().add(newPayable);
                     }
                 }
@@ -194,7 +193,12 @@ public class PayableService extends BaseService {
                     whereCollection.add(actual);
                 }
                 if (request.getWherePaid() != null) {
-                    Predicate paid = cb.equal(payable.get(Payable_.paid), request.getWherePaid());
+                    Predicate paid = null;
+                    if (request.getWherePaid()) {
+                        paid = cb.isNotNull(payable.get(Payable_.paidDate));
+                    } else {
+                        paid = cb.isNull(payable.get(Payable_.paidDate));
+                    }
                     whereCollection.add(paid);
                 }
                 attachWhereToQueries(whereCollection, cq, cq2);

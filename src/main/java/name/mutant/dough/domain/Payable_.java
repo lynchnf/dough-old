@@ -15,5 +15,7 @@ public class Payable_ {
     public static volatile SingularAttribute<Payable, Date> actDueDate;
     public static volatile SingularAttribute<Payable, BigDecimal> actAmount;
     public static volatile SingularAttribute<Payable, String> memo;
-    public static volatile SingularAttribute<Payable, Boolean> paid;
+    public static volatile SingularAttribute<Payable, Date> paidDate;
+    public static volatile SingularAttribute<Payable, BigDecimal> paidAmount;
+    public static volatile SingularAttribute<Payable, String> confirmCode;
 }

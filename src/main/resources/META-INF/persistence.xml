@@ -30,4 +30,18 @@
                  <property name="hibernate.format_sql" value="true" /> -->
         </properties>
     </persistence-unit>
+
+    <persistence-unit name="dough.mysql.pu">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <properties>
+            <property name="javax.persistence.jdbc.driver" value=" com.mysql.jdbc.Driver" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/doughdb" />
+            <property name="javax.persistence.jdbc.user" value="doughuser" />
+            <property name="javax.persistence.jdbc.password" value="swordfish" />
+
+            <property name="hibernate.hbm2ddl.auto" value="update" />
+            <!-- <property name="hibernate.show_sql" value="true" />
+                 <property name="hibernate.format_sql" value="true" /> -->
+        </properties>
+    </persistence-unit>
 </persistence>
