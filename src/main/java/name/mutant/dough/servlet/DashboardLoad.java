@@ -1,7 +1,6 @@
 package name.mutant.dough.servlet;
 
 import name.mutant.dough.DoughException;
-import name.mutant.dough.domain.Payable;
 import name.mutant.dough.service.PayableService;
 import name.mutant.dough.service.filter.request.PayableFilterRequest;
 import name.mutant.dough.service.filter.request.PayableOrderByField;
@@ -33,6 +32,7 @@ public class DashboardLoad extends HttpServlet {
         PayableFilterRequest payableFilterRequest = new PayableFilterRequest();
         payableFilterRequest.setWherePaid(false);
         payableFilterRequest.setOrderByField(PayableOrderByField.DUE_DATE);
+        payableFilterRequest.setMax(-1);
         PayableFilterResponse payableFilterResponse = null;
         try {
             payableFilterResponse = PayableService.filterPayables(payableFilterRequest);

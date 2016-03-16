@@ -18,7 +18,7 @@
 </ul>
 <h2>Dashboard</h2>
 
-<table>
+<table border="1">
     <tr>
         <th>Payee Name</th>
         <th>Amount Due</th>

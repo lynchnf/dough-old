@@ -6,6 +6,13 @@
     <display-name>dough</display-name>
     <description>Personal finance software.</description>
 
+    <listener>
+        <listener-class>name.mutant.dough.AppStartUp</listener-class>
+    </listener>
+    <listener>
+        <listener-class>name.mutant.dough.CloseEntityManagerFactory</listener-class>
+    </listener>
+
     <servlet>
         <servlet-name>DashboardLoad</servlet-name>
         <servlet-class>name.mutant.dough.servlet.DashboardLoad</servlet-class>
