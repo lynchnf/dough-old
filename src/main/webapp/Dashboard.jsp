@@ -25,8 +25,10 @@
         <th>Due Date</th>
     </tr>
     <% java.util.List<name.mutant.dough.domain.Payable> payableResultList = (java.util.List<name.mutant.dough.domain.Payable>) request.getAttribute("payableResultList");
-        for (name.mutant.dough.domain.Payable payable : payableResultList) { %>
-    <tr>
+        for (name.mutant.dough.domain.Payable payable : payableResultList) {
+            String rowStyle = "font-style: normal;";
+            if (payable.getActDueDate() == null) rowStyle = "font-style: italic;"; %>
+    <tr style="<%= rowStyle %>>">
         <td><%= payable.getPayee().getName() %></td>
         <td><%= payable.getActAmount() == null ? payable.getEstAmount() : payable.getActAmount() %></td>
         <td><%= payable.getActDueDate() == null ? payable.getEstDueDate() : payable.getActDueDate() %></td>
