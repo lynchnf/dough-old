@@ -1,7 +1,9 @@
 package name.mutant.dough.servlet;
 
 import name.mutant.dough.DoughException;
+import name.mutant.dough.service.AcctService;
 import name.mutant.dough.service.PayableService;
+import name.mutant.dough.service.dto.AcctBalance;
 import name.mutant.dough.service.filter.request.PayableFilterRequest;
 import name.mutant.dough.service.filter.request.PayableOrderByField;
 import name.mutant.dough.service.filter.response.PayableFilterResponse;
@@ -40,6 +42,14 @@ public class DashboardLoad extends HttpServlet {
             errors.add(e.getMessage());
         }
         req.setAttribute("payableResultList", payableFilterResponse.getResultList());
+
+        List<AcctBalance> acctBalances = new ArrayList<>();
+        try {
+            acctBalances.addAll(AcctService.getAcctBalances());
+        } catch (DoughException e) {
+            errors.add(e.getMessage());
+        }
+        req.setAttribute("acctBalances", acctBalances);
 
         // Go to next page.
         req.setAttribute("errors", errors);

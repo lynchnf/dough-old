@@ -36,5 +36,25 @@
     <% } %>
 </table>
 
+<table border="1">
+    <tr>
+        <th>Acct Id</th>
+        <th>Acct Name</th>
+        <th>Acct Type</th>
+        <th>Balance</th>
+        <th>Last Tran Date</th>
+    </tr>
+    <% java.util.List<name.mutant.dough.service.dto.AcctBalance> acctBalances = (java.util.List<name.mutant.dough.service.dto.AcctBalance>) request.getAttribute("acctBalances");
+        for (name.mutant.dough.service.dto.AcctBalance acctBalance : acctBalances) { %>
+    <tr>
+        <td><%= acctBalance.getAcctId() %></td>
+        <td><%= acctBalance.getAcctName() %></td>
+        <td><%= acctBalance.getAcctType() %></td>
+        <td><%= acctBalance.getBalance() %></td>
+        <td><%= acctBalance.getLastTranDate() %></td>
+    </tr>
+    <% } %>
+</table>
+
 </body>
 </html>
