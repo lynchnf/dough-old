@@ -40,7 +40,7 @@ import java.util.ResourceBundle;
  */
 public abstract class BaseService {
     private static final Logger LOG = LogManager.getLogger();
-    private static ResourceBundle appBundle = ResourceBundle.getBundle("application");
+    protected static ResourceBundle appBundle = ResourceBundle.getBundle("application");
     private static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(appBundle.getString("persistence.unit.name"));
     private static ThreadLocal<EntityManager> currentEntityManager = new ThreadLocal<>();
 

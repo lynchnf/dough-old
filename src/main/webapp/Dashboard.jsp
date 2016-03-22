@@ -20,18 +20,27 @@
 
 <table border="1">
     <tr>
+        <th>Payable Id</th>
         <th>Payee Name</th>
-        <th>Amount Due</th>
+        <th>Amount</th>
         <th>Due Date</th>
     </tr>
-    <% java.util.List<name.mutant.dough.domain.Payable> payableResultList = (java.util.List<name.mutant.dough.domain.Payable>) request.getAttribute("payableResultList");
-        for (name.mutant.dough.domain.Payable payable : payableResultList) {
-            String rowStyle = "font-style: normal;";
-            if (payable.getActDueDate() == null) rowStyle = "font-style: italic;"; %>
-    <tr style="<%= rowStyle %>>">
-        <td><%= payable.getPayee().getName() %></td>
-        <td><%= payable.getActAmount() == null ? payable.getEstAmount() : payable.getActAmount() %></td>
-        <td><%= payable.getActDueDate() == null ? payable.getEstDueDate() : payable.getActDueDate() %></td>
+    <% java.util.List<name.mutant.dough.service.dto.BillToPay> payableResultList = (java.util.List<name.mutant.dough.service.dto.BillToPay>) request.getAttribute("billsToPay");
+        for (name.mutant.dough.service.dto.BillToPay billToPay : payableResultList) {
+            String style = "font-style: italic;";
+            if (billToPay.isActual()) {
+                style = "font-style: normal;";
+            }
+            if (billToPay.isOverDue()) {
+                style += " color: red;";
+            } else if (billToPay.isAlmostDue()) {
+                style += " color: orange;";
+            } %>
+    <tr style="<%= style %>">
+        <td><%= billToPay.getPayableId() %></td>
+        <td><%= billToPay.getPayeeName() %></td>
+        <td><%= billToPay.getAmount() %></td>
+        <td><%= billToPay.getDueDate() %></td>
     </tr>
     <% } %>
 </table>

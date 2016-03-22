@@ -4,6 +4,7 @@ import name.mutant.dough.DoughException;
 import name.mutant.dough.service.AcctService;
 import name.mutant.dough.service.PayableService;
 import name.mutant.dough.service.dto.AcctBalance;
+import name.mutant.dough.service.dto.BillToPay;
 import name.mutant.dough.service.filter.request.PayableFilterRequest;
 import name.mutant.dough.service.filter.request.PayableOrderByField;
 import name.mutant.dough.service.filter.response.PayableFilterResponse;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DashboardLoad extends HttpServlet {
@@ -31,17 +33,13 @@ public class DashboardLoad extends HttpServlet {
         List<String> messages = (List<String>) req.getAttribute("messages");
         if (messages == null) messages = new ArrayList<>();
 
-        PayableFilterRequest payableFilterRequest = new PayableFilterRequest();
-        payableFilterRequest.setWherePaid(false);
-        payableFilterRequest.setOrderByField(PayableOrderByField.DUE_DATE);
-        payableFilterRequest.setMax(-1);
-        PayableFilterResponse payableFilterResponse = null;
+        List<BillToPay> billsToPay = new ArrayList<>();
         try {
-            payableFilterResponse = PayableService.filterPayables(payableFilterRequest);
+            billsToPay.addAll(PayableService.getBillsToPay(new Date()));
         } catch (DoughException e) {
             errors.add(e.getMessage());
         }
-        req.setAttribute("payableResultList", payableFilterResponse.getResultList());
+        req.setAttribute("billsToPay", billsToPay);
 
         List<AcctBalance> acctBalances = new ArrayList<>();
         try {

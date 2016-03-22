@@ -5,6 +5,8 @@ import name.mutant.dough.domain.Payable;
 import name.mutant.dough.domain.Payable_;
 import name.mutant.dough.domain.Payee;
 import name.mutant.dough.domain.Payee_;
+import name.mutant.dough.service.dto.BillToPay;
+import name.mutant.dough.service.filter.request.OrderByDirection;
 import name.mutant.dough.service.filter.request.PayableFilterRequest;
 import name.mutant.dough.service.filter.request.PayableOrderByField;
 import name.mutant.dough.service.filter.response.PayableFilterResponse;
@@ -14,18 +16,8 @@ import org.quartz.CronExpression;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import javax.persistence.criteria.*;
+import java.util.*;
 
 public class PayableService extends BaseService {
     private static final Logger LOG = LogManager.getLogger();
@@ -226,10 +218,6 @@ public class PayableService extends BaseService {
                 if (request.getFirst() > 0) query.setFirstResult(request.getFirst());
                 if (request.getMax() >= 0) query.setMaxResults(request.getMax());
                 List<Payable> resultList = query.getResultList();
-                // Instantiate payee name.
-                for (Payable result : resultList) {
-                    result.getPayee().getName();
-                }
                 response.setResultList(resultList);
 
                 // Get total record count.
@@ -241,6 +229,47 @@ public class PayableService extends BaseService {
 
             public String getErrorMessage() {
                 return "Error reading payables with filter request=\"" + request + "\".";
+            }
+        };
+        return doWithEntityManager(function);
+    }
+
+    public static List<BillToPay> getBillsToPay(Date today) throws DoughException {
+        DaoFunction<List<BillToPay>> function = new DaoFunction<List<BillToPay>>() {
+            public List<BillToPay> doFunction(EntityManager entityManager) throws Exception {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(today);
+                try {
+                    cal.add(Calendar.DATE, Integer.parseInt(appBundle.getString("almost.due.days")));
+                } catch (NumberFormatException e) {
+                    cal.add(Calendar.DATE, 10);
+                } catch (MissingResourceException e) {
+                    cal.add(Calendar.DATE, 10);
+                }
+                Date almost = cal.getTime();
+                PayableFilterRequest request = new PayableFilterRequest();
+                request.setWherePaid(Boolean.FALSE);
+                request.setOrderByField(PayableOrderByField.DUE_DATE);
+                request.setOrderByDirection(OrderByDirection.ASC);
+                request.setMax(-1);
+                PayableFilterResponse response = filterPayables(request);
+                List<BillToPay> billsToPay = new ArrayList<>();
+                for (Payable result : response.getResultList()) {
+                    BillToPay billToPay = new BillToPay();
+                    billToPay.setPayableId(result.getId());
+                    billToPay.setPayeeName(result.getPayee().getName());
+                    billToPay.setDueDate(result.getActDueDate() == null ? result.getEstDueDate() : result.getActDueDate());
+                    billToPay.setAmount(result.getActAmount() == null ? result.getEstAmount() : result.getActAmount());
+                    billToPay.setActual(result.getActDueDate() != null);
+                    billToPay.setOverDue(billToPay.getDueDate().before(today));
+                    billToPay.setAlmostDue(billToPay.getDueDate().before(almost));
+                    billsToPay.add(billToPay);
+                }
+                return billsToPay;
+            }
+
+            public String getErrorMessage() {
+                return "Error getting bills to pay with date =\"" + today + "\".";
             }
         };
         return doWithEntityManager(function);
