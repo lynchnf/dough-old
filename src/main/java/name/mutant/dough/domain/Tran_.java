@@ -12,8 +12,10 @@ public abstract class Tran_ {
     public static volatile SingularAttribute<Tran, Acct> acct;
     public static volatile SingularAttribute<Tran, TranType> type;
     public static volatile SingularAttribute<Tran, Date> postDate;
+    public static volatile SingularAttribute<Tran, Date> userDate;
     public static volatile SingularAttribute<Tran, BigDecimal> amount;
     public static volatile SingularAttribute<Tran, String> fitId;
+    public static volatile SingularAttribute<Tran, String> sic;
     public static volatile SingularAttribute<Tran, String> checkNumber;
     public static volatile SingularAttribute<Tran, String> name;
     public static volatile SingularAttribute<Tran, String> memo;

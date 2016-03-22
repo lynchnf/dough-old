@@ -50,8 +50,10 @@ public class OfxService extends BaseService {
     private static final String STMTTRN_END = "</STMTTRN>";
     private static final String TRNTYPE = "<TRNTYPE>";
     private static final String DTPOSTED = "<DTPOSTED>";
+    private static final String DTUSER = "<DTUSER>";
     private static final String TRNAMT = "<TRNAMT>";
     private static final String FITID = "<FITID>";
+    private static final String SIC = "<SIC>";
     private static final String CHECKNUM = "<CHECKNUM>";
     private static final String CORRECTFITID = "<CORRECTFITID>";
     private static final String CORRECTACTION = "<CORRECTACTION>";
@@ -108,9 +110,13 @@ public class OfxService extends BaseService {
                         BadToken(state, line);
                     } else if (line.contains(DTPOSTED)) {
                         BadToken(state, line);
+                    } else if (line.contains(DTUSER)) {
+                        BadToken(state, line);
                     } else if (line.contains(TRNAMT)) {
                         BadToken(state, line);
                     } else if (line.contains(FITID)) {
+                        BadToken(state, line);
+                    } else if (line.contains(SIC)) {
                         BadToken(state, line);
                     } else if (line.contains(CHECKNUM)) {
                         BadToken(state, line);
@@ -160,9 +166,13 @@ public class OfxService extends BaseService {
                         BadToken(state, line);
                     } else if (line.contains(DTPOSTED)) {
                         BadToken(state, line);
+                    } else if (line.contains(DTUSER)) {
+                        BadToken(state, line);
                     } else if (line.contains(TRNAMT)) {
                         BadToken(state, line);
                     } else if (line.contains(FITID)) {
+                        BadToken(state, line);
+                    } else if (line.contains(SIC)) {
                         BadToken(state, line);
                     } else if (line.contains(CHECKNUM)) {
                         BadToken(state, line);
@@ -216,9 +226,13 @@ public class OfxService extends BaseService {
                         BadToken(state, line);
                     } else if (line.contains(DTPOSTED)) {
                         BadToken(state, line);
+                    } else if (line.contains(DTUSER)) {
+                        BadToken(state, line);
                     } else if (line.contains(TRNAMT)) {
                         BadToken(state, line);
                     } else if (line.contains(FITID)) {
+                        BadToken(state, line);
+                    } else if (line.contains(SIC)) {
                         BadToken(state, line);
                     } else if (line.contains(CHECKNUM)) {
                         BadToken(state, line);
@@ -269,9 +283,13 @@ public class OfxService extends BaseService {
                         BadToken(state, line);
                     } else if (line.contains(DTPOSTED)) {
                         BadToken(state, line);
+                    } else if (line.contains(DTUSER)) {
+                        BadToken(state, line);
                     } else if (line.contains(TRNAMT)) {
                         BadToken(state, line);
                     } else if (line.contains(FITID)) {
+                        BadToken(state, line);
+                    } else if (line.contains(SIC)) {
                         BadToken(state, line);
                     } else if (line.contains(CHECKNUM)) {
                         BadToken(state, line);
@@ -322,9 +340,13 @@ public class OfxService extends BaseService {
                         BadToken(state, line);
                     } else if (line.contains(DTPOSTED)) {
                         BadToken(state, line);
+                    } else if (line.contains(DTUSER)) {
+                        BadToken(state, line);
                     } else if (line.contains(TRNAMT)) {
                         BadToken(state, line);
                     } else if (line.contains(FITID)) {
+                        BadToken(state, line);
+                    } else if (line.contains(SIC)) {
                         BadToken(state, line);
                     } else if (line.contains(CHECKNUM)) {
                         BadToken(state, line);
@@ -380,7 +402,18 @@ public class OfxService extends BaseService {
                             int idx = response.getOfxStmtTrans().size() - 1;
                             response.getOfxStmtTrans().get(idx).setPostDate(d);
                         } catch (ParseException e) {
-                            String msg = "Error parsing date in line=\"" + line + "\".";
+                            String msg = "Error parsing post date in line=\"" + line + "\".";
+                            LOG.error(msg, e);
+                            throw new DoughException(msg, e);
+                        }
+                    } else if (line.contains(DTUSER)) {
+                        String s = StringUtils.substringAfter(line, DTUSER);
+                        try {
+                            Date d = DF.parse(s.substring(0, 14));
+                            int idx = response.getOfxStmtTrans().size() - 1;
+                            response.getOfxStmtTrans().get(idx).setUserDate(d);
+                        } catch (ParseException e) {
+                            String msg = "Error parsing user date in line=\"" + line + "\".";
                             LOG.error(msg, e);
                             throw new DoughException(msg, e);
                         }
@@ -393,6 +426,10 @@ public class OfxService extends BaseService {
                         String s = StringUtils.substringAfter(line, FITID);
                         int idx = response.getOfxStmtTrans().size() - 1;
                         response.getOfxStmtTrans().get(idx).setFitId(s);
+                    } else if (line.contains(SIC)) {
+                        String s = StringUtils.substringAfter(line, SIC);
+                        int idx = response.getOfxStmtTrans().size() - 1;
+                        response.getOfxStmtTrans().get(idx).setSic(s);
                     } else if (line.contains(CHECKNUM)) {
                         String s = StringUtils.substringAfter(line, CHECKNUM);
                         int idx = response.getOfxStmtTrans().size() - 1;
@@ -465,8 +502,10 @@ public class OfxService extends BaseService {
                 tran.setAcct(acct);
                 tran.setType(ofxStmtTran.getType());
                 tran.setPostDate(ofxStmtTran.getPostDate());
+                tran.setUserDate(ofxStmtTran.getUserDate());
                 tran.setAmount(ofxStmtTran.getAmount());
                 tran.setFitId(ofxStmtTran.getFitId());
+                tran.setSic(ofxStmtTran.getSic());
                 tran.setCheckNumber(ofxStmtTran.getCheckNumber());
                 tran.setName(ofxStmtTran.getName());
                 tran.setMemo(ofxStmtTran.getMemo());

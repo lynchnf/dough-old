@@ -28,8 +28,10 @@ public class Tran implements Serializable {
     private Acct acct;
     private TranType type;
     private Date postDate;
+    private Date userDate;
     private BigDecimal amount;
     private String fitId;
+    private String sic;
     private String checkNumber;
     private String name;
     private String memo;
@@ -85,6 +87,16 @@ public class Tran implements Serializable {
         this.postDate = postDate;
     }
 
+    @Column(name = "USER_DATE")
+    @Temporal(TemporalType.DATE)
+    public Date getUserDate() {
+        return userDate;
+    }
+
+    public void setUserDate(Date userDate) {
+        this.userDate = userDate;
+    }
+
     @Column(name = "AMOUNT", precision = 9, scale = 2)
     public BigDecimal getAmount() {
         return amount;
@@ -94,13 +106,22 @@ public class Tran implements Serializable {
         this.amount = amount;
     }
 
-    @Column(name = "FITID", length = 50, nullable = false)
+    @Column(name = "FITID", length = 100, nullable = false)
     public String getFitId() {
         return fitId;
     }
 
     public void setFitId(String fitId) {
         this.fitId = fitId;
+    }
+
+    @Column(name = "SIC", length = 10)
+    public String getSic() {
+        return sic;
+    }
+
+    public void setSic(String sic) {
+        this.sic = sic;
     }
 
     @Column(name = "CHECK_NUMBER", length = 10)

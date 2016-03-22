@@ -8,8 +8,10 @@ import java.util.Date;
 public class OfxStmtTran {
     private TranType type;
     private Date postDate;
+    private Date userDate;
     private BigDecimal amount;
     private String fitId;
+    private String sic;
     private String checkNumber;
     private String correctFitId;
     private CorrectAction correctAction;
@@ -32,6 +34,14 @@ public class OfxStmtTran {
         this.postDate = postDate;
     }
 
+    public Date getUserDate() {
+        return userDate;
+    }
+
+    public void setUserDate(Date userDate) {
+        this.userDate = userDate;
+    }
+
     public BigDecimal getAmount() {
         return amount;
     }
@@ -46,6 +56,14 @@ public class OfxStmtTran {
 
     public void setFitId(String fitId) {
         this.fitId = fitId;
+    }
+
+    public String getSic() {
+        return sic;
+    }
+
+    public void setSic(String sic) {
+        this.sic = sic;
     }
 
     public String getCheckNumber() {
