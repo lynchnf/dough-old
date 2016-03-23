@@ -80,7 +80,7 @@ public class Payee implements Serializable {
         this.type = type;
     }
 
-    @Column(name = "CRON_EXPRESSION", length = 20)
+    @Column(name = "CRON_EXPRESSION", length = 50)
     public String getCronExpression() {
         return cronExpression;
     }
