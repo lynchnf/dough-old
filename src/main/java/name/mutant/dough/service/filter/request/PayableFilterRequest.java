@@ -80,58 +80,18 @@ public class PayableFilterRequest extends BaseFilterRequest {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("PayableFilterRequest [");
-        if (wherePayeeIdEq != null) {
-            builder.append("wherePayeeIdEq=");
-            builder.append(wherePayeeIdEq);
-            builder.append(", ");
-        }
-        if (whereDueDateAfter != null) {
-            builder.append("whereDueDateAfter=");
-            builder.append(whereDueDateAfter);
-            builder.append(", ");
-        }
-        if (whereDueDateBefore != null) {
-            builder.append("whereDueDateBefore=");
-            builder.append(whereDueDateBefore);
-            builder.append(", ");
-        }
-        if (whereMemoLike != null) {
-            builder.append("whereMemoLike=");
-            builder.append(whereMemoLike);
-            builder.append(", ");
-        }
-        if (whereActual != null) {
-            builder.append("whereActual=");
-            builder.append(whereActual);
-            builder.append(", ");
-        }
-        if (wherePaid != null) {
-            builder.append("wherePaid=");
-            builder.append(wherePaid);
-            builder.append(", ");
-        }
-        if (whereNoBill != null) {
-            builder.append("whereNoBill=");
-            builder.append(whereNoBill);
-            builder.append(", ");
-        }
-        if (orderByField != null) {
-            builder.append("orderByField=");
-            builder.append(orderByField);
-            builder.append(", ");
-        }
-        if (orderByDirection != null) {
-            builder.append("orderByDirection=");
-            builder.append(orderByDirection);
-            builder.append(", ");
-        }
-        builder.append("first=");
-        builder.append(first);
-        builder.append(", max=");
-        builder.append(max);
-        builder.append("]");
-        return builder.toString();
+        final StringBuilder sb = new StringBuilder("PayableFilterRequest{");
+        if (wherePayeeIdEq != null) sb.append("wherePayeeIdEq=").append(wherePayeeIdEq).append(", ");
+        if (whereDueDateAfter != null) sb.append("whereDueDateAfter=").append(whereDueDateAfter).append(", ");
+        if (whereDueDateBefore != null) sb.append("whereDueDateBefore=").append(whereDueDateBefore).append(", ");
+        if (whereMemoLike != null) sb.append("whereMemoLike='").append(whereMemoLike).append('\'').append(", ");
+        if (whereActual != null) sb.append("whereActual=").append(whereActual).append(", ");
+        if (wherePaid != null) sb.append("wherePaid=").append(wherePaid).append(", ");
+        if (whereNoBill != null) sb.append("whereNoBill=").append(whereNoBill).append(", ");
+        sb.append("orderByField=").append(orderByField).append(", ");
+        sb.append("orderByDirection=").append(orderByDirection).append(", ");
+        sb.append("first=").append(first).append(", ");
+        sb.append("max=").append(max).append('}');
+        return sb.toString();
     }
 }

@@ -73,7 +73,7 @@ public class PayableService extends BaseService {
                 cq2.select(cb.count(payable));
 
                 // Where ...
-                Collection<Predicate> whereCollection = new HashSet<Predicate>();
+                Collection<Predicate> whereCollection = new HashSet<>();
                 if (request.getWherePayeeIdEq() != null) {
                     Predicate payeeIdEq = cb.equal(payee.get(Payee_.id), request.getWherePayeeIdEq());
                     whereCollection.add(payeeIdEq);

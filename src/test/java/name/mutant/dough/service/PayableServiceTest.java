@@ -26,13 +26,13 @@ public class PayableServiceTest {
     private static final String READ_PAYABLE_MEMO = "read ice";
     private static final Long SAVE_PAYABLE_ID = Long.valueOf(1897);
     private static final String SAVE_PAYABLE_MEMO = "save ehm";
+    private static final Long[] FILTER_PAYABLE_ID = {Long.valueOf(9912), Long.valueOf(5579), Long.valueOf(1171)};
+    private static final String[] FILTER_PAYABLE_MEMO = {"filter ufv", "filter nwc", "filter ssh"};
     private static final Long SCHEDULE_PAYEE_ID = new Long(6962);
     private static final String SCHEDULE_CRON_EXPRESSION = "0 0 0 20 * ?";
     private static final String SCHEDULE_EST_AMOUNT = "38.59";
     private static final String SCHEDULE_TODAY = "2016-02-15";
     private static final String[] SCHEDULE_EST_DUE_DATE = {"2016-02-20", "2016-03-20"};
-    private static final Long[] FILTER_PAYABLE_ID = {Long.valueOf(9912), Long.valueOf(5579), Long.valueOf(1171)};
-    private static final String[] FILTER_PAYABLE_MEMO = {"filter ufv", "filter nwc", "filter ssh"};
     private static final String BILL_TO_PAY_TODAY = "2016-01-01";
     private static final Long[] BILL_TO_PAY_ID = {Long.valueOf(6730), Long.valueOf(5376), Long.valueOf(1897), Long.valueOf(7655), Long.valueOf(1483), Long.valueOf(9912), Long.valueOf(1171), Long.valueOf(5676), Long.valueOf(2949), Long.valueOf(4577), Long.valueOf(4440), Long.valueOf(6307)};
     private static final String[] BILL_TO_PAY_NAME = {"filter tna", "read dxk", "save jog", "filter tqi", "filter agy", "filter agy", "filter ahq", "filter gsi", "filter lvy", "cron wtp", "filter wli", "filter leo"};
@@ -93,6 +93,7 @@ public class PayableServiceTest {
         request.setWhereMemoLike("filter"); // select only memos containing "filter"
         request.setWherePaid(Boolean.FALSE); // select only unpaid
         PayableFilterResponse response = PayableService.filterPayables(request);
+/*
         List<Payable> resultList = response.getResultList(); // DEBUG
         System.out.println("Test Filter Payables"); // DEBUG
         for (int i = 0; i < resultList.size(); i++) { // DEBUG
@@ -106,6 +107,7 @@ public class PayableServiceTest {
                     (resultList.get(i).getPaidDate() == null ? null : DATE_FORMAT.format(resultList.get(i).getPaidDate())) + "\", \"" +
                     resultList.get(i).getPaidAmount() + "\""); // DEBUG
         } // DEBUG
+*/
 
         // There should be ten unpaid records with names containing "filter".
         assertEquals(Long.valueOf(10), response.getCount());

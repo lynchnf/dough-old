@@ -4,6 +4,10 @@ import name.mutant.dough.DoughException;
 import name.mutant.dough.domain.Acct;
 import name.mutant.dough.domain.AcctType;
 import name.mutant.dough.service.dto.AcctBalance;
+import name.mutant.dough.service.filter.request.AcctFilterRequest;
+import name.mutant.dough.service.filter.request.AcctOrderByField;
+import name.mutant.dough.service.filter.request.OrderByDirection;
+import name.mutant.dough.service.filter.response.AcctFilterResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -14,7 +18,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class AcctServiceTest {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -22,6 +30,8 @@ public class AcctServiceTest {
     private static final String READ_ACCT_NAME = "read ira";
     private static final Long SAVE_ACCT_ID = Long.valueOf(2401);
     private static final String SAVE_ACCT_NAME = "save uju";
+    private static final Long[] FILTER_ACCT_ID = {Long.valueOf(7949), Long.valueOf(6251), Long.valueOf(5621)};
+    private static final String[] FILTER_ACCT_NAME = {"filter htv", "filter sds", "filter khv"};
     private static final String READ_FID = "1111";
     private static final String READ_OFX_ACCT_ID = "4094";
     private static final Long ACCT_BALANCE_ID = Long.valueOf(7399);
@@ -85,6 +95,41 @@ public class AcctServiceTest {
     }
 
     @Test
+    public void testFilterAccts() throws Exception {
+        // Set up our filter request.
+        AcctFilterRequest request = new AcctFilterRequest();
+        request.setMax(3); // three records per page
+        request.setFirst(3); // show second page
+        request.setOrderByField(AcctOrderByField.FID); // sort by fid
+        request.setOrderByDirection(OrderByDirection.ASC); // sort fowards
+        request.setWhereNameLike("filter"); // select only names containing "filter"
+        AcctFilterResponse response = AcctService.filterAccts(request);
+/*
+        System.out.println("Test Filter Accts"); // DEBUG
+        System.out.println("idx    id  name        fid   ofx acct"); // DEBUG
+        List<Acct> resultList = response.getResultList(); // DEBUG
+        for (int i = 0; i < resultList.size(); i++) { // DEBUG
+            System.out.printf(" %2d  %4s  %-10s  %s  %s%n",
+                    i,
+                    resultList.get(i).getId(),
+                    resultList.get(i).getName(),
+                    resultList.get(i).getFid(),
+                    resultList.get(i).getOfxAcctId()); // DEBUG
+        } // DEBUG
+*/
+
+        // There should be ten records with names containing "filter".
+        assertEquals(Long.valueOf(10), response.getCount());
+
+        // We should fetch the fourth to sixth records in fid order.
+        assertEquals(FILTER_ACCT_ID.length, response.getResultList().size());
+        for (int i = 0; i < response.getResultList().size(); i++) {
+            assertEquals(FILTER_ACCT_ID[i], response.getResultList().get(i).getId());
+            assertEquals(FILTER_ACCT_NAME[i], response.getResultList().get(i).getName());
+        }
+    }
+
+    @Test
     public void testReadAcctByFidAndOfxAcctId() throws Exception {
         Acct acct = AcctService.readAcctByFidAndOfxAcctId(READ_FID, READ_OFX_ACCT_ID);
         assertNotNull(acct);
@@ -95,20 +140,26 @@ public class AcctServiceTest {
     public void testGetAcctBalances() throws Exception {
         List<AcctBalance> resultList = AcctService.getAcctBalances();
 /*
+        System.out.println("Test Filter Accts"); // DEBUG
+        System.out.println("idx    id  name              type        balance  last"); // DEBUG
+        NumberFormat curFormat = NumberFormat.getCurrencyInstance(); // DEBUG
         for (int i = 0; i < resultList.size(); i++) { // DEBUG
-            System.out.println("resultList[" + i + "]=\"" +
-                    resultList.get(i).getAcctId() + "\", \"" +
-                    resultList.get(i).getAcctName() + "\", \"" +
-                    resultList.get(i).getAcctType() + "\", \"" +
-                    resultList.get(i).getBalance() + "\", \"" +
-                    resultList.get(i).getLastTranDate() + "\""); // DEBUG
+            System.out.printf(" %2d  %4s  %-16s  %-8s  %9s  %-10s%n",
+                    i,
+                    resultList.get(i).getAcctId(),
+                    resultList.get(i).getAcctName(),
+                    resultList.get(i).getAcctType(),
+                    curFormat.format(resultList.get(i).getBalance()),
+                    resultList.get(i).getLastTranDate()); // DEBUG
         } // DEBUG
 */
-        assertEquals(3, resultList.size());
-        assertEquals(ACCT_BALANCE_ID, resultList.get(2).getAcctId());
-        assertEquals(ACCT_BALANCE_NAME, resultList.get(2).getAcctName());
-        assertEquals(ACCT_BALANCE_TYPE, resultList.get(2).getAcctType());
-        assertEquals(ACCT_BALANCE_AMT, resultList.get(2).getBalance().toPlainString());
-        assertEquals(ACCT_BALANCE_DATE, DATE_FORMAT.format(resultList.get(2).getLastTranDate()));
+
+        assertEquals(13, resultList.size());
+        AcctBalance last = resultList.get(resultList.size() - 1);
+        assertEquals(ACCT_BALANCE_ID, last.getAcctId());
+        assertEquals(ACCT_BALANCE_NAME, last.getAcctName());
+        assertEquals(ACCT_BALANCE_TYPE, last.getAcctType());
+        assertEquals(ACCT_BALANCE_AMT, last.getBalance().toPlainString());
+        assertEquals(ACCT_BALANCE_DATE, DATE_FORMAT.format(last.getLastTranDate()));
     }
 }

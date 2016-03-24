@@ -3,9 +3,13 @@ package name.mutant.dough.service;
 import name.mutant.dough.DoughException;
 import name.mutant.dough.domain.Acct;
 import name.mutant.dough.domain.Acct_;
+import name.mutant.dough.domain.Payable_;
 import name.mutant.dough.domain.Tran;
 import name.mutant.dough.service.dto.AcctBalance;
+import name.mutant.dough.service.filter.request.AcctFilterRequest;
+import name.mutant.dough.service.filter.request.AcctOrderByField;
 import name.mutant.dough.service.filter.request.OrderByDirection;
+import name.mutant.dough.service.filter.response.AcctFilterResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,7 +18,9 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 public class AcctService extends BaseService {
@@ -55,6 +61,105 @@ public class AcctService extends BaseService {
             }
         };
         return doInTransaction(function);
+    }
+
+    public static AcctFilterResponse filterAccts(AcctFilterRequest request) throws DoughException {
+        DaoFunction<AcctFilterResponse> function = new DaoFunction<AcctFilterResponse>() {
+            public AcctFilterResponse doFunction(EntityManager entityManager) throws Exception {
+                // Select ...
+                CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+                CriteriaQuery<Acct> cq = cb.createQuery(Acct.class);
+                CriteriaQuery<Long> cq2 = cb.createQuery(Long.class);
+                Root<Acct> acct = cq.from(Acct.class);
+                cq2.from(Acct.class);
+                cq.select(acct);
+                cq2.select(cb.count(acct));
+
+                // Where ...
+                Collection<Predicate> whereCollection = new HashSet<>();
+                if (request.getWhereAcctNbrEq() != null) {
+                    Predicate whereAcctNbrEq = cb.equal(acct.get(Acct_.acctNbr), request.getWhereAcctNbrEq());
+                    whereCollection.add(whereAcctNbrEq);
+                }
+                if (request.getWhereNameLike() != null) {
+                    Expression<String> lowerName = cb.lower(acct.get(Acct_.name));
+                    String pattern = "%" + request.getWhereNameLike().toLowerCase() + "%";
+                    Predicate whereNameLike = cb.like(lowerName, pattern);
+                    whereCollection.add(whereNameLike);
+                }
+                if (request.getWhereOrganizationLike() != null) {
+                    Expression<String> lowerOrganization = cb.lower(acct.get(Acct_.organization));
+                    String pattern = "%" + request.getWhereOrganizationLike().toLowerCase() + "%";
+                    Predicate whereOrganizationLike = cb.like(lowerOrganization, pattern);
+                    whereCollection.add(whereOrganizationLike);
+                }
+                if (request.getWhereFidEq() != null) {
+                    Predicate whereFidEq = cb.equal(acct.get(Acct_.fid), request.getWhereFidEq());
+                    whereCollection.add(whereFidEq);
+                }
+                if (request.getWhereOfxBankIdEq() != null) {
+                    Predicate whereOfxBankIdEq = cb.equal(acct.get(Acct_.ofxBankId), request.getWhereOfxBankIdEq());
+                    whereCollection.add(whereOfxBankIdEq);
+                }
+                if (request.getWhereOfxAcctIdEq() != null) {
+                    Predicate whereOfxAcctIdEq = cb.equal(acct.get(Acct_.ofxAcctId), request.getWhereOfxAcctIdEq());
+                    whereCollection.add(whereOfxAcctIdEq);
+                }
+                if (request.getWhereTypeEq() != null) {
+                    Predicate whereTypeEq = cb.equal(acct.get(Acct_.type), request.getWhereTypeEq());
+                    whereCollection.add(whereTypeEq);
+                }
+                attachWhereToQueries(whereCollection, cq, cq2);
+
+                // Order by ...
+                List<Expression<?>> orderByPathList = new ArrayList<>();
+                if (request.getOrderByField() == AcctOrderByField.ACCT_NBR) {
+                    orderByPathList.add(acct.get(Acct_.acctNbr));
+                }
+                if (request.getOrderByField() == AcctOrderByField.NAME) {
+                    orderByPathList.add(acct.get(Acct_.name));
+                }
+                if (request.getOrderByField() == AcctOrderByField.ORGANIZATION) {
+                    orderByPathList.add(acct.get(Acct_.organization));
+                }
+                if (request.getOrderByField() == AcctOrderByField.FID) {
+                    orderByPathList.add(acct.get(Acct_.fid));
+                }
+                if (request.getOrderByField() == AcctOrderByField.OFX_BANK_ID) {
+                    orderByPathList.add(acct.get(Acct_.ofxBankId));
+                }
+                if (request.getOrderByField() == AcctOrderByField.OFX_ACCT_ID) {
+                    orderByPathList.add(acct.get(Acct_.ofxAcctId));
+                }
+                if (request.getOrderByField() == AcctOrderByField.TYPE) {
+                    orderByPathList.add(acct.get(Acct_.type));
+                }
+                // Always order by id.
+                orderByPathList.add(acct.get(Acct_.id));
+                // Ascending or Descending?
+                attachOrderByToQuery(cb, orderByPathList, request.getOrderByDirection(), cq);
+
+                AcctFilterResponse response = new AcctFilterResponse();
+
+                // Get a page of records.
+                TypedQuery<Acct> query = entityManager.createQuery(cq);
+                if (request.getFirst() > 0) query.setFirstResult(request.getFirst());
+                if (request.getMax() >= 0) query.setMaxResults(request.getMax());
+                List<Acct> resultList = query.getResultList();
+                response.setResultList(resultList);
+
+                // Get total record count.
+                TypedQuery<Long> query2 = entityManager.createQuery(cq2);
+                Long count = query2.getSingleResult();
+                response.setCount(count);
+                return response;
+            }
+
+            public String getErrorMessage() {
+                return "Error reading accts with filter request=\"" + request + "\".";
+            }
+        };
+        return doWithEntityManager(function);
     }
 
     public static Acct readAcctByFidAndOfxAcctId(String fid, String ofxAcctId) throws DoughException {
