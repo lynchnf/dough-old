@@ -3,7 +3,6 @@ package name.mutant.dough.service;
 import name.mutant.dough.DoughException;
 import name.mutant.dough.domain.Acct;
 import name.mutant.dough.domain.Acct_;
-import name.mutant.dough.domain.Payable_;
 import name.mutant.dough.domain.Tran;
 import name.mutant.dough.service.dto.AcctBalance;
 import name.mutant.dough.service.filter.request.AcctFilterRequest;
@@ -15,7 +14,11 @@ import org.apache.logging.log4j.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -167,15 +170,11 @@ public class AcctService extends BaseService {
             private String message = "Error reading acct fid=\"" + fid + "\", ofxAcctId=\"" + ofxAcctId + "\".";
 
             public Acct doFunction(EntityManager entityManager) throws Exception {
-                CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-                CriteriaQuery<Acct> cq = cb.createQuery(Acct.class);
-                Root<Acct> acct = cq.from(Acct.class);
-                cq.select(acct);
-                Predicate fidEquals = cb.equal(acct.get(Acct_.fid), fid);
-                Predicate ofxAcctIdEquals = cb.equal(acct.get(Acct_.ofxAcctId), ofxAcctId);
-                cq.where(fidEquals, ofxAcctIdEquals);
-                TypedQuery<Acct> query = entityManager.createQuery(cq);
-                List<Acct> resultList = query.getResultList();
+                AcctFilterRequest request = new AcctFilterRequest();
+                request.setWhereFidEq(fid);
+                request.setWhereOfxAcctIdEq(ofxAcctId);
+                AcctFilterResponse response = filterAccts(request);
+                List<Acct> resultList = response.getResultList();
                 if (resultList.isEmpty()) {
                     return null;
                 } else if (resultList.size() == 1) {
@@ -196,17 +195,14 @@ public class AcctService extends BaseService {
     public static List<AcctBalance> getAcctBalances() throws DoughException {
         DaoFunction<List<AcctBalance>> function = new DaoFunction<List<AcctBalance>>() {
             public List<AcctBalance> doFunction(EntityManager entityManager) throws Exception {
-                CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-                CriteriaQuery<Acct> cq = cb.createQuery(Acct.class);
-                Root<Acct> acct = cq.from(Acct.class);
-                cq.select(acct);
-                List<Expression<?>> orderByPathList = new ArrayList<>();
-                orderByPathList.add(acct.get(Acct_.name));
-                orderByPathList.add(acct.get(Acct_.id));
-                attachOrderByToQuery(cb, orderByPathList, OrderByDirection.ASC, cq);
-                TypedQuery<Acct> query = entityManager.createQuery(cq);
+                AcctFilterRequest request = new AcctFilterRequest();
+                request.setOrderByField(AcctOrderByField.NAME);
+                request.setOrderByDirection(OrderByDirection.ASC);
+                request.setMax(-1);
+                AcctFilterResponse response = filterAccts(request);
+                List<Acct> resultList = response.getResultList();
                 List<AcctBalance> acctBalances = new ArrayList<>();
-                for (Acct result : query.getResultList()) {
+                for (Acct result : resultList) {
                     AcctBalance acctBalance = new AcctBalance();
                     acctBalance.setAcctId(result.getId());
                     acctBalance.setAcctName(result.getName());
