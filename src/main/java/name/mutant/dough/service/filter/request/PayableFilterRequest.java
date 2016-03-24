@@ -11,6 +11,7 @@ public class PayableFilterRequest extends BaseFilterRequest {
     private String whereMemoLike;
     private Boolean whereActual;
     private Boolean wherePaid;
+    private Boolean whereNoBill;
     private PayableOrderByField orderByField = DEFAULT_ORDER_BY_FIELD;
 
     public Long getWherePayeeIdEq() {
@@ -61,6 +62,14 @@ public class PayableFilterRequest extends BaseFilterRequest {
         this.wherePaid = wherePaid;
     }
 
+    public Boolean getWhereNoBill() {
+        return whereNoBill;
+    }
+
+    public void setWhereNoBill(Boolean whereNoBill) {
+        this.whereNoBill = whereNoBill;
+    }
+
     public PayableOrderByField getOrderByField() {
         return orderByField;
     }
@@ -103,7 +112,11 @@ public class PayableFilterRequest extends BaseFilterRequest {
             builder.append(wherePaid);
             builder.append(", ");
         }
-
+        if (whereNoBill != null) {
+            builder.append("whereNoBill=");
+            builder.append(whereNoBill);
+            builder.append(", ");
+        }
         if (orderByField != null) {
             builder.append("orderByField=");
             builder.append(orderByField);

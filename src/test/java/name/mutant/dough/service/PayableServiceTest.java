@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -33,13 +34,13 @@ public class PayableServiceTest {
     private static final Long[] FILTER_PAYABLE_ID = {Long.valueOf(9912), Long.valueOf(5579), Long.valueOf(1171)};
     private static final String[] FILTER_PAYABLE_MEMO = {"filter ufv", "filter nwc", "filter ssh"};
     private static final String BILL_TO_PAY_TODAY = "2016-01-01";
-    private static final Long[] BILL_TO_PAY_ID = {Long.valueOf(6730), Long.valueOf(5376), Long.valueOf(1897), Long.valueOf(7655), Long.valueOf(1483), Long.valueOf(9912), Long.valueOf(5579), Long.valueOf(1171), Long.valueOf(5676), Long.valueOf(2949), Long.valueOf(4577), Long.valueOf(4440), Long.valueOf(6307)};
-    private static final String[] BILL_TO_PAY_NAME = {"filter tna", "read dxk", "save jog", "filter tqi", "filter agy", "filter agy", "filter ahq", "filter ahq", "filter gsi", "filter lvy", "cron wtp", "filter wli", "filter leo"};
-    private static final String[] BILL_TO_PAY_DUE = {"2015-12-25", "2015-12-31", "2016-01-01", "2016-01-03", "2016-01-12", "2016-01-23", "2016-01-24", "2016-01-30", "2016-02-10", "2016-02-15", "2016-02-20", "2016-02-27", "2016-03-04"};
-    private static final String[] BILL_TO_PAY_AMOUNT = {"82.64", "71.58", "42.13", "43.18", "55.99", "25.88", "61.28", "98.42", "60.74", "3.58", "38.59", "60.15", "80.97"};
-    private static final Boolean[] BILL_TO_PAY_ACTUAL = {Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE};
-    private static final Boolean[] BILL_TO_PAY_OVER = {Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE};
-    private static final Boolean[] BILL_TO_PAY_ALMOST = {null, null, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE};
+    private static final Long[] BILL_TO_PAY_ID = {Long.valueOf(6730), Long.valueOf(5376), Long.valueOf(1897), Long.valueOf(7655), Long.valueOf(1483), Long.valueOf(9912), Long.valueOf(1171), Long.valueOf(5676), Long.valueOf(2949), Long.valueOf(4577), Long.valueOf(4440), Long.valueOf(6307)};
+    private static final String[] BILL_TO_PAY_NAME = {"filter tna", "read dxk", "save jog", "filter tqi", "filter agy", "filter agy", "filter ahq", "filter gsi", "filter lvy", "cron wtp", "filter wli", "filter leo"};
+    private static final String[] BILL_TO_PAY_DUE = {"2015-12-25", "2015-12-31", "2016-01-01", "2016-01-03", "2016-01-12", "2016-01-23", "2016-01-30", "2016-02-10", "2016-02-15", "2016-02-20", "2016-02-27", "2016-03-04"};
+    private static final String[] BILL_TO_PAY_AMOUNT = {"82.64", "71.58", "42.13", "43.18", "55.99", "25.88", "98.42", "60.74", "3.58", "38.59", "60.15", "80.97"};
+    private static final Boolean[] BILL_TO_PAY_ACTUAL = {Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE};
+    private static final Boolean[] BILL_TO_PAY_OVER = {Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE};
+    private static final Boolean[] BILL_TO_PAY_ALMOST = {null, null, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE};
 
     @Before
     public void setUp() throws Exception {
@@ -82,6 +83,43 @@ public class PayableServiceTest {
     }
 
     @Test
+    public void testFilterPayables() throws Exception {
+        // Set up our filter request.
+        PayableFilterRequest request = new PayableFilterRequest();
+        request.setMax(3); // three records per page
+        request.setFirst(3); // show second page
+        request.setOrderByField(PayableOrderByField.DUE_DATE); // sort by due date
+        request.setOrderByDirection(OrderByDirection.ASC); // sort fowards
+        request.setWhereMemoLike("filter"); // select only memos containing "filter"
+        request.setWherePaid(Boolean.FALSE); // select only unpaid
+        PayableFilterResponse response = PayableService.filterPayables(request);
+        List<Payable> resultList = response.getResultList(); // DEBUG
+        System.out.println("Test Filter Payables"); // DEBUG
+        for (int i = 0; i < resultList.size(); i++) { // DEBUG
+            System.out.println("resultList[" + i + "]=\"" +
+                    resultList.get(i).getId() + "\", \"" +
+                    DATE_FORMAT.format(resultList.get(i).getEstDueDate()) + "\", \"" +
+                    resultList.get(i).getEstAmount() + "\", \"" +
+                    (resultList.get(i).getActDueDate() == null ? null : DATE_FORMAT.format(resultList.get(i).getActDueDate())) + "\", \"" +
+                    resultList.get(i).getActAmount() + "\", \"" +
+                    resultList.get(i).getMemo() + "\", \"" +
+                    (resultList.get(i).getPaidDate() == null ? null : DATE_FORMAT.format(resultList.get(i).getPaidDate())) + "\", \"" +
+                    resultList.get(i).getPaidAmount() + "\""); // DEBUG
+        } // DEBUG
+
+        // There should be ten unpaid records with names containing "filter".
+        assertEquals(Long.valueOf(10), response.getCount());
+
+        // We should fetch the fourth to sixth records in due date order.
+        assertEquals(FILTER_PAYABLE_ID.length, response.getResultList().size());
+        for (int i = 0; i < response.getResultList().size(); i++) {
+            assertEquals(FILTER_PAYABLE_ID[i], response.getResultList().get(i).getId());
+            assertEquals(FILTER_PAYABLE_MEMO[i], response.getResultList().get(i).getMemo());
+            assertNull(response.getResultList().get(i).getPaidDate());
+        }
+    }
+
+    @Test
     public void testCreateEstimatedPayables() throws Exception {
         // Verify our account exists and has the schedule values we expect.
         Payee payee1 = PayeeService.readPayee(SCHEDULE_PAYEE_ID);
@@ -119,45 +157,8 @@ public class PayableServiceTest {
                 // Verify the new one has the expected values.
                 assertEquals(SCHEDULE_EST_DUE_DATE[1], DATE_FORMAT.format(payable.getEstDueDate()));
                 assertEquals(SCHEDULE_EST_AMOUNT, payable.getEstAmount().toPlainString());
+                assertFalse(payable.getNoBill().booleanValue());
             }
-        }
-    }
-
-    @Test
-    public void testFilterPayables() throws Exception {
-        // Set up our filter request.
-        PayableFilterRequest request = new PayableFilterRequest();
-        request.setMax(3); // three records per page
-        request.setFirst(3); // show second page
-        request.setOrderByField(PayableOrderByField.DUE_DATE); // sort by due date
-        request.setOrderByDirection(OrderByDirection.ASC); // sort fowards
-        request.setWhereMemoLike("filter"); // select only memos containing "filter"
-        request.setWherePaid(Boolean.FALSE); // select only unpaid
-        PayableFilterResponse response = PayableService.filterPayables(request);
-/*
-        List<Payable> resultList = response.getResultList(); // DEBUG
-        for (int i = 0; i < resultList.size(); i++) { // DEBUG
-            System.out.println("resultList[" + i + "]=\"" +
-                    resultList.get(i).getId() + "\", \"" +
-                    DATE_FORMAT.format(resultList.get(i).getEstDueDate()) + "\", \"" +
-                    resultList.get(i).getEstAmount() + "\", \"" +
-                    (resultList.get(i).getActDueDate() == null ? null : DATE_FORMAT.format(resultList.get(i).getActDueDate())) + "\", \"" +
-                    resultList.get(i).getActAmount() + "\", \"" +
-                    resultList.get(i).getMemo() + "\", \"" +
-                    (resultList.get(i).getPaidDate() == null ? null : DATE_FORMAT.format(resultList.get(i).getPaidDate())) + "\", \"" +
-                    resultList.get(i).getPaidAmount() + "\""); // DEBUG
-        } // DEBUG
-*/
-
-        // There should be ten unpaid records with names containing "filter".
-        assertEquals(Long.valueOf(10), response.getCount());
-
-        // We should fetch the fourth to sixth records in due date order.
-        assertEquals(FILTER_PAYABLE_ID.length, response.getResultList().size());
-        for (int i = 0; i < response.getResultList().size(); i++) {
-            assertEquals(FILTER_PAYABLE_ID[i], response.getResultList().get(i).getId());
-            assertEquals(FILTER_PAYABLE_MEMO[i], response.getResultList().get(i).getMemo());
-            assertNull(response.getResultList().get(i).getPaidDate());
         }
     }
 
@@ -166,16 +167,22 @@ public class PayableServiceTest {
         Date today = DATE_FORMAT.parse(BILL_TO_PAY_TODAY);
         List<BillToPay> billsToPay = PayableService.getBillsToPay(today);
         assertEquals(BILL_TO_PAY_ID.length, billsToPay.size());
+/*
+        System.out.println("Test Get Bills To Pay"); // DEBUG
+        System.out.println("idx    id  payee       due date       amt  actual  over  almost"); // DEBUG
+        NumberFormat curFormat = NumberFormat.getCurrencyInstance(); // DEBUG
+*/
         for (int i = 0; i < billsToPay.size(); i++) {
 /*
-            System.out.println("billsToPay[" + i + "]=\"" +
-                    billsToPay.get(i).getPayableId() + "\", \"" +
-                    billsToPay.get(i).getPayeeName() + "\", \"" +
-                    (billsToPay.get(i).getDueDate() == null ? null : DATE_FORMAT.format(billsToPay.get(i).getDueDate())) + "\", \"" +
-                    billsToPay.get(i).getAmount() + "\", \"" +
-                    billsToPay.get(i).isActual() + "\", \"" +
-                    billsToPay.get(i).isOverDue() + "\", \"" +
-                    billsToPay.get(i).isAlmostDue() + "\""); // DEBUG
+            System.out.printf(" %2d  %4s  %-10s  %8s  %6s  %-5b  %-5b  %-5b%n",
+                    i,
+                    billsToPay.get(i).getPayableId(),
+                    billsToPay.get(i).getPayeeName(),
+                    (billsToPay.get(i).getDueDate() == null ? null : DATE_FORMAT.format(billsToPay.get(i).getDueDate())),
+                    curFormat.format(billsToPay.get(i).getAmount()),
+                    billsToPay.get(i).isActual(),
+                    billsToPay.get(i).isOverDue(),
+                    billsToPay.get(i).isAlmostDue()); // DEBUG
 */
             assertEquals(BILL_TO_PAY_ID[i], billsToPay.get(i).getPayableId());
             assertEquals(BILL_TO_PAY_NAME[i], billsToPay.get(i).getPayeeName());
