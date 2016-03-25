@@ -81,36 +81,36 @@ public class AcctService extends BaseService {
                 // Where ...
                 Collection<Predicate> whereCollection = new HashSet<>();
                 if (request.getWhereAcctNbrEq() != null) {
-                    Predicate whereAcctNbrEq = cb.equal(acct.get(Acct_.acctNbr), request.getWhereAcctNbrEq());
-                    whereCollection.add(whereAcctNbrEq);
+                    Predicate acctNbrEq = cb.equal(acct.get(Acct_.acctNbr), request.getWhereAcctNbrEq());
+                    whereCollection.add(acctNbrEq);
                 }
                 if (request.getWhereNameLike() != null) {
                     Expression<String> lowerName = cb.lower(acct.get(Acct_.name));
                     String pattern = "%" + request.getWhereNameLike().toLowerCase() + "%";
-                    Predicate whereNameLike = cb.like(lowerName, pattern);
-                    whereCollection.add(whereNameLike);
+                    Predicate nameLike = cb.like(lowerName, pattern);
+                    whereCollection.add(nameLike);
                 }
                 if (request.getWhereOrganizationLike() != null) {
                     Expression<String> lowerOrganization = cb.lower(acct.get(Acct_.organization));
                     String pattern = "%" + request.getWhereOrganizationLike().toLowerCase() + "%";
-                    Predicate whereOrganizationLike = cb.like(lowerOrganization, pattern);
-                    whereCollection.add(whereOrganizationLike);
+                    Predicate organizationLike = cb.like(lowerOrganization, pattern);
+                    whereCollection.add(organizationLike);
                 }
                 if (request.getWhereFidEq() != null) {
-                    Predicate whereFidEq = cb.equal(acct.get(Acct_.fid), request.getWhereFidEq());
-                    whereCollection.add(whereFidEq);
+                    Predicate fidEq = cb.equal(acct.get(Acct_.fid), request.getWhereFidEq());
+                    whereCollection.add(fidEq);
                 }
                 if (request.getWhereOfxBankIdEq() != null) {
-                    Predicate whereOfxBankIdEq = cb.equal(acct.get(Acct_.ofxBankId), request.getWhereOfxBankIdEq());
-                    whereCollection.add(whereOfxBankIdEq);
+                    Predicate ofxBankIdEq = cb.equal(acct.get(Acct_.ofxBankId), request.getWhereOfxBankIdEq());
+                    whereCollection.add(ofxBankIdEq);
                 }
                 if (request.getWhereOfxAcctIdEq() != null) {
-                    Predicate whereOfxAcctIdEq = cb.equal(acct.get(Acct_.ofxAcctId), request.getWhereOfxAcctIdEq());
-                    whereCollection.add(whereOfxAcctIdEq);
+                    Predicate ofxAcctIdEq = cb.equal(acct.get(Acct_.ofxAcctId), request.getWhereOfxAcctIdEq());
+                    whereCollection.add(ofxAcctIdEq);
                 }
                 if (request.getWhereTypeEq() != null) {
-                    Predicate whereTypeEq = cb.equal(acct.get(Acct_.type), request.getWhereTypeEq());
-                    whereCollection.add(whereTypeEq);
+                    Predicate typeEq = cb.equal(acct.get(Acct_.type), request.getWhereTypeEq());
+                    whereCollection.add(typeEq);
                 }
                 attachWhereToQueries(whereCollection, cq, cq2);
 

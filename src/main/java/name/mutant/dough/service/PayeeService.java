@@ -67,11 +67,11 @@ public class PayeeService extends BaseService {
                 // Select ...
                 CriteriaBuilder cb = entityManager.getCriteriaBuilder();
                 CriteriaQuery<Payee> cq = cb.createQuery(Payee.class);
-                Root<Payee> payee = cq.from(Payee.class);
-                cq.select(payee);
                 CriteriaQuery<Long> cq2 = cb.createQuery(Long.class);
-                Root<Payee> payee2 = cq2.from(Payee.class);
-                cq2.select(cb.count(payee2));
+                Root<Payee> payee = cq.from(Payee.class);
+                cq2.from(Payee.class);
+                cq.select(payee);
+                cq2.select(cb.count(payee));
 
                 // Where ...
                 Collection<Predicate> whereCollection = new HashSet<Predicate>();
