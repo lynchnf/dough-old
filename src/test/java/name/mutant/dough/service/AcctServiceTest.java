@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -34,6 +35,7 @@ public class AcctServiceTest {
     private static final String[] FILTER_ACCT_NAME = {"filter htv", "filter sds", "filter khv"};
     private static final String READ_FID = "1111";
     private static final String READ_OFX_ACCT_ID = "4094";
+    private static final String VALIDATE_OFX_ACCT_ID = "9749";
     private static final Long ACCT_BALANCE_ID = Long.valueOf(7399);
     private static final String ACCT_BALANCE_NAME = "zzz acct balance";
     private static final AcctType ACCT_BALANCE_TYPE = AcctType.CHECKING;
@@ -58,6 +60,19 @@ public class AcctServiceTest {
         Acct acct2 = AcctService.readAcct(READ_ACCT_ID);
         assertNotNull(acct2);
         assertEquals(READ_ACCT_NAME, acct2.getName());
+    }
+
+    @Test
+    public void testValidateSaveAcct() throws Exception {
+        Acct acct = new Acct();
+        acct.setFid(READ_FID);
+        acct.setOfxAcctId(READ_OFX_ACCT_ID);
+        List<String> errors = AcctService.validateSaveAcct(acct);
+        assertFalse(errors.isEmpty());
+
+        acct.setOfxAcctId(VALIDATE_OFX_ACCT_ID);
+        List<String> errors2 = AcctService.validateSaveAcct(acct);
+        assertTrue(errors2.isEmpty());
     }
 
     @Test

@@ -17,10 +17,26 @@
         <servlet-name>DashboardLoad</servlet-name>
         <servlet-class>name.mutant.dough.servlet.DashboardLoad</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AcctEditLoad</servlet-name>
+        <servlet-class>name.mutant.dough.servlet.AcctEditLoad</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AcctEditProcess</servlet-name>
+        <servlet-class>name.mutant.dough.servlet.AcctEditProcess</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>DashboardLoad</servlet-name>
         <url-pattern>/DashboardLoad</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AcctEditLoad</servlet-name>
+        <url-pattern>/AcctEditLoad</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AcctEditProcess</servlet-name>
+        <url-pattern>/AcctEditProcess</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>

@@ -48,7 +48,15 @@ public class AcctService extends BaseService {
     public static List<String> validateSaveAcct(Acct acct) {
         List<String> errors = new ArrayList<>();
 
-        // TODO Business validation rules here.
+        // FID and OFX Acct ID must be unique.
+        try {
+            Acct acct2 = readAcctByFidAndOfxAcctId(acct.getFid(), acct.getOfxAcctId());
+            if (acct2 != null && !acct2.getId().equals(acct.getId())) {
+                errors.add("Another Acct exists with this FID and OFX Acct ID .");
+            }
+        } catch (DoughException e) {
+            errors.add(e.getMessage());
+        }
 
         return errors;
     }
