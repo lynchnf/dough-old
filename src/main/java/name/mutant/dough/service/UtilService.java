@@ -11,28 +11,34 @@ import java.util.ResourceBundle;
 public class UtilService {
     private static final Logger LOG = LogManager.getLogger();
     private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd";
+    private static String dateFormatPattern;
     private static DateFormat dateFormat;
 
     private UtilService() {
     }
 
-    public static DateFormat getDateFormat() {
-        if (dateFormat == null) {
+    public static String getDateFormatPattern() {
+        if (dateFormatPattern == null) {
             ResourceBundle appBundle = ResourceBundle.getBundle("application");
-            String dateFormatPattern = null;
             try {
                 dateFormatPattern = appBundle.getString("date.format.pattern");
             } catch (MissingResourceException e) {
                 LOG.warn("Application property date.format.pattern is missing.");
                 dateFormatPattern = DEFAULT_DATE_FORMAT_PATTERN;
             }
+        }
+        return dateFormatPattern;
+    }
+
+    public static DateFormat getDateFormat() {
+        if (dateFormat == null) {
             try {
-                dateFormat = new SimpleDateFormat(dateFormatPattern);
+                dateFormat = new SimpleDateFormat(getDateFormatPattern());
             } catch (IllegalArgumentException e) {
                 LOG.warn("Application property date.format.pattern is invalid.");
+                dateFormatPattern = DEFAULT_DATE_FORMAT_PATTERN;
                 dateFormat = new SimpleDateFormat("DEFAULT_DATE_FORMAT_PATTERN");
             }
-
         }
         return dateFormat;
     }

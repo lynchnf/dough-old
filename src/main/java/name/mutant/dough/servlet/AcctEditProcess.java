@@ -87,6 +87,7 @@ public class AcctEditProcess extends HttpServlet {
         if (typeStr == null) {
             errors.add("Type is required.");
         } else {
+            LOG.debug("typeStr=\"" + typeStr + "\"");
             acct.setType(AcctType.valueOf(typeStr));
         }
         if (beginBalanceStr == null) {
@@ -96,7 +97,7 @@ public class AcctEditProcess extends HttpServlet {
             try {
                 acct.setBeginDate(dateFormat.parse(beginDateStr));
             } catch (ParseException e) {
-                errors.add("Begin Date is not a valid date in " + dateFormat + " format.");
+                errors.add("Begin Date is not a valid date in " + UtilService.getDateFormatPattern() + " format.");
             }
         }
         if (beginBalanceStr == null) {
@@ -110,14 +111,14 @@ public class AcctEditProcess extends HttpServlet {
                 Number number = numberFormat.parse(beginBalanceStr);
                 acct.setBeginBalance(BigDecimal.valueOf(number.doubleValue()).setScale(2, RoundingMode.HALF_UP));
             } catch (ParseException e) {
-                errors.add("Begin Balance is not a valid number in " + numberFormat + " format.");
+                errors.add("Begin Balance is not a valid amount.");
             }
         }
 
-        List<String> saveErrors = AcctService.validateSaveAcct(acct);
-        if (!saveErrors.isEmpty()) {
-            errors.addAll(saveErrors);
-        } else {
+        if (errors.isEmpty()) {
+            errors.addAll(AcctService.validateSaveAcct(acct));
+        }
+        if (errors.isEmpty()) {
             try {
                 AcctService.saveAcct(acct);
                 messages.add("Acct successfully saved.");
@@ -130,9 +131,22 @@ public class AcctEditProcess extends HttpServlet {
         req.setAttribute("errors", errors);
         req.setAttribute("messages", messages);
         if (errors.isEmpty()) {
-            getServletContext().getRequestDispatcher("/AcctEdit.jsp").forward(req, resp);
+            // TODO Put success message in "flash" somehow.
+            resp.sendRedirect(resp.encodeRedirectURL(req.getContextPath() + "/DashboardLoad"));
         } else {
-            resp.sendRedirect(resp.encodeRedirectURL("/Dashboard.jsp"));
+            req.setAttribute("id", StringUtils.trimToEmpty(idStr));
+            req.setAttribute("version", StringUtils.trimToEmpty(versionStr));
+            req.setAttribute("acctNbr", StringUtils.trimToEmpty(acctNbr));
+            req.setAttribute("name", StringUtils.trimToEmpty(name));
+            req.setAttribute("organization", StringUtils.trimToEmpty(organization));
+            req.setAttribute("fid", StringUtils.trimToEmpty(fid));
+            req.setAttribute("ofxBankId", StringUtils.trimToEmpty(ofxBankId));
+            req.setAttribute("ofxAcctId", StringUtils.trimToEmpty(ofxAcctId));
+            req.setAttribute("type", StringUtils.trimToEmpty(typeStr));
+            req.setAttribute("beginDate", StringUtils.trimToEmpty(beginDateStr));
+            req.setAttribute("beginBalance", StringUtils.trimToEmpty(beginBalanceStr));
+
+            getServletContext().getRequestDispatcher("/AcctEdit.jsp").forward(req, resp);
         }
     }
 }

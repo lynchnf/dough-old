@@ -47,7 +47,19 @@
         </tr>
         <tr>
             <th>Type</th>
-            <td><input type="text" name="type" value="<%= request.getAttribute("type") %>"></td>
+            <td>
+                <select name="type">
+                    <option value="">Please select a type ...</option>
+                    <%  name.mutant.dough.domain.AcctType[] acctTypes = name.mutant.dough.domain.AcctType.values();
+                        for (name.mutant.dough.domain.AcctType acctType : acctTypes) {
+                            if (acctType.name().equals(request.getAttribute("type"))) { %>
+                                <option value="<%= acctType.name() %>" selected="true"><%= acctType %></option>
+                        <%  } else { %>
+                                <option value="<%= acctType.name() %>"><%= acctType %></option>
+                        <%  }
+                        } %>
+                </select>
+            </td>
         </tr>
         <tr>
             <th>Begin Date</th>
