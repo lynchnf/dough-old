@@ -37,6 +37,15 @@ public class AcctEditLoad extends HttpServlet {
 
         String acctId = req.getParameter("acctId");
         if (acctId == null) {
+            req.setAttribute("id", StringUtils.EMPTY);
+            req.setAttribute("version", StringUtils.EMPTY);
+            req.setAttribute("acctNbr", StringUtils.EMPTY);
+            req.setAttribute("name", StringUtils.EMPTY);
+            req.setAttribute("organization", StringUtils.EMPTY);
+            req.setAttribute("fid", StringUtils.EMPTY);
+            req.setAttribute("ofxBankId", StringUtils.EMPTY);
+            req.setAttribute("ofxAcctId", StringUtils.EMPTY);
+            req.setAttribute("type", StringUtils.EMPTY);
             DateFormat dateFormat = UtilService.getDateFormat();
             req.setAttribute("beginDate", dateFormat.format(new Date()));
             req.setAttribute("beginBalance", BigDecimal.ZERO);

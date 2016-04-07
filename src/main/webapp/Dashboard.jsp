@@ -63,6 +63,7 @@
             </tr>
     <%  } %>
 </table>
+<a href="<%= baseUrl %>">New Acct</a>
 
 </body>
 </html>
