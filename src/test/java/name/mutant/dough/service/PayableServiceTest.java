@@ -13,12 +13,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class PayableServiceTest {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -33,6 +37,7 @@ public class PayableServiceTest {
     private static final String SCHEDULE_EST_AMOUNT = "38.59";
     private static final String SCHEDULE_TODAY = "2016-02-15";
     private static final String[] SCHEDULE_EST_DUE_DATE = {"2016-02-20", "2016-03-20"};
+    private static final Long PAST_PAYEE_ID = new Long(5018);
     private static final String BILL_TO_PAY_TODAY = "2016-01-01";
     private static final Long[] BILL_TO_PAY_ID = {Long.valueOf(6730), Long.valueOf(5376), Long.valueOf(1897), Long.valueOf(7655), Long.valueOf(1483), Long.valueOf(9912), Long.valueOf(1171), Long.valueOf(5676), Long.valueOf(2949), Long.valueOf(4577), Long.valueOf(4440), Long.valueOf(6307)};
     private static final String[] BILL_TO_PAY_NAME = {"filter tna", "read dxk", "save jog", "filter tqi", "filter agy", "filter agy", "filter ahq", "filter gsi", "filter lvy", "cron wtp", "filter wli", "filter leo"};
@@ -162,6 +167,18 @@ public class PayableServiceTest {
                 assertFalse(payable.getNoBill().booleanValue());
             }
         }
+    }
+
+    @Test
+    public void testCreateEstimatedPayablesWithPastCronString() throws Exception {
+        Payee payee1 = PayeeService.readPayee(PAST_PAYEE_ID);
+        assertNotNull(payee1);
+        List<Payable> payables1 = PayableService.readAllPayablesForPayee(PAST_PAYEE_ID);
+        assertTrue(payables1.isEmpty());
+        Date today = DATE_FORMAT.parse(SCHEDULE_TODAY);
+        PayableService.createEstimatedPayables(PAST_PAYEE_ID, today);
+        List<Payable> payables2 = PayableService.readAllPayablesForPayee(PAST_PAYEE_ID);
+        assertTrue(payables2.isEmpty());
     }
 
     @Test

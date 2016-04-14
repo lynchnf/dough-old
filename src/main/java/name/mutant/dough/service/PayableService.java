@@ -16,8 +16,20 @@ import org.quartz.CronExpression;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
-import java.util.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.MissingResourceException;
 
 public class PayableService extends BaseService {
     private static final Logger LOG = LogManager.getLogger();
@@ -216,16 +228,18 @@ public class PayableService extends BaseService {
                 payee.getPayables().size(); // Instantiate payables list.
                 CronExpression cronExpression = new CronExpression(payee.getCronExpression());
                 Date nextDueDate = afterDate;
-                for (int i = 0; i < payee.getNbrEstToCreate(); i++) {
+                for (int i = 0; i < payee.getNbrEstToCreate() && nextDueDate != null; i++) {
                     nextDueDate = cronExpression.getNextValidTimeAfter(nextDueDate);
-                    List<Payable> nextPayables = PayableService.readPayablesByPayeeAndEstDueDate(payeeId, nextDueDate);
-                    if (nextPayables == null || nextPayables.isEmpty()) {
-                        Payable newPayable = new Payable();
-                        newPayable.setPayee(payee);
-                        newPayable.setEstDueDate(nextDueDate);
-                        newPayable.setEstAmount(payee.getEstAmount());
-                        newPayable.setNoBill(Boolean.FALSE);
-                        payee.getPayables().add(newPayable);
+                    if (nextDueDate != null) {
+                        List<Payable> nextPayables = PayableService.readPayablesByPayeeAndEstDueDate(payeeId, nextDueDate);
+                        if (nextPayables == null || nextPayables.isEmpty()) {
+                            Payable newPayable = new Payable();
+                            newPayable.setPayee(payee);
+                            newPayable.setEstDueDate(nextDueDate);
+                            newPayable.setEstAmount(payee.getEstAmount());
+                            newPayable.setNoBill(Boolean.FALSE);
+                            payee.getPayables().add(newPayable);
+                        }
                     }
                 }
                 PayeeService.savePayee(payee);
