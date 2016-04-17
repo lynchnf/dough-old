@@ -13,6 +13,8 @@ public class UtilService {
     private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd";
     private static String dateFormatPattern;
     private static DateFormat dateFormat;
+    private static String importDir;
+    private static String processedDir;
 
     private UtilService() {
     }
@@ -41,5 +43,21 @@ public class UtilService {
             }
         }
         return dateFormat;
+    }
+
+    public static String getImportDir() {
+        if (importDir == null) {
+            ResourceBundle appBundle = ResourceBundle.getBundle("application");
+            importDir = appBundle.getString("import.dir");
+        }
+        return importDir;
+    }
+
+    public static String getProcessedDir() {
+        if (processedDir == null) {
+            ResourceBundle appBundle = ResourceBundle.getBundle("application");
+            processedDir = appBundle.getString("processed.dir");
+        }
+        return processedDir;
     }
 }

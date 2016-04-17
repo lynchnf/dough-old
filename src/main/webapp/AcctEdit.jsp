@@ -20,6 +20,7 @@
 <form method="post" action="<%= actionUrl %>">
     <input type="hidden" name="id" value="<%= request.getAttribute("id") %>">
     <input type="hidden" name="version" value="<%= request.getAttribute("version") %>">
+    <input type="hidden" name="importInProgress" value="<%= request.getAttribute("importInProgress") %>">
     <table border="1">
         <tr>
             <th>Acct Nbr</th>
@@ -71,7 +72,17 @@
         </tr>
         <tr>
             <th></th>
-            <td><input type="submit" name="saveButton" value="Save"></td>
+            <td>
+                <%  Boolean importInProgress = (Boolean) request.getAttribute("importInProgress");
+                    if (importInProgress != null && importInProgress.booleanValue()) { %>
+                        <input type="submit" name="saveButton" value="Save &amp; Exit">
+                        <input type="submit" name="continueButton" value="Save &amp; Continue">
+                <%  } else { %>
+                        <input type="submit" name="saveButton" value="Save">
+                <%  } %>
+                <input type="submit" name="reloadButton" value="Reload Page">
+                <input type="submit" name="cancelButton" value="Cancel">
+            </td>
         </tr>
     </table>
 </form>

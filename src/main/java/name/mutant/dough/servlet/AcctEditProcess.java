@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -40,6 +41,11 @@ public class AcctEditProcess extends HttpServlet {
         List<String> messages = (List<String>) req.getAttribute("messages");
         if (messages == null) messages = new ArrayList<>();
 
+        String saveButton = StringUtils.trimToNull(req.getParameter("saveButton"));
+        String continueButton = StringUtils.trimToNull(req.getParameter("continueButton"));
+        String reloadButton = StringUtils.trimToNull(req.getParameter("reloadButton"));
+        String cancelButton = StringUtils.trimToNull(req.getParameter("cancelButton"));
+
         String idStr = StringUtils.trimToNull(req.getParameter("id"));
         String versionStr = StringUtils.trimToNull(req.getParameter("version"));
         String acctNbr = StringUtils.trimToNull(req.getParameter("acctNbr"));
@@ -51,74 +57,78 @@ public class AcctEditProcess extends HttpServlet {
         String typeStr = StringUtils.trimToNull(req.getParameter("type"));
         String beginDateStr = StringUtils.trimToNull(req.getParameter("beginDate"));
         String beginBalanceStr = StringUtils.trimToNull(req.getParameter("beginBalance"));
+        String importInProgressStr = StringUtils.trimToNull(req.getParameter("importInProgress"));
 
+        // If neither reload nor cancel buttons were hit, do conversion and validation.
         Acct acct = new Acct();
-
-        if (idStr != null) {
-            acct.setId(Long.valueOf(idStr));
-            acct.setVersion(Integer.valueOf(versionStr));
-        }
-        if (acctNbr == null) {
-            errors.add("Acct Nbr is required.");
-        } else {
-            acct.setAcctNbr(acctNbr);
-        }
-        if (name == null) {
-            errors.add("Name is required.");
-        } else {
-            acct.setName(name);
-        }
-        acct.setOrganization(organization);
-
-        // FID is required (for now).
-        if (fid == null) {
-            errors.add("FID is required.");
-        } else {
-            acct.setFid(fid);
-        }
-        acct.setOfxBankId(ofxBankId);
-
-        // OFX Acct ID is required (for now).
-        if (ofxAcctId == null) {
-            errors.add("OFX Acct ID is required.");
-        } else {
-            acct.setOfxAcctId(ofxAcctId);
-        }
-        if (typeStr == null) {
-            errors.add("Type is required.");
-        } else {
-            LOG.debug("typeStr=\"" + typeStr + "\"");
-            acct.setType(AcctType.valueOf(typeStr));
-        }
-        if (beginBalanceStr == null) {
-            errors.add("Begin Date is required.");
-        } else {
-            DateFormat dateFormat = UtilService.getDateFormat();
-            try {
-                acct.setBeginDate(dateFormat.parse(beginDateStr));
-            } catch (ParseException e) {
-                errors.add("Begin Date is not a valid date in " + UtilService.getDateFormatPattern() + " format.");
+        if (reloadButton == null && cancelButton == null) {
+            if (idStr != null) {
+                acct.setId(Long.valueOf(idStr));
+                acct.setVersion(Integer.valueOf(versionStr));
             }
-        }
-        if (beginBalanceStr == null) {
-            errors.add("Begin Balance is required.");
-        } else {
-            String symbol = Currency.getInstance(Locale.getDefault()).getSymbol();
-            if (beginBalanceStr.startsWith(symbol) && beginBalanceStr.length() > 1)
-                beginBalanceStr = beginBalanceStr.substring(1);
-            NumberFormat numberFormat = NumberFormat.getInstance();
-            try {
-                Number number = numberFormat.parse(beginBalanceStr);
-                acct.setBeginBalance(BigDecimal.valueOf(number.doubleValue()).setScale(2, RoundingMode.HALF_UP));
-            } catch (ParseException e) {
-                errors.add("Begin Balance is not a valid amount.");
+            if (acctNbr == null) {
+                errors.add("Acct Nbr is required.");
+            } else {
+                acct.setAcctNbr(acctNbr);
             }
-        }
+            if (name == null) {
+                errors.add("Name is required.");
+            } else {
+                acct.setName(name);
+            }
+            acct.setOrganization(organization);
 
-        if (errors.isEmpty()) {
+            // FID is required (for now).
+            if (fid == null) {
+                errors.add("FID is required.");
+            } else {
+                acct.setFid(fid);
+            }
+            acct.setOfxBankId(ofxBankId);
+
+            // OFX Acct ID is required (for now).
+            if (ofxAcctId == null) {
+                errors.add("OFX Acct ID is required.");
+            } else {
+                acct.setOfxAcctId(ofxAcctId);
+            }
+            if (typeStr == null) {
+                errors.add("Type is required.");
+            } else {
+                LOG.debug("typeStr=\"" + typeStr + "\"");
+                acct.setType(AcctType.valueOf(typeStr));
+            }
+            if (beginBalanceStr == null) {
+                errors.add("Begin Date is required.");
+            } else {
+                DateFormat dateFormat = UtilService.getDateFormat();
+                try {
+                    acct.setBeginDate(dateFormat.parse(beginDateStr));
+                } catch (ParseException e) {
+                    errors.add("Begin Date is not a valid date in " + UtilService.getDateFormatPattern() + " format.");
+                }
+            }
+            if (beginBalanceStr == null) {
+                errors.add("Begin Balance is required.");
+            } else {
+                String symbol = Currency.getInstance(Locale.getDefault()).getSymbol();
+                if (beginBalanceStr.startsWith(symbol) && beginBalanceStr.length() > 1)
+                    beginBalanceStr = beginBalanceStr.substring(1);
+                NumberFormat numberFormat = NumberFormat.getInstance();
+                try {
+                    Number number = numberFormat.parse(beginBalanceStr);
+                    acct.setBeginBalance(BigDecimal.valueOf(number.doubleValue()).setScale(2, RoundingMode.HALF_UP));
+                } catch (ParseException e) {
+                    errors.add("Begin Balance is not a valid amount.");
+                }
+            }
+
+            // Business validation.
             errors.addAll(AcctService.validateSaveAcct(acct));
         }
-        if (errors.isEmpty()) {
+
+        // If a save button was pressed (and no errors), do business processing.
+        if ((saveButton != null || continueButton != null) && errors.isEmpty()) {
             try {
                 AcctService.saveAcct(acct);
                 messages.add("Acct successfully saved.");
@@ -130,10 +140,7 @@ public class AcctEditProcess extends HttpServlet {
         // Go to next page.
         req.setAttribute("errors", errors);
         req.setAttribute("messages", messages);
-        if (errors.isEmpty()) {
-            // TODO Put success message in "flash" somehow.
-            resp.sendRedirect(resp.encodeRedirectURL(req.getContextPath() + "/DashboardLoad"));
-        } else {
+        if (!errors.isEmpty()) {
             req.setAttribute("id", StringUtils.trimToEmpty(idStr));
             req.setAttribute("version", StringUtils.trimToEmpty(versionStr));
             req.setAttribute("acctNbr", StringUtils.trimToEmpty(acctNbr));
@@ -145,8 +152,22 @@ public class AcctEditProcess extends HttpServlet {
             req.setAttribute("type", StringUtils.trimToEmpty(typeStr));
             req.setAttribute("beginDate", StringUtils.trimToEmpty(beginDateStr));
             req.setAttribute("beginBalance", StringUtils.trimToEmpty(beginBalanceStr));
-
+            req.setAttribute("importInProgressStr", StringUtils.trimToEmpty(importInProgressStr));
             getServletContext().getRequestDispatcher("/AcctEdit.jsp").forward(req, resp);
+        } else if (saveButton != null) {
+            // TODO Put success message in "flash" somehow and redirect to dashboard.
+            // resp.sendRedirect(resp.encodeRedirectURL(req.getContextPath() + "/DashboardLoad"));
+            getServletContext().getRequestDispatcher("/DashboardLoad").forward(req, resp);
+        } else if (continueButton != null) {
+            getServletContext().getRequestDispatcher("/AcctUploadProcess").forward(req, resp);
+        } else if (reloadButton != null) {
+            if (idStr != null) {
+                getServletContext().getRequestDispatcher("/AcctEditLoad?acctId=" + URLEncoder.encode(idStr, "UTF-8")).forward(req, resp);
+            } else {
+                getServletContext().getRequestDispatcher("/AcctEditLoad").forward(req, resp);
+            }
+        } else if (cancelButton != null) {
+            getServletContext().getRequestDispatcher("/DashboardLoad").forward(req, resp);
         }
     }
 }

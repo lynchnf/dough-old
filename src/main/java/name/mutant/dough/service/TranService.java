@@ -64,6 +64,22 @@ public class TranService extends BaseService {
         return doInTransaction(function);
     }
 
+    public static void saveTrans(List<Tran> trans) throws DoughException {
+        DaoFunction<Void> function = new DaoFunction<Void>() {
+            public Void doFunction(EntityManager entityManager) throws Exception {
+                for (Tran tran : trans) {
+                    saveTran(tran);
+                }
+                return null;
+            }
+
+            public String getErrorMessage() {
+                return "Error saving multiple trans.";
+            }
+        };
+        doInTransaction(function);
+    }
+
     public static TranFilterResponse filterTrans(TranFilterRequest request) throws DoughException {
         DaoFunction<TranFilterResponse> function = new DaoFunction<TranFilterResponse>() {
             public TranFilterResponse doFunction(EntityManager entityManager) throws Exception {

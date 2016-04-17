@@ -49,6 +49,7 @@ public class AcctEditLoad extends HttpServlet {
             DateFormat dateFormat = UtilService.getDateFormat();
             req.setAttribute("beginDate", dateFormat.format(new Date()));
             req.setAttribute("beginBalance", BigDecimal.ZERO);
+            req.setAttribute("importInProgress", Boolean.FALSE);
         } else {
             try {
                 Acct acct = AcctService.readAcct(Long.parseLong(acctId));
@@ -68,6 +69,7 @@ public class AcctEditLoad extends HttpServlet {
                     DateFormat dateFormat = UtilService.getDateFormat();
                     req.setAttribute("beginDate", dateFormat.format(acct.getBeginDate()));
                     req.setAttribute("beginBalance", acct.getBeginBalance());
+                    req.setAttribute("importInProgress", Boolean.FALSE);
                 }
             } catch (DoughException e) {
                 errors.add(e.getMessage());
