@@ -5,6 +5,7 @@ import name.mutant.dough.domain.Acct;
 import name.mutant.dough.domain.AcctType;
 import name.mutant.dough.service.AcctService;
 import name.mutant.dough.service.UtilService;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -133,7 +134,7 @@ public class AcctEditProcess extends HttpServlet {
                 AcctService.saveAcct(acct);
                 messages.add("Acct successfully saved.");
             } catch (DoughException e) {
-                errors.add(e.getMessage());
+                errors.add(StringEscapeUtils.escapeHtml4(e.getMessage()));
             }
         }
 

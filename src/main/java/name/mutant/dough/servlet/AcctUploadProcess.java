@@ -8,6 +8,7 @@ import name.mutant.dough.service.OfxService;
 import name.mutant.dough.service.TranService;
 import name.mutant.dough.service.UtilService;
 import name.mutant.dough.service.response.OfxParseFileResponse;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,7 +80,7 @@ public class AcctUploadProcess extends HttpServlet {
                 }
             }
         } catch (DoughException e) {
-            errors.add(e.getMessage());
+            errors.add(StringEscapeUtils.escapeHtml4(e.getMessage()));
         }
 
         // Go to next page.

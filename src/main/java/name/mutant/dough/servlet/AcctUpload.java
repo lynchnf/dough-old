@@ -5,6 +5,7 @@ import name.mutant.dough.service.UtilService;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -75,11 +76,11 @@ public class AcctUpload extends HttpServlet {
                 }
             } catch (Exception e) {
                 if (e instanceof DoughException) {
-                    errors.add(e.getMessage());
+                    errors.add(StringEscapeUtils.escapeHtml4(e.getMessage()));
                 } else {
                     String msg = "Error uploading file(s).";
                     LOG.error(msg, e);
-                    errors.add(msg);
+                    errors.add(StringEscapeUtils.escapeHtml4(msg));
                 }
             }
         }

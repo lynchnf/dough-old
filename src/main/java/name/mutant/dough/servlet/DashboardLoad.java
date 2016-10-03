@@ -8,6 +8,7 @@ import name.mutant.dough.service.dto.BillToPay;
 import name.mutant.dough.service.filter.request.PayableFilterRequest;
 import name.mutant.dough.service.filter.request.PayableOrderByField;
 import name.mutant.dough.service.filter.response.PayableFilterResponse;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -37,7 +38,7 @@ public class DashboardLoad extends HttpServlet {
         try {
             billsToPay.addAll(PayableService.getBillsToPay(new Date()));
         } catch (DoughException e) {
-            errors.add(e.getMessage());
+            errors.add(StringEscapeUtils.escapeHtml4(e.getMessage()));
         }
         req.setAttribute("billsToPay", billsToPay);
 
@@ -45,7 +46,7 @@ public class DashboardLoad extends HttpServlet {
         try {
             acctBalances.addAll(AcctService.getAcctBalances());
         } catch (DoughException e) {
-            errors.add(e.getMessage());
+            errors.add(StringEscapeUtils.escapeHtml4(e.getMessage()));
         }
         req.setAttribute("acctBalances", acctBalances);
 

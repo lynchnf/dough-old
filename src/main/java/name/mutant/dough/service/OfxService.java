@@ -58,6 +58,7 @@ public class OfxService extends BaseService {
     private static final String CORRECTFITID = "<CORRECTFITID>";
     private static final String CORRECTACTION = "<CORRECTACTION>";
     private static final String NAME = "<NAME>";
+    private static final String CATEGORY = "<CATEGORY>";
     private static final String MEMO = "<MEMO>";
     private static final DateFormat DF = new SimpleDateFormat("yyyyMMddHHmmss");
 
@@ -126,6 +127,8 @@ public class OfxService extends BaseService {
                         BadToken(state, line);
                     } else if (line.contains(NAME)) {
                         BadToken(state, line);
+                    } else if (line.contains(CATEGORY)) {
+                        BadToken(state, line);
                     } else if (line.contains(MEMO)) {
                         BadToken(state, line);
                     }
@@ -181,6 +184,8 @@ public class OfxService extends BaseService {
                     } else if (line.contains(CORRECTACTION)) {
                         BadToken(state, line);
                     } else if (line.contains(NAME)) {
+                        BadToken(state, line);
+                    } else if (line.contains(CATEGORY)) {
                         BadToken(state, line);
                     } else if (line.contains(MEMO)) {
                         BadToken(state, line);
@@ -242,6 +247,8 @@ public class OfxService extends BaseService {
                         BadToken(state, line);
                     } else if (line.contains(NAME)) {
                         BadToken(state, line);
+                    } else if (line.contains(CATEGORY)) {
+                        BadToken(state, line);
                     } else if (line.contains(MEMO)) {
                         BadToken(state, line);
                     } else {
@@ -299,6 +306,8 @@ public class OfxService extends BaseService {
                         BadToken(state, line);
                     } else if (line.contains(NAME)) {
                         BadToken(state, line);
+                    } else if (line.contains(CATEGORY)) {
+                        BadToken(state, line);
                     } else if (line.contains(MEMO)) {
                         BadToken(state, line);
                     } else {
@@ -355,6 +364,8 @@ public class OfxService extends BaseService {
                     } else if (line.contains(CORRECTACTION)) {
                         BadToken(state, line);
                     } else if (line.contains(NAME)) {
+                        BadToken(state, line);
+                    } else if (line.contains(CATEGORY)) {
                         BadToken(state, line);
                     } else if (line.contains(MEMO)) {
                         BadToken(state, line);
@@ -447,6 +458,8 @@ public class OfxService extends BaseService {
                         String s = StringUtils.substringAfter(line, NAME);
                         int idx = response.getOfxStmtTrans().size() - 1;
                         response.getOfxStmtTrans().get(idx).setName(s);
+                    } else if (line.contains(CATEGORY)) {
+                        // ignore
                     } else if (line.contains(MEMO)) {
                         String s = StringUtils.substringAfter(line, MEMO);
                         int idx = response.getOfxStmtTrans().size() - 1;
