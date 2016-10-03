@@ -12,6 +12,7 @@ public class PayableFilterRequest extends BaseFilterRequest {
     private Boolean whereActual;
     private Boolean wherePaid;
     private Boolean whereNoBill;
+    private Boolean whereMissedBill;
     private PayableOrderByField orderByField = DEFAULT_ORDER_BY_FIELD;
 
     public Long getWherePayeeIdEq() {
@@ -70,6 +71,14 @@ public class PayableFilterRequest extends BaseFilterRequest {
         this.whereNoBill = whereNoBill;
     }
 
+    public Boolean getWhereMissedBill() {
+        return whereMissedBill;
+    }
+
+    public void setWhereMissedBill(Boolean whereMissedBill) {
+        this.whereMissedBill = whereMissedBill;
+    }
+
     public PayableOrderByField getOrderByField() {
         return orderByField;
     }
@@ -88,6 +97,7 @@ public class PayableFilterRequest extends BaseFilterRequest {
         if (whereActual != null) sb.append("whereActual=").append(whereActual).append(", ");
         if (wherePaid != null) sb.append("wherePaid=").append(wherePaid).append(", ");
         if (whereNoBill != null) sb.append("whereNoBill=").append(whereNoBill).append(", ");
+        if (whereMissedBill != null) sb.append("whereMissedBill=").append(whereMissedBill).append(", ");
         sb.append("orderByField=").append(orderByField).append(", ");
         sb.append("orderByDirection=").append(orderByDirection).append(", ");
         sb.append("first=").append(first).append(", ");

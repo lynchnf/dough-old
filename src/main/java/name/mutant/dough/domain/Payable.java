@@ -32,6 +32,7 @@ public class Payable implements Serializable {
     private BigDecimal paidAmount;
     private String confirmCode;
     private Boolean noBill;
+    private Boolean missedBill;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -146,5 +147,14 @@ public class Payable implements Serializable {
 
     public void setNoBill(Boolean noBill) {
         this.noBill = noBill;
+    }
+
+    @Column(name = "MISSED_BILL")
+    public Boolean getMissedBill() {
+        return missedBill;
+    }
+
+    public void setMissedBill(Boolean missedBill) {
+        this.missedBill = missedBill;
     }
 }

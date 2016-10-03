@@ -132,6 +132,10 @@ public class PayableService extends BaseService {
                     Predicate noBillEq = cb.equal(payable.get(Payable_.noBill), request.getWhereNoBill());
                     whereCollection.add(noBillEq);
                 }
+                if (request.getWhereMissedBill() != null) {
+                    Predicate missedBillEq = cb.equal(payable.get(Payable_.missedBill), request.getWhereMissedBill());
+                    whereCollection.add(missedBillEq);
+                }
                 attachWhereToQueries(whereCollection, cq, cq2);
 
                 // Order by ...
@@ -238,6 +242,7 @@ public class PayableService extends BaseService {
                             newPayable.setEstDueDate(nextDueDate);
                             newPayable.setEstAmount(payee.getEstAmount());
                             newPayable.setNoBill(Boolean.FALSE);
+                            newPayable.setMissedBill(Boolean.FALSE);
                             payee.getPayables().add(newPayable);
                         }
                     }
@@ -269,6 +274,7 @@ public class PayableService extends BaseService {
                 PayableFilterRequest request = new PayableFilterRequest();
                 request.setWherePaid(Boolean.FALSE);
                 request.setWhereNoBill(Boolean.FALSE);
+                request.setWhereMissedBill(Boolean.FALSE);
                 request.setOrderByField(PayableOrderByField.DUE_DATE);
                 request.setOrderByDirection(OrderByDirection.ASC);
                 request.setMax(-1);
