@@ -41,8 +41,7 @@ public class AcctUploadProcess extends HttpServlet {
         List<String> messages = (List<String>) req.getAttribute("messages");
         if (messages == null) messages = new ArrayList<>();
 
-        File importDir = new File(UtilService.getImportDir());
-        File[] importFiles = importDir.listFiles();
+        File[] importFiles = UtilService.getImportFiles();
         boolean needToCreateAcct = false;
         OfxParseFileResponse response = null;
         try {
@@ -69,8 +68,7 @@ public class AcctUploadProcess extends HttpServlet {
                     }
                     TranService.saveTrans(transToSave);
                     messages.add("" + transToSave.size() + " trans successfully saved.");
-                    File processedDir = new File(UtilService.getProcessedDir());
-                    if (!processedDir.exists()) processedDir.mkdirs();
+                    File processedDir = UtilService.getProcessedDir();
                     File processedFile = new File(processedDir, importFiles[i].getName());
                     if (!importFiles[i].renameTo(processedFile)) {
                         String msg = "Error moving file " + importFiles[i] + " to directory " + processedDir + ".";

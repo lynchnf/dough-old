@@ -3,18 +3,24 @@ package name.mutant.dough.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.FileFilter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.io.File;
+import java.net.URL;
 
 public class UtilService {
     private static final Logger LOG = LogManager.getLogger();
     private static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd";
+    private static final String IMPORT_DIR = "fileupload/import/";
+    private static final String PROCESSED_DIR = "fileupload/processed/";
+    private static final String MARKER_FILE = "do-not-delete.txt";
     private static String dateFormatPattern;
     private static DateFormat dateFormat;
-    private static String importDir;
-    private static String processedDir;
+    private static File importDir;
+    private static File processedDir;
 
     private UtilService() {
     }
@@ -45,19 +51,27 @@ public class UtilService {
         return dateFormat;
     }
 
-    public static String getImportDir() {
+    public static File getImportDir() {
         if (importDir == null) {
-            ResourceBundle appBundle = ResourceBundle.getBundle("application");
-            importDir = appBundle.getString("import.dir");
+            importDir = getParentDirFromMarkerFile(IMPORT_DIR + MARKER_FILE);
         }
         return importDir;
     }
 
-    public static String getProcessedDir() {
+    public static File[] getImportFiles() {
+        return getImportDir().listFiles(file -> !MARKER_FILE.equals(file.getName()));
+    }
+
+    public static File getProcessedDir() {
         if (processedDir == null) {
-            ResourceBundle appBundle = ResourceBundle.getBundle("application");
-            processedDir = appBundle.getString("processed.dir");
+            processedDir = getParentDirFromMarkerFile(PROCESSED_DIR + MARKER_FILE);
         }
         return processedDir;
+    }
+
+    private static File getParentDirFromMarkerFile(String markerFilePath) {
+        URL url = Thread.currentThread().getContextClassLoader().getResource(markerFilePath);
+        File file = new File(url.getPath());
+        return file.getParentFile();
     }
 }

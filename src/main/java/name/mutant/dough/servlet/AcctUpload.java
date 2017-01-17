@@ -60,8 +60,7 @@ public class AcctUpload extends HttpServlet {
                 if (formItems != null && formItems.size() > 0) {
                     long fileNumber = System.currentTimeMillis();
                     String fileNamePrefix = FILE_NAME_DATE_FORMAT.format(new Date());
-                    File importDir = new File(UtilService.getImportDir());
-                    if (!importDir.exists()) importDir.mkdirs();
+                    File importDir = UtilService.getImportDir();
                     for (FileItem item : formItems) {
 
                         // Processes only fields that are not form fields.
