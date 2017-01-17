@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name = "PAYABLE")
+@Table(name = "payable")
 public class Payable implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long id;

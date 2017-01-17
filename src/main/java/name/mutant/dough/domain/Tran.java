@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name = "TRAN", uniqueConstraints = {@UniqueConstraint(columnNames = {"ACCT_ID", "FITID"})})
+@Table(name = "tran", uniqueConstraints = {@UniqueConstraint(columnNames = {"ACCT_ID", "FITID"})})
 public class Tran implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long id;

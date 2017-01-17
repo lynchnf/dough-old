@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "ACCT", uniqueConstraints = {@UniqueConstraint(columnNames = {"FID", "OFX_ACCT_ID"})})
+@Table(name = "acct", uniqueConstraints = {@UniqueConstraint(columnNames = {"FID", "OFX_ACCT_ID"})})
 public class Acct implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long id;
