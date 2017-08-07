@@ -22,3 +22,6 @@ target
 # IntelliJ files and build directories
 .idea
 *.iml
+
+# Logs
+logs/
