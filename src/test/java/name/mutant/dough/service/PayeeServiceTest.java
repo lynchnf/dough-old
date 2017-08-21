@@ -39,6 +39,7 @@ public class PayeeServiceTest {
         assertEquals(READ_PAYEE_NAME, payee2.getName());
     }
 
+/*
     @Test
     public void testSavePayee() throws Exception {
         // Start by verifying that our test payee exists.
@@ -59,6 +60,7 @@ public class PayeeServiceTest {
         Payee payee3 = PayeeService.readPayee(SAVE_PAYEE_ID);
         assertEquals(newName, payee3.getName());
     }
+*/
 
     @Test
     public void testFilterPayees() throws Exception {
