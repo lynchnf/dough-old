@@ -4,19 +4,19 @@ body {
 
 @media ( min-width : 768px) {
     body {
-        background: white url('bg-sm.png') repeat-y center;
+        background: white url('../images/bg-sm.png') repeat-y center;
     }
 }
 
 @media ( min-width : 992px) {
     body {
-        background: white url('bg-md.png') repeat-y center;
+        background: white url('../images/bg-md.png') repeat-y center;
     }
 }
 
 @media ( min-width : 1200px) {
     body {
-        background: white url('bg-lg.png') repeat-y center;
+        background: white url('../images/bg-lg.png') repeat-y center;
     }
 }
 

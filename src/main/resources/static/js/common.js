@@ -1,76 +1,118 @@
 var MyCommon = new Object();
 
-MyCommon.goToFirstPage = function() {
-    var oldVal = Number(document.getElementById("pageNumber").value);
+MyCommon.goToFirstPage = function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var listFormId = $(this).attr("data-list-form");
+    var oldVal = Number($("#" + listFormId + " .pageNumber").val());
     var newVal = 0;
-    document.getElementById("pageNumber").value = newVal;
-    console.log("pageNumber changed from " + oldVal + " to " + newVal + ".");
-    document.getElementById("listForm").submit();
-}
+    console.log("goToFirstPage: changing pageNumber from " + oldVal + " to " + newVal + ".");
+    $("#" + listFormId + " .pageNumber").val(newVal);
+    $("#" + listFormId).submit();
+};
 
-MyCommon.goToPreviousPage = function() {
-    var oldVal = Number(document.getElementById("pageNumber").value);
-    var newVal = Number(document.getElementById("currentPage").value) - 1;
-    document.getElementById("pageNumber").value = newVal;
-    console.log("pageNumber changed from " + oldVal + " to " + newVal + ".");
-    document.getElementById("listForm").submit();
-}
+MyCommon.goToPreviousPage = function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var listFormId = $(this).attr("data-list-form");
+    var oldVal = Number($("#" + listFormId + " .pageNumber").val());
+    var newVal = Number($("#" + listFormId + " .currentPage").val()) - 1;
+    console.log("goToPreviousPage: changing pageNumber from " + oldVal + " to " + newVal + ".");
+    $("#" + listFormId + " .pageNumber").val(newVal);
+    $("#" + listFormId).submit();
+};
 
-MyCommon.goToNextPage = function() {
-    var oldVal = Number(document.getElementById("pageNumber").value);
-    var newVal = Number(document.getElementById("currentPage").value) + 1;
-    document.getElementById("pageNumber").value = newVal;
-    console.log("pageNumber changed from " + oldVal + " to " + newVal + ".");
-    document.getElementById("listForm").submit();
-}
+MyCommon.goToNextPage = function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var listFormId = $(this).attr("data-list-form");
+    var oldVal = Number($("#" + listFormId + " .pageNumber").val());
+    var newVal = Number($("#" + listFormId + " .currentPage").val()) + 1;
+    console.log("goToNextPage: changing pageNumber from " + oldVal + " to " + newVal + ".");
+    $("#" + listFormId + " .pageNumber").val(newVal);
+    $("#" + listFormId).submit();
+};
 
-MyCommon.goToLastPage = function() {
-    var oldVal = Number(document.getElementById("pageNumber").value);
-    var newVal = Number(document.getElementById("totalPages").value) - 1;
-    document.getElementById("pageNumber").value = newVal;
-    console.log("pageNumber changed from " + oldVal + " to " + newVal + ".");
-    document.getElementById("listForm").submit();
-}
+MyCommon.goToLastPage = function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var listFormId = $(this).attr("data-list-form");
+    var oldVal = Number($("#" + listFormId + " .pageNumber").val());
+    var newVal = Number($("#" + listFormId + " .totalPages").val()) - 1;
+    console.log("goToLastPage: changing pageNumber from " + oldVal + " to " + newVal + ".");
+    $("#" + listFormId + " .pageNumber").val(newVal);
+    $("#" + listFormId).submit();
+};
 
-MyCommon.changePageSize = function() {
-    document.getElementById("pageNumber").value = 0;
-    console.log("pageNumber reset to 0.");
-    var oldVal = document.getElementById("pageSize").value;
-    var newVal = document.getElementById("selectPageSize").value;
-    document.getElementById("pageSize").value = newVal;
-    console.log("pageSize changed from " + oldVal + " to " + newVal + ".");
-    document.getElementById("listForm").submit();
-}
+MyCommon.changePageSize = function (event) {
+    var listFormId = $(this).attr("data-list-form");
+    console.log("changePageSize: resetting pageNumber to 0.");
+    $("#" + listFormId + " .pageNumber").val(0);
+    var oldVal = Number($("#" + listFormId + " .pageSize").val());
+    var newVal = Number($(this).val());
+    console.log("changePageSize: changing pageSize from " + oldVal + " to " + newVal + ".");
+    $("#" + listFormId + " .pageSize").val(newVal);
+    $("#" + listFormId).submit();
+};
 
-MyCommon.changeSort = function(newCol) {
-    document.getElementById("pageNumber").value = 0;
-    console.log("pageNumber reset to 0.");
-    var oldCol = document.getElementById("sortColumn").value;
-    var oldDir = document.getElementById("sortDirection").value;
+MyCommon.changeSort = function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var listFormId = $(this).attr("data-list-form");
+    var oldCol = $("#" + listFormId + " .sortColumn").val();
+    var oldDir = $("#" + listFormId + " .sortDirection").val();
+    var newCol = $(this).attr("data-sort-column");
     if (newCol == oldCol) {
         var newDir = "DESC";
         if (oldDir == "DESC") {
             newDir = "ASC";
         }
-        document.getElementById("sortDirection").value = newDir;
-        console.log("sortDirection changed from " + oldDir + " to " + newDir + ".");
+        console.log("changeSort: changing sortDirection from " + oldDir + " to " + newDir + ".");
+        $("#" + listFormId + " .sortDirection").val(newDir);
     } else {
-        document.getElementById("sortDirection").value = "ASC";
-        console.log("sortDirection reset to ASC.");
-        document.getElementById("sortColumn").value = newCol;
-        console.log("sortColumn changed from " + oldCol + " to " + newCol + ".");
+        console.log("changeSort: resetting sortDirection to ASC.");
+        $("#" + listFormId + " .sortDirection").val("ASC");
+        console.log("changeSort: changing sortColumn from " + oldCol + " to " + newCol + ".");
+        $("#" + listFormId + " .sortColumn").val(newCol);
     }
-    document.getElementById("listForm").submit();
+    $("#" + listFormId).submit();
+};
+
+MyCommon.filterList = function() {
+    var listFormId = $(this).attr("data-list-form");
+    console.log("changePageSize: resetting pageNumber to 0.");
+    $("#" + listFormId + " .pageNumber").val(0);
+    var oldName = $("#" + listFormId + " .whereNameContains").val();
+    var newName = $("#" + listFormId + " .newWhereNameContains").val();
+    console.log("filterList: changing whereNameContains from " + oldName + " to " + newName + ".");
+    $("#" + listFormId + " .whereNameContains").val(newName);
+    $("#" + listFormId).submit();
 }
 
-MyCommon.filter = function() {
-    document.getElementById("pageNumber").value = 0;
-    console.log("pageNumber reset to 0.");
-    var oldName = document.getElementById("whereNameContains").value;
-    var newName = document.getElementById("newWhereNameContains").value;
-    document.getElementById("whereNameContains").value = newName;
-    console.log("whereNameContains changed from " + oldName + " to " + newName + ".");
-    document.getElementById("listForm").submit();
-}
 
-$('#goToFirstPage')
+$(document).ready(function () {
+    // Put sort indicator on column heading.
+    $(".changeSort").each(function (index) {
+        var listFormId = $(this).attr("data-list-form");
+        var oldCol = $("#" + listFormId + " .sortColumn").val();
+        var oldDir = $("#" + listFormId + " .sortDirection").val();
+        var newCol = $(this).attr("data-sort-column");
+        if (newCol == oldCol) {
+            var innerText = $(this).html();
+            if (oldDir == "DESC") {
+                innerText += " <i class='fa fa-caret-down'></i>";
+            } else {
+                innerText += " <i class='fa fa-caret-up'></i>";
+            }
+            $(this).html(innerText);
+        }
+    });
+
+    $(".goToFirstPage").on("click", MyCommon.goToFirstPage);
+    $(".goToPreviousPage").on("click", MyCommon.goToPreviousPage);
+    $(".goToNextPage").on("click", MyCommon.goToNextPage);
+    $(".goToLastPage").on("click", MyCommon.goToLastPage);
+    $(".changePageSize").on("change", MyCommon.changePageSize);
+    $(".changeSort").on("click", MyCommon.changeSort);
+    $(".filterList").on("click", MyCommon.filterList);
+});

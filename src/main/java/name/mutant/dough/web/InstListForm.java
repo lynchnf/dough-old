@@ -1,6 +1,6 @@
 package name.mutant.dough.web;
 
-import name.mutant.dough.data.Acct;
+import name.mutant.dough.data.Inst;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,13 +12,13 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 
 /**
- * Created by lynchnf on 7/14/17.
+ * Created by lynchnf on 9/15/17.
  */
-public class AcctListForm implements Page<Acct> {
-    private Page<Acct> innerPage;
+public class InstListForm implements Page<Inst> {
+    private Page<Inst> innerPage;
     private Sort.Order firstSortOrder;
 
-    public AcctListForm(Page<Acct> innerPage) {
+    public InstListForm(Page<Inst> innerPage) {
         this.innerPage = innerPage;
         firstSortOrder = innerPage.getSort().iterator().next();
     }
@@ -42,7 +42,7 @@ public class AcctListForm implements Page<Acct> {
     }
 
     @Override
-    public <S> Page<S> map(Converter<? super Acct, ? extends S> converter) {
+    public <S> Page<S> map(Converter<? super Inst, ? extends S> converter) {
         return innerPage.map(converter);
     }
 
@@ -62,7 +62,7 @@ public class AcctListForm implements Page<Acct> {
     }
 
     @Override
-    public List<Acct> getContent() {
+    public List<Inst> getContent() {
         return innerPage.getContent();
     }
 
@@ -107,17 +107,17 @@ public class AcctListForm implements Page<Acct> {
     }
 
     @Override
-    public Iterator<Acct> iterator() {
+    public Iterator<Inst> iterator() {
         return innerPage.iterator();
     }
 
     @Override
-    public void forEach(Consumer<? super Acct> consumer) {
+    public void forEach(Consumer<? super Inst> consumer) {
         innerPage.forEach(consumer);
     }
 
     @Override
-    public Spliterator<Acct> spliterator() {
+    public Spliterator<Inst> spliterator() {
         return innerPage.spliterator();
     }
 }

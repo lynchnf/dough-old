@@ -1,6 +1,6 @@
 package name.mutant.dough.web;
 
-import name.mutant.dough.data.Acct;
+import name.mutant.dough.data.OfxFile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,13 +14,19 @@ import java.util.function.Consumer;
 /**
  * Created by lynchnf on 7/14/17.
  */
-public class AcctListForm implements Page<Acct> {
-    private Page<Acct> innerPage;
+public class OfxFileListForm implements Page<OfxFile> {
+    private String whereOriginalFilenameContains;
+    private Page<OfxFile> innerPage;
     private Sort.Order firstSortOrder;
 
-    public AcctListForm(Page<Acct> innerPage) {
+    public OfxFileListForm(String whereOriginalFilenameContains, Page<OfxFile> innerPage) {
+        this.whereOriginalFilenameContains = whereOriginalFilenameContains;
         this.innerPage = innerPage;
         firstSortOrder = innerPage.getSort().iterator().next();
+    }
+
+    public String getWhereOriginalFilenameContains() {
+        return whereOriginalFilenameContains;
     }
 
     public String getSortColumn() {
@@ -42,7 +48,7 @@ public class AcctListForm implements Page<Acct> {
     }
 
     @Override
-    public <S> Page<S> map(Converter<? super Acct, ? extends S> converter) {
+    public <S> Page<S> map(Converter<? super OfxFile, ? extends S> converter) {
         return innerPage.map(converter);
     }
 
@@ -62,7 +68,7 @@ public class AcctListForm implements Page<Acct> {
     }
 
     @Override
-    public List<Acct> getContent() {
+    public List<OfxFile> getContent() {
         return innerPage.getContent();
     }
 
@@ -107,17 +113,17 @@ public class AcctListForm implements Page<Acct> {
     }
 
     @Override
-    public Iterator<Acct> iterator() {
+    public Iterator<OfxFile> iterator() {
         return innerPage.iterator();
     }
 
     @Override
-    public void forEach(Consumer<? super Acct> consumer) {
+    public void forEach(Consumer<? super OfxFile> consumer) {
         innerPage.forEach(consumer);
     }
 
     @Override
-    public Spliterator<Acct> spliterator() {
+    public Spliterator<OfxFile> spliterator() {
         return innerPage.spliterator();
     }
 }

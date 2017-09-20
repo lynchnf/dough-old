@@ -1,8 +1,7 @@
 package name.mutant.dough.web;
 
-import name.mutant.dough.data.Acct;
-import name.mutant.dough.data.AcctRepository;
-import name.mutant.dough.data.AcctType;
+import name.mutant.dough.data.Inst;
+import name.mutant.dough.data.InstRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,23 +15,21 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Date;
 
 /**
  * Created by lynchnf on 7/14/17.
  */
 @Controller
-public class AcctController {
-    private static final Logger logger = LoggerFactory.getLogger(AcctController.class);
+public class InstController {
+    private static final Logger logger = LoggerFactory.getLogger(InstController.class);
     private static final String defaultSortColumn = "id";
     // Does not include default sort column.
-    private static final String[] sortableColumns = {"acctNbr","name","ofxBankId","ofxAcctId","type","beginDate","beginBalance"};
+    private static final String[] sortableColumns = {"organization","fid"};
     @Autowired
-    private AcctRepository acctRepository;
+    private InstRepository instRepository;
 
-    @RequestMapping("/acctList")
+    @RequestMapping("/instList")
     public String list(
             @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
             @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
@@ -48,11 +45,11 @@ public class AcctController {
 
         // Get a page of records.
         Pageable pageable = new PageRequest(pageNumber, pageSize, sortDirection, sortColumns);
-        Page<Acct> page = acctRepository.findAll(pageable);
-        AcctListForm acctListForm = new AcctListForm(page);
+        Page<Inst> page = instRepository.findAll(pageable);
+        InstListForm instListForm = new InstListForm(page);
 
         // Add objects to model and display the webpage.
-        model.addAttribute("acctListForm", acctListForm);
-        return "acctList";
+        model.addAttribute("instListForm", instListForm);
+        return "instList";
     }
 }

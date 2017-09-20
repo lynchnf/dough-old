@@ -1,14 +1,20 @@
 package name.mutant.dough.data;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Version;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
- * Created by lynchnf on 7/19/17.
+ * Created by lynchnf on 7/14/17.
  */
 @Entity
 public class OfxFile {
@@ -20,8 +26,10 @@ public class OfxFile {
     private String originalFilename;
     private String contentType;
     private Long size;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date uploadTimestamp;
-    private Boolean processed;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<OfxLine> ofxLines = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -71,11 +79,11 @@ public class OfxFile {
         this.uploadTimestamp = uploadTimestamp;
     }
 
-    public Boolean getProcessed() {
-        return processed;
+    public List<OfxLine> getOfxLines() {
+        return ofxLines;
     }
 
-    public void setProcessed(Boolean processed) {
-        this.processed = processed;
+    public void setOfxLines(List<OfxLine> ofxLines) {
+        this.ofxLines = ofxLines;
     }
 }
