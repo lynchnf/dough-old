@@ -1,12 +1,14 @@
 package name.mutant.dough.service.response;
 
+import name.mutant.dough.data.AcctType;
+
 /**
  * Created by lynchnf on 9/15/17.
  */
 public class OfxAcct {
     private String bankId;
     private String acctId;
-    private String type;
+    private AcctType type;
 
     public String getBankId() {
         return bankId;
@@ -24,11 +26,11 @@ public class OfxAcct {
         this.acctId = acctId;
     }
 
-    public String getType() {
+    public AcctType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(AcctType type) {
         this.type = type;
     }
 }

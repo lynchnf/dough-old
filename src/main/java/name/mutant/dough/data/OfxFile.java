@@ -2,6 +2,7 @@ package name.mutant.dough.data;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,7 +29,7 @@ public class OfxFile {
     private Long size;
     @Temporal(TemporalType.TIMESTAMP)
     private Date uploadTimestamp;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "ofxFile")
     private List<OfxLine> ofxLines = new ArrayList<>();
 
     public Long getId() {

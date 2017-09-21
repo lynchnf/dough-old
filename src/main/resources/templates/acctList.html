@@ -60,6 +60,7 @@
                         <tr>
                             <th><a class="changeSort" data-list-form="listForm" data-sort-column="id" href="#">Id</a></th>
                             <th>Version</th>
+                            <th><a class="changeSort" data-list-form="listForm" data-sort-column="inst.organization" href="#">Organization</a></th>
                             <th><a class="changeSort" data-list-form="listForm" data-sort-column="acctNbr" href="#">Acct
                                 Nbr</a></th>
                             <th><a class="changeSort" data-list-form="listForm" data-sort-column="name" href="#">Name</a>
@@ -80,6 +81,7 @@
                         <tr th:each="acct : ${acctListForm}">
                             <td><span th:text="${acct.id}"/></td>
                             <td th:text="${acct.version}"></td>
+                            <td th:text="${acct.inst==null?'':acct.inst.organization}"></td>
                             <td th:text="${acct.acctNbr}"></td>
                             <td th:text="${acct.name}"></td>
                             <td th:text="${acct.ofxBankId}"></td>

@@ -2,7 +2,6 @@ package name.mutant.dough.web;
 
 import name.mutant.dough.data.Inst;
 import name.mutant.dough.data.InstRepository;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,17 +24,16 @@ public class InstController {
     private static final Logger logger = LoggerFactory.getLogger(InstController.class);
     private static final String defaultSortColumn = "id";
     // Does not include default sort column.
-    private static final String[] sortableColumns = {"organization","fid"};
+    private static final String[] sortableColumns = {"organization", "fid"};
     @Autowired
     private InstRepository instRepository;
 
     @RequestMapping("/instList")
-    public String list(
-            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-            @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
-            @RequestParam(value = "sortColumn", required = false, defaultValue = "id") String sortColumn,
-            @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") Sort.Direction sortDirection,
-            Model model) {
+    public String list(@RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+                       @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
+                       @RequestParam(value = "sortColumn", required = false, defaultValue = "id") String sortColumn,
+                       @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") Sort.Direction
+                                   sortDirection, Model model) {
 
         // Convert sort column from string to an array of strings.
         String[] sortColumns = {defaultSortColumn};

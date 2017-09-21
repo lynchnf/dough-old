@@ -1,6 +1,8 @@
 package name.mutant.dough.web;
 
 import name.mutant.dough.DoughException;
+import name.mutant.dough.data.Acct;
+import name.mutant.dough.data.AcctRepository;
 import name.mutant.dough.data.Inst;
 import name.mutant.dough.data.InstRepository;
 import name.mutant.dough.data.OfxFile;
@@ -21,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,7 +36,9 @@ public class OfxController {
     private static final Logger logger = LoggerFactory.getLogger(OfxController.class);
     private static final String defaultSortColumn = "id";
     // Does not include default sort column.
-    private static final String[] sortableColumns = {"originalFilename", "contentType", "size"};
+    private static final String[] sortableColumns = {"originalFilename", "contentType", "size", "uploadTimestamp"};
+    @Autowired
+    private AcctRepository acctRepository;
     @Autowired
     private InstRepository instRepository;
     @Autowired
@@ -60,9 +66,28 @@ public class OfxController {
                 String msg = "Unexpected Error: More than one Inst with fid=\"" + fid + "\".";
                 throw new DoughException(msg);
             }
-
-
-
+            String ofxAcctId = ofxParseResponse.getOfxAcct().getAcctId();
+            List<Acct> accts = acctRepository.findByOfxAcctIdAndInstId(ofxAcctId, inst.getId());
+            Acct acct = null;
+            if (accts.isEmpty()) {
+                Acct newAcct = new Acct();
+                newAcct.setInst(inst);
+                inst.getAccts().add(newAcct);
+                newAcct.setAcctNbr(ofxAcctId);
+                newAcct.setName(inst.getOrganization() + "-*" + ofxAcctId.substring(ofxAcctId.length() - 4));
+                newAcct.setOfxBankId(ofxParseResponse.getOfxAcct().getBankId());
+                newAcct.setOfxAcctId(ofxAcctId);
+                newAcct.setType(ofxParseResponse.getOfxAcct().getType());
+                newAcct.setBeginDate(new Date());
+                newAcct.setBeginBalance(BigDecimal.ZERO);
+                acct = acctRepository.save(newAcct);
+            } else if (accts.size() == 1) {
+                acct = accts.iterator().next();
+            } else {
+                String msg = "Unexpected Error: More than one Acct with fid=\"" + fid + "\" and acctId= \"" +
+                        ofxAcctId + "\".";
+                throw new DoughException(msg);
+            }
 
         } catch (DoughException e) {
             String errorMessage = e.getMessage();
@@ -71,12 +96,12 @@ public class OfxController {
     }
 
     @RequestMapping("/ofxFileList")
-    public String list(@RequestParam(value = "whereOriginalFilenameContains", required = false) String whereOriginalFilenameContains,
-            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-            @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
-            @RequestParam(value = "sortColumn", required = false, defaultValue = "id") String sortColumn,
-            @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") Sort.Direction sortDirection,
-            Model model) {
+    public String list(@RequestParam(value = "whereOriginalFilenameContains", required = false) String
+                                   whereOriginalFilenameContains, @RequestParam(value = "pageNumber", required =
+            false, defaultValue = "0") int pageNumber, @RequestParam(value = "pageSize", required = false,
+            defaultValue = "10") int pageSize, @RequestParam(value = "sortColumn", required = false, defaultValue =
+            "id") String sortColumn, @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC")
+            Sort.Direction sortDirection, Model model) {
 
         // Convert sort column from string to an array of strings.
         String[] sortColumns = {defaultSortColumn};

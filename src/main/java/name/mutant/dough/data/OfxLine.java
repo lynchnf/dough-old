@@ -1,6 +1,7 @@
 package name.mutant.dough.data;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,8 +19,8 @@ public class OfxLine {
     private Long id;
     @Version
     private Integer version;
-    @ManyToOne
-    //@JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ofx_file_id", nullable = false)
     private OfxFile ofxFile;
     private String text;
 

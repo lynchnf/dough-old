@@ -1,6 +1,7 @@
 package name.mutant.dough.service;
 
 import name.mutant.dough.DoughException;
+import name.mutant.dough.data.AcctType;
 import name.mutant.dough.data.OfxFile;
 import name.mutant.dough.data.OfxFileRepository;
 import name.mutant.dough.data.OfxLine;
@@ -58,13 +59,26 @@ public class OfxService {
     private static final String CATEGORY = "<CATEGORY>";
     private static final String MEMO = "<MEMO>";
     private static final DateFormat DF = new SimpleDateFormat("yyyyMMddHHmmss");
-
-    private enum State {
-        OFX, FI, BANKACCTFROM, CCACCTFROM, BANKTRANLIST, STMTTRN
-    }
-
     @Autowired
     OfxFileRepository ofxFileRepository;
+
+    private static void BadState(State state) throws DoughException {
+        String msg = "Invalid state=\"" + state + "\".";
+        logger.error(msg);
+        throw new DoughException(msg);
+    }
+
+    private static void BadToken(State state, String line) throws DoughException {
+        String msg = "Invalid token found: state=\"" + state + "\", line=\"" + line + "\".";
+        logger.error(msg);
+        throw new DoughException(msg);
+    }
+
+    private static void MissingToken(State state, String line) throws DoughException {
+        String msg = "No valid token found: state=\"" + state + "\", line=\"" + line + "\".";
+        logger.error(msg);
+        throw new DoughException(msg);
+    }
 
     public OfxFile upload(MultipartFile uploadedFile) throws DoughException {
         if (uploadedFile.isEmpty()) {
@@ -256,7 +270,8 @@ public class OfxService {
                     response.getOfxAcct().setAcctId(s);
                 } else if (ofxLine.getText().contains(ACCTTYPE)) {
                     String s = StringUtils.substringAfter(ofxLine.getText(), ACCTTYPE);
-                    response.getOfxAcct().setType(s);
+                    AcctType acctType = AcctType.valueOf(s);
+                    response.getOfxAcct().setType(acctType);
                 } else if (ofxLine.getText().contains(BANKTRANLIST)) {
                     BadToken(state, ofxLine.getText());
                 } else if (ofxLine.getText().contains(BANKTRANLIST_END)) {
@@ -510,21 +525,7 @@ public class OfxService {
         return response;
     }
 
-    private static void BadState(State state) throws DoughException {
-        String msg = "Invalid state=\"" + state + "\".";
-        logger.error(msg);
-        throw new DoughException(msg);
-    }
-
-    private static void BadToken(State state, String line) throws DoughException {
-        String msg = "Invalid token found: state=\"" + state + "\", line=\"" + line + "\".";
-        logger.error(msg);
-        throw new DoughException(msg);
-    }
-
-    private static void MissingToken(State state, String line) throws DoughException {
-        String msg = "No valid token found: state=\"" + state + "\", line=\"" + line + "\".";
-        logger.error(msg);
-        throw new DoughException(msg);
+    private enum State {
+        OFX, FI, BANKACCTFROM, CCACCTFROM, BANKTRANLIST, STMTTRN
     }
 }
