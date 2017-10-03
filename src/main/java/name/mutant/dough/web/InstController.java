@@ -28,7 +28,7 @@ public class InstController {
     @Autowired
     private InstRepository instRepository;
 
-    @RequestMapping("/instList")
+    @RequestMapping("/instListAction")
     public String list(@RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
                        @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
                        @RequestParam(value = "sortColumn", required = false, defaultValue = "id") String sortColumn,

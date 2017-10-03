@@ -23,7 +23,7 @@
 </div>
 <div class="content">
     <div class="container">
-        <form id="listForm" class="form-inline" action="#" method="post" th:action="@{/instList}">
+        <form id="listForm" class="form-inline" action="#" method="post" th:action="@{/instListAction}">
             <input type="hidden" class="pageNumber" name="pageNumber" th:value="${instListForm.number}"/>
             <input type="hidden" class="pageSize" name="pageSize" th:value="${instListForm.size}"/>
             <input type="hidden" class="sortColumn" name="sortColumn" th:value="${instListForm.sortColumn}"/>

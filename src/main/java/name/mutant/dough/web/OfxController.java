@@ -19,11 +19,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -46,12 +49,20 @@ public class OfxController {
     @Autowired
     private OfxService ofxService;
 
-    @RequestMapping("ofxFileUpload")
-    public String upload(@RequestParam("ofxFile") MultipartFile ofxFile) {
-        OfxFile savedOfxFile = null;
+    @PostMapping("/ofxFileUploadAction")
+    public String upload(@RequestParam("ofxFile") MultipartFile ofxFile, Model model, RedirectAttributes
+            redirectAttributes) {
         try {
-            savedOfxFile = ofxService.upload(ofxFile);
+            OfxFile savedOfxFile = ofxService.upload(ofxFile);
             OfxParseResponse ofxParseResponse = ofxService.parse(savedOfxFile.getId());
+            String successMessage = "File " + ofxFile.getOriginalFilename() + " successfully uploaded.";
+            logger.info(successMessage);
+            List<String> successMessages = new ArrayList<>();
+            successMessages.add(successMessage);
+            successMessages.add("This is a test message.");
+            successMessages.add("This is only a test message.");
+            redirectAttributes.addFlashAttribute("successMessages", successMessages);
+
             String fid = ofxParseResponse.getOfxInst().getFid();
             List<Inst> insts = instRepository.findByFid(fid);
             Inst inst = null;
@@ -88,14 +99,23 @@ public class OfxController {
                         ofxAcctId + "\".";
                 throw new DoughException(msg);
             }
-
+            return "redirect:/ofxFileList";
         } catch (DoughException e) {
-            String errorMessage = e.getMessage();
+            String msg = "Error uploading file " + ofxFile.getOriginalFilename() + ".";
+            logger.warn(msg, e);
+
+            List<String> errorMessages = new ArrayList<>();
+            errorMessages.add(msg);
+            errorMessages.add(e.getMessage());
+            errorMessages.add("This is a test message.");
+            errorMessages.add("This is only a test message.");
+            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+
+            return list(null, 0, 10, "id", Sort.Direction.ASC, model);
         }
-        return "redirect:/ofxFileList";
     }
 
-    @RequestMapping("/ofxFileList")
+    @RequestMapping("/ofxFileListAction")
     public String list(@RequestParam(value = "whereOriginalFilenameContains", required = false) String
                                    whereOriginalFilenameContains, @RequestParam(value = "pageNumber", required =
             false, defaultValue = "0") int pageNumber, @RequestParam(value = "pageSize", required = false,

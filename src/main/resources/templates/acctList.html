@@ -23,13 +23,17 @@
 </div>
 <div class="content">
     <div class="container">
-        <form id="listForm" class="form-inline" action="#" method="post" th:action="@{/acctList}">
+        <form id="listForm" class="form-inline" action="#" method="post" th:action="@{/acctListAction}">
             <input type="hidden" class="pageNumber" name="pageNumber" th:value="${acctListForm.number}"/>
             <input type="hidden" class="pageSize" name="pageSize" th:value="${acctListForm.size}"/>
             <input type="hidden" class="sortColumn" name="sortColumn" th:value="${acctListForm.sortColumn}"/>
             <input type="hidden" class="sortDirection" name="sortDirection" th:value="${acctListForm.sortDirection}"/>
             <input type="hidden" class="currentPage" th:value="${acctListForm.number}"/>
             <input type="hidden" class="totalPages" th:value="${acctListForm.totalPages}"/>
+            <input type="hidden" th:field="${acctListForm.whereOrganization}"/>
+            <input type="hidden" th:field="${acctListForm.whereName}"/>
+            <input type="hidden" th:field="${acctListForm.whereType}"/>
+            <input type="hidden" th:field="${acctListForm.whereAcctNbr}"/>
 
             <div class="row">
                 <div class="col-sm-12">
@@ -47,49 +51,61 @@
                             class="fa fa-angle-double-right fa-lg"></i></a>
                     </span>
                     &nbsp;&nbsp;&nbsp;page size <select class="changePageSize" data-list-form="listForm">
-                        <option value="5" th:selected="${acctListForm.size} == 5">5</option>
-                        <option value="10" th:selected="${acctListForm.size} == 10">10</option>
-                        <option value="20" th:selected="${acctListForm.size} == 20">20</option>
-                        <option value="50" th:selected="${acctListForm.size} == 50">50</option>
-                    </select>
+                    <option value="5" th:selected="${acctListForm.size} == 5">5</option>
+                    <option value="10" th:selected="${acctListForm.size} == 10">10</option>
+                    <option value="20" th:selected="${acctListForm.size} == 20">20</option>
+                    <option value="50" th:selected="${acctListForm.size} == 50">50</option>
+                </select>
                 </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-striped table-hover table-condensed">
                     <thead>
-                        <tr>
-                            <th><a class="changeSort" data-list-form="listForm" data-sort-column="id" href="#">Id</a></th>
-                            <th>Version</th>
-                            <th><a class="changeSort" data-list-form="listForm" data-sort-column="inst.organization" href="#">Organization</a></th>
-                            <th><a class="changeSort" data-list-form="listForm" data-sort-column="acctNbr" href="#">Acct
-                                Nbr</a></th>
-                            <th><a class="changeSort" data-list-form="listForm" data-sort-column="name" href="#">Name</a>
-                            </th>
-                            <th><a class="changeSort" data-list-form="listForm" data-sort-column="ofxBankId" href="#">Bank
-                                Id</a></th>
-                            <th><a class="changeSort" data-list-form="listForm" data-sort-column="ofxAcctId" href="#">Acct
-                                Id</a></th>
-                            <th><a class="changeSort" data-list-form="listForm" data-sort-column="type" href="#">Type</a>
-                            </th>
-                            <th><a class="changeSort" data-list-form="listForm" data-sort-column="beginDate" href="#">Begin
-                                Date</a></th>
-                            <th><a class="changeSort" data-list-form="listForm" data-sort-column="beginBalance" href="#">Begin
-                                Balance</a></th>
-                        </tr>
+                    <tr>
+                        <th></th>
+                        <th><a class="changeSort" data-list-form="listForm" data-sort-column="inst.organization"
+                               href="#">Organization</a></th>
+                        <th><a class="changeSort" data-list-form="listForm" data-sort-column="name" href="#">Name</a>
+                        </th>
+                        <th><a class="changeSort" data-list-form="listForm" data-sort-column="type" href="#">Type</a>
+                        </th>
+                        <th><a class="changeSort" data-list-form="listForm" data-sort-column="acctNbr" href="#">Acct
+                            Nbr</a></th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button type="button" id="filterAcctList" class="btn btn-primary btn-sm"
+                                    data-list-form="listForm"><i class="fa fa-filter"/> Filter
+                            </button>
+                        </td>
+                        <td><input type="text" id="newWhereOrganization" placeholder="contains"
+                                   th:value="${acctListForm.whereOrganization}"/></td>
+                        <td><input type="text" id="newWhereName" placeholder="contains"
+                                   th:value="${acctListForm.whereName}"/></td>
+                        <td><select id="newWhereType">
+                            <option value="">select</option>
+                            <option th:each="acctType : ${T(name.mutant.dough.data.AcctType).values()}"
+                                    th:value="${acctType}" th:text="${acctType}"
+                                    th:selected="${acctListForm.whereType} == ${acctType}"></option>
+                        </select></td>
+                        <td><input type="text" id="newWhereAcctNbr" placeholder="contains"
+                                   th:value="${acctListForm.whereAcctNbr}"/></td>
+                    </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="acct : ${acctListForm}">
-                            <td><span th:text="${acct.id}"/></td>
-                            <td th:text="${acct.version}"></td>
-                            <td th:text="${acct.inst==null?'':acct.inst.organization}"></td>
-                            <td th:text="${acct.acctNbr}"></td>
-                            <td th:text="${acct.name}"></td>
-                            <td th:text="${acct.ofxBankId}"></td>
-                            <td th:text="${acct.ofxAcctId}"></td>
-                            <td th:text="${acct.type}"></td>
-                            <td th:text="${#dates.format(acct.beginDate,'M/d/yyyy')}"></td>
-                            <td>$<span th:text="${#numbers.formatDecimal(acct.beginBalance,1,'DEFAULT',2,'DEFAULT')}"/></td>
-                        </tr>
+                    <tr th:each="acct : ${acctListForm}">
+                        <td>
+                            <a href="#" title="View" th:href="@{/acctViewAction(id=${acct.id})}"><i class="fa fa-eye"/></a>
+                            &nbsp;<a href="#" title="Edit" th:href="@{/acctEditAction(id=${acct.id})}"><i
+                                class="fa fa-pencil"/></a>
+                            &nbsp;<a href="#" title="Reconcile" th:href="@{/acctReconcileAction(id=${acct.id})}"><i
+                                class="fa fa-balance-scale"/></a>
+                        </td>
+                        <td th:text="${acct.inst==null?'':acct.inst.organization}"></td>
+                        <td th:text="${acct.name}"></td>
+                        <td th:text="${acct.type}"></td>
+                        <td th:text="${acct.acctNbr}"></td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -106,5 +122,6 @@
 <script src="js/ie10-viewport-bug-workaround.js"></script>
 <script src="js/menu.js"></script>
 <script src="js/common.js"></script>
+<script src="js/acctList.js"></script>
 </body>
 </html>

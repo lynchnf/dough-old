@@ -19,12 +19,18 @@
 <div class="header">
     <div class="container">
         <h1>OFX Files</h1>
+        <ul th:each="successMessage : ${successMessages}">
+            <li class="text-success" th:text="${successMessage}"></li>
+        </ul>
+        <ul th:each="errorMessage : ${errorMessages}">
+            <li class="text-danger" th:text="${errorMessage}"></li>
+        </ul>
     </div>
 </div>
 <div class="content">
     <div class="container">
         <form id="uploadForm" class="form-horizontal" action="#" method="post" enctype="multipart/form-data"
-              th:action="@{/ofxFileUpload}">
+              th:action="@{/ofxFileUploadAction}">
             <div class="form-group">
                 <label for="ofxFile" class="col-sm-2 control-label">Select File</label>
                 <div class="col-sm-10">
@@ -37,7 +43,7 @@
                 </div>
             </div>
         </form>
-        <form id="listForm" class="form-inline" action="#" method="post" th:action="@{/ofxFileList}">
+        <form id="listForm" class="form-inline" action="#" method="post" th:action="@{/ofxFileListAction}">
             <input type="hidden" class="whereOriginalFilenameContains"
                    th:field="${ofxFileListForm.whereOriginalFilenameContains}"/>
             <input type="hidden" class="pageNumber" name="pageNumber" th:value="${ofxFileListForm.number}"/>

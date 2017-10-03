@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Dough</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="css/footer.css"/>
+    <link rel="stylesheet" href="css/menu.css"/>
+    <link rel="stylesheet" href="css/main.css"/>
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="header">
+    <div class="container">
+        <h1>Account</h1>
+    </div>
+</div>
+<div class="content">
+    <div class="container">
+        <form class="form-horizontal" action="#" method="post" th:action="@{/acctEditAction}">
+            <input type="hidden" th:field="${acctEditForm.id}"/>
+            <input type="hidden" th:field="${acctEditForm.version}"/>
+            <div class="form-group">
+                <label for="instId" class="control-label col-sm-3 col-md-2">Organization</label>
+                <div class="col-sm-9 col-md-10">
+                    <select class="form-control" th:field="${acctEditForm.instId}">
+                        <option value="">select</option>
+                        <option th:each="inst : ${acctEditForm.allInsts}"
+                                th:value="${inst.id}" th:text="${inst.organization}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="name" class="control-label col-sm-3 col-md-2">Account Name</label>
+                <div class="col-sm-9 col-md-10">
+                    <input type="text" class="form-control" th:field="${acctEditForm.name}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="type" class="control-label col-sm-3 col-md-2">Account Type</label>
+                <div class="col-sm-9 col-md-10">
+                    <select class="form-control" th:field="${acctEditForm.type}">
+                        <option value="">select</option>
+                        <option th:each="acctType : ${T(name.mutant.dough.data.AcctType).values()}"
+                                th:value="${acctType}" th:text="${acctType}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="acctNbr" class="control-label col-sm-3 col-md-2">Account Number</label>
+                <div class="col-sm-9 col-md-10">
+                    <input type="text" class="form-control" th:field="${acctEditForm.acctNbr}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="ofxBankId" class="control-label col-sm-3 col-md-2">OFX Bank Id</label>
+                <div class="col-sm-9 col-md-10">
+                    <input type="text" class="form-control" th:field="${acctEditForm.ofxBankId}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="ofxAcctId" class="control-label col-sm-3 col-md-2">OFX Acct Id</label>
+                <div class="col-sm-9 col-md-10">
+                    <input type="text" class="form-control" th:field="${acctEditForm.ofxAcctId}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="beginDate" class="control-label col-sm-3 col-md-2">Begin Date</label>
+                <div class="col-sm-9 col-md-10">
+                    <input type="text" class="form-control" th:field="${acctEditForm.beginDate}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="beginBalance" class="control-label col-sm-3 col-md-2">Begin Balance</label>
+                <div class="col-sm-9 col-md-10">
+                    <input type="text" class="form-control" th:field="${acctEditForm.beginBalance}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-md-offset-2 col-sm-9 col-md-10">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="footer">
+    <div class="container">
+        <p>Page Footer Goes Here</p>
+    </div>
+</div>
+<script src="js/jquery-1.12.4.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/ie10-viewport-bug-workaround.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/common.js"></script>
+</body>
+</html>

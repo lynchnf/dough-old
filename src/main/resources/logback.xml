@@ -24,7 +24,6 @@
     </appender>
 
     <logger name="name.mutant.dough" level="debug"/>
-    <logger name="org.hibernate" level="debug"/>
     <root level="info">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
