@@ -1,0 +1,31 @@
+body {
+    background-color: #e8e8e8;
+}
+
+@media ( min-width : 768px) {
+    body {
+        background: white url('bg-sm.png') repeat-y center;
+    }
+}
+
+@media ( min-width : 992px) {
+    body {
+        background: white url('bg-md.png') repeat-y center;
+    }
+}
+
+@media ( min-width : 1200px) {
+    body {
+        background: white url('bg-lg.png') repeat-y center;
+    }
+}
+
+.header {
+    background-color: Gray;
+}
+
+.content {}
+
+.footer {
+    background-color: DarkGray;
+}

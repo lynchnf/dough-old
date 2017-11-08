@@ -1,0 +1,33 @@
+/* Needed for the sticky footer. */
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    background-color: #cccccc;
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+}
+
+header {
+    background-color: #bbbbbb;
+    font-family: FreeSerif, serif;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 50px;
+}
+
+.logo {
+    vertical-align: -25px;
+}
+
+footer {
+    background-color: #aaaaaa;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 60px;
+}
