@@ -60,35 +60,11 @@
                         <th>Balance</th>
                         <th>Last Tran</th>
                     </tr>
-                    <tr>
-                        <td>US Bank</td>
-                        <td>CHECKING</td>
-                        <td>-$1,234.56</td>
-                        <td>12/31/2017</td>
-                    </tr>
-                    <tr>
-                        <td>Planetary</td>
-                        <td>CREDIT_CARD</td>
-                        <td>-$1,234.56</td>
-                        <td>12/31/2017</td>
-                    </tr>
-                    <tr>
-                        <td>Spirit</td>
-                        <td>CREDIT_CARD</td>
-                        <td>-$1,234.56</td>
-                        <td>12/31/2017</td>
-                    </tr>
-                    <tr>
-                        <td>United</td>
-                        <td>CREDIT_CARD</td>
-                        <td>-$1,234.56</td>
-                        <td>12/31/2017</td>
-                    </tr>
-                    <tr>
-                        <td>BancorpSouth</td>
-                        <td>CREDIT_CARD</td>
-                        <td>-$1,234.56</td>
-                        <td>12/31/2017</td>
+                    <tr th:each="accountBalance : ${accountBalances}">
+                        <td th:text="${accountBalance.name}"></td>
+                        <td th:text="${accountBalance.type}"></td>
+                        <td th:text="${#numbers.formatDecimal(accountBalance.balance,1,'DEFAULT',2,'DEFAULT')}"></td>
+                        <td th:text="${#dates.format(accountBalance.lastTransDate,'M/d/yyyy')}"></td>
                     </tr>
                 </table>
                 <form class="form-inline">
