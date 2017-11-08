@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Title Goes Here</title>
-    <link rel="stylesheet" href="css/bootstrap.css">
-    <link rel="stylesheet" href="css/main.css">
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Dough</title>
+    <link rel="stylesheet" href="css/bootstrap.css"/>
+    <link rel="stylesheet" href="css/main.css"/>
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -16,8 +16,8 @@
 
 <header>
     <div class="container">
-        <img class="logo" src="images/logo.png" alt="Logo">
-        Project Name
+        <img class="logo" src="images/logo.png" alt="Logo"/>
+        Dough
     </div>
 </header>
 
@@ -91,18 +91,12 @@
                         <td>12/31/2017</td>
                     </tr>
                 </table>
-                <form class="form-horizontal">
+                <form class="form-inline">
                     <div class="form-group">
-                        <label for="uploadfile" class="col-sm-4 control-label">File To Upload</label>
-                        <div class="col-sm-8">
-                            <input id="uploadfile" type="file" class="form-control-static">
-                        </div>
+                        <label for="uploadfile" class="control-label">File To Upload</label>
+                        <input id="uploadfile" type="file" class="form-control-static"/>
                     </div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-4 col-sm-8">
-                            <button type="submit" class="btn btn-primary">Upload</button>
-                        </div>
-                    </div>
+                    <button type="submit" class="btn btn-primary">Upload</button>
                 </form>
             </div>
             <div class="col-sm-6">
@@ -252,8 +246,10 @@
         <p>Page Footer Goes Here</p>
     </div>
 </footer>
+
 <script src="js/jquery-1.11.1.js"></script>
 <script src="js/bootstrap.js"></script>
 <script src="js/ie10-viewport-bug-workaround.js"></script>
 <script src="js/common.js"></script>
 </body>
+</html>
