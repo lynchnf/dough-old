@@ -1,110 +1,104 @@
 package name.mutant.dough.service;
 
+import name.mutant.dough.DoughNotFoundException;
+import name.mutant.dough.DoughOptimisticLockingException;
+import name.mutant.dough.FakeDataUtil;
 import name.mutant.dough.domain.Acct;
 import name.mutant.dough.domain.Tran;
-import name.mutant.dough.service.filter.request.OrderByDirection;
-import name.mutant.dough.service.filter.request.TranFilterRequest;
-import name.mutant.dough.service.filter.request.TranOrderByField;
-import name.mutant.dough.service.filter.response.TranFilterResponse;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.After;
+import name.mutant.dough.repository.TranRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
+@RunWith(SpringRunner.class)
 public class TranServiceTest {
-    private static final Long READ_TRAN_ID = Long.valueOf(5144);
-    private static final String READ_TRAN_NAME = "read tki";
-    private static final Long SAVE_TRAN_ID = Long.valueOf(8909);
-    private static final String SAVE_TRAN_NAME = "save jma";
-    private static final Long READ_ACCT_ID = Long.valueOf(3317);
-    private static final Long[] FILTER_TRAN_ID = {Long.valueOf(4181), Long.valueOf(7915), Long.valueOf(2198)};
-    private static final String[] FILTER_TRAN_NAME = {"filter glv", "filter hxb", "filter iqi"};
-    private static final String READ_FITID = "2714";
+    private Long tran1Id;
+    private Long tran2Id;
+    private Acct acct1;
+    private Tran tran1;
+    private String tran1Name;
+
+    @TestConfiguration
+    static class TranServiceTestConfiguration {
+        @Bean
+        public TranService tranService() {
+            return new TranService();
+        }
+    }
+
+    @Autowired
+    private TranService tranService;
+    @MockBean
+    private TranRepository tranRepository;
 
     @Before
     public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    @Test
-    public void testReadTran() throws Exception {
-        Tran tran = TranService.readTran(READ_TRAN_ID);
-        assertNotNull(tran);
-        assertEquals(READ_TRAN_NAME, tran.getName());
+        tran1Id = Long.valueOf(1);
+        tran2Id = Long.valueOf(2);
+        acct1 = FakeDataUtil.buildAcct(3);
+        tran1 = FakeDataUtil.buildTran(acct1, tran1Id, null);
+        tran1Name = tran1.getName();
     }
 
     @Test
-    public void testSaveTran() throws Exception {
-        // Start by verifying that our test tran exists.
-        Tran tran1 = TranService.readTran(SAVE_TRAN_ID);
-        assertEquals(SAVE_TRAN_NAME, tran1.getName());
-        assertNotEquals(Integer.valueOf(0), tran1.getVersion());
-
-        // Try updating the name.
-        Tran tran2 = new Tran();
-        tran2.setId(tran1.getId());
-        tran2.setVersion(tran1.getVersion());
-
-        Long acctId = tran1.getAcct().getId();
-        Acct newAcct = AcctService.readAcct(acctId);
-        tran2.setAcct(newAcct);
-
-        tran2.setFitId(tran1.getFitId());
-        String newName = StringUtils.replace(SAVE_TRAN_NAME, "save", "changed");
-        tran2.setName(newName);
-        TranService.saveTran(tran2);
-
-        // Verify that our test tran has really been changed.
-        Tran tran3 = TranService.readTran(SAVE_TRAN_ID);
-        assertEquals(newName, tran3.getName());
+    public void findTranById() throws Exception {
+        Mockito.when(tranRepository.findById(tran1Id)).thenReturn(Optional.of(tran1));
+        Tran tran = tranService.findTranById(tran1Id);
+        assertEquals(tran1Name, tran.getName());
     }
 
     @Test
-    public void testFilterTrans() throws Exception {
-        TranFilterRequest request = new TranFilterRequest();
-        request.setMax(3); // three records per page
-        request.setFirst(3); // show second page
-        request.setOrderByField(TranOrderByField.POST_DATE); // sort by due date
-        request.setOrderByDirection(OrderByDirection.DESC); // sort backwards
-        request.setWhereNameLike("filter"); // select only names containing "filter"
-        TranFilterResponse response = TranService.filterTrans(request);
-/*
-        System.out.println("Test Filter Trans"); // DEBUG
-        System.out.println("idx    id  name        post"); // DEBUG
-        List<Tran> resultList = response.getResultList(); // DEBUG
-        for (int i = 0; i < resultList.size(); i++) { // DEBUG
-            System.out.printf(" %2d  %4s  %-10s  %tF%n",
-                    i,
-                    resultList.get(i).getId(),
-                    resultList.get(i).getName(),
-                    resultList.get(i).getPostDate()); // DEBUG
-        } // DEBUG
-*/
-
-        // There should be ten unpaid records with names containing "filter".
-        assertEquals(Long.valueOf(10), response.getCount());
-
-        // We should fetch the fourth to sixth records in due date order.
-        assertEquals(FILTER_TRAN_ID.length, response.getResultList().size());
-        for (int i = 0; i < response.getResultList().size(); i++) {
-            assertEquals(FILTER_TRAN_ID[i], response.getResultList().get(i).getId());
-            assertEquals(FILTER_TRAN_NAME[i], response.getResultList().get(i).getName());
+    public void findTranByIdNotFound() {
+        Mockito.when(tranRepository.findById(tran2Id)).thenReturn(Optional.empty());
+        try {
+            Tran tran = tranService.findTranById(tran2Id);
+            fail();
+        } catch (DoughNotFoundException e) {
         }
     }
 
     @Test
-    public void testReadTranByAcctAndFitId() throws Exception {
-        Tran tran1 = TranService.readTranByAcctAndFitId(READ_ACCT_ID, READ_FITID);
-        assertNotNull(tran1);
-        assertEquals(READ_TRAN_NAME, tran1.getName());
+    public void saveTran() throws Exception {
+        List<Tran> trans1 = new ArrayList<>();
+        trans1.add(tran1);
+        Mockito.when(tranRepository.saveAll(Mockito.anyIterable())).thenReturn(trans1);
+        Iterable<Tran> trans2 = tranService.saveAllTrans(trans1);
+        Iterator<Tran> trans2Iterator = trans2.iterator();
+        assertEquals(tran1Name, trans2Iterator.next().getName());
+        assertFalse(trans2Iterator.hasNext());
+    }
+
+    @Test
+    public void saveTranOptimisticLocking() {
+        List<Tran> trans1 = new ArrayList<>();
+        trans1.add(tran1);
+        Mockito.when(tranRepository.saveAll(Mockito.anyIterable()))
+                .thenThrow(ObjectOptimisticLockingFailureException.class);
+        try {
+            Iterable<Tran> trans2 = tranService.saveAllTrans(trans1);
+            fail();
+        } catch (DoughOptimisticLockingException e) {
+        }
+    }
+
+    @Test
+    public void findAllNonAssigned() {
+        Mockito.when(tranRepository.findAll()).thenReturn(new ArrayList<>());
+        Iterable<Tran> trans = tranService.findAllNonAssigned();
+        assertFalse(trans.iterator().hasNext());
     }
 }

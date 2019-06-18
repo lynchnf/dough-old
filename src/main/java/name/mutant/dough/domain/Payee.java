@@ -1,39 +1,37 @@
 package name.mutant.dough.domain;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Version;
-import java.io.Serializable;
-import java.math.BigDecimal;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "payee")
-public class Payee implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private Long id;
-    private Integer version;
-    private String name;
-    private String acctNbr;
-    private PayeeType type;
-    private String cronExpression;
-    private Integer nbrEstToCreate;
-    private BigDecimal estAmount;
-    private List<Payable> payables = new ArrayList<>();
-
+public class Payee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", nullable = false)
+    private Long id;
+    @Version
+    private Integer version = 0;
+    @Column(length = 50)
+    private String name;
+    @Column(length = 50)
+    private String number;
+    @Column(length = 50)
+    private String nickname;
+    @Column(length = 50)
+    private String address1;
+    @Column(length = 50)
+    private String address2;
+    @Column(length = 50)
+    private String city;
+    @Column(length = 2)
+    private String state;
+    @Column(length = 10)
+    private String zipCode;
+    @Column(length = 20)
+    private String phoneNumber;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "payee")
+    private List<Payable> payables = new ArrayList<>();
+
     public Long getId() {
         return id;
     }
@@ -42,8 +40,6 @@ public class Payee implements Serializable {
         this.id = id;
     }
 
-    @Version
-    @Column(name = "VERSION")
     public Integer getVersion() {
         return version;
     }
@@ -52,7 +48,6 @@ public class Payee implements Serializable {
         this.version = version;
     }
 
-    @Column(name = "NAME", length = 255)
     public String getName() {
         return name;
     }
@@ -61,53 +56,70 @@ public class Payee implements Serializable {
         this.name = name;
     }
 
-    @Column(name = "ACCT_NBR", length = 20)
-    public String getAcctNbr() {
-        return acctNbr;
+    public String getNumber() {
+        return number;
     }
 
-    public void setAcctNbr(String acctNbr) {
-        this.acctNbr = acctNbr;
+    public void setNumber(String number) {
+        this.number = number;
     }
 
-    @Column(name = "TYPE")
-    @Enumerated(EnumType.STRING)
-    public PayeeType getType() {
-        return type;
+    public String getNickname() {
+        return nickname;
     }
 
-    public void setType(PayeeType type) {
-        this.type = type;
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
-    @Column(name = "CRON_EXPRESSION", length = 50)
-    public String getCronExpression() {
-        return cronExpression;
+    public String getAddress1() {
+        return address1;
     }
 
-    public void setCronExpression(String cronExpression) {
-        this.cronExpression = cronExpression;
+    public void setAddress1(String address1) {
+        this.address1 = address1;
     }
 
-    @Column(name = "NBR_EST_TO_CREATE")
-    public Integer getNbrEstToCreate() {
-        return nbrEstToCreate;
+    public String getAddress2() {
+        return address2;
     }
 
-    public void setNbrEstToCreate(Integer nbrEstToCreate) {
-        this.nbrEstToCreate = nbrEstToCreate;
+    public void setAddress2(String address2) {
+        this.address2 = address2;
     }
 
-    @Column(name = "EST_AMOUNT", precision = 9, scale = 2)
-    public BigDecimal getEstAmount() {
-        return estAmount;
+    public String getCity() {
+        return city;
     }
 
-    public void setEstAmount(BigDecimal estAmount) {
-        this.estAmount = estAmount;
+    public void setCity(String city) {
+        this.city = city;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "payee")
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public List<Payable> getPayables() {
         return payables;
     }

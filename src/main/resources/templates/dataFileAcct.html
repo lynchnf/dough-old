@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head::head"></head>
+<body>
+<header th:replace="fragments/header::header"></header>
+<main class="container">
+    <h1>Data File Upload to Account</h1>
+    <div th:replace="fragments/alerts::alerts"></div>
+    <p>Data has been uploaded and it cannot be determined unambiguously which account it belongs to.</p>
+    <div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Organization</label>
+            <div class="col-sm-9">
+                <p class="form-control-plaintext" th:text="${ofxInst.organization}"></p>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">FID</label>
+            <div class="col-sm-9">
+                <p class="form-control-plaintext" th:text="${ofxInst.fid}"></p>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Bank Id</label>
+            <div class="col-sm-9">
+                <p class="form-control-plaintext" th:text="${ofxAcct.bankId}"></p>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Acct Id</label>
+            <div class="col-sm-9">
+                <p class="form-control-plaintext" th:text="${ofxAcct.acctId}"></p>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Type</label>
+            <div class="col-sm-9">
+                <p class="form-control-plaintext" th:text="${ofxAcct.type}"></p>
+            </div>
+        </div>
+    </div>
+    <p>Maybe one of the following accounts has changed it's account number. If so, please select that account.</p>
+    <table class="table table-sm table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Begin Date</th>
+            <th>Type</th>
+            <th>Number</th>
+            <th>Eff Date</th>
+        </tr>
+        <tr th:each="acctNbr:${acctNbrs}">
+            <td><a th:href="@{/acctUpload(dataFileId=${dataFileId},acctId=${acctNbr.acct.id})}"
+                   th:text="${acctNbr.acct.name}"></a></td>
+            <td th:text="${#dates.format(acctNbr.acct.beginDate,'M/d/yyyy')}"></td>
+            <td th:text="${acctNbr.acct.type}"></td>
+            <td th:text="${acctNbr.number}"></td>
+            <td th:text="${#dates.format(acctNbr.effDate,'M/d/yyyy')}"></td>
+        </tr>
+    </table>
+    <p>Maybe it's a completely new account. If so, please click <a th:href="@{/acctUpload(dataFileId=${dataFileId})}">here</a>.
+    </p>
+</main>
+<footer th:replace="fragments/footer::footer"></footer>
+</body>
+</html>

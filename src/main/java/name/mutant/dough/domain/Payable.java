@@ -1,42 +1,36 @@
 package name.mutant.dough.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
-import java.io.Serializable;
+import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
-@Table(name = "payable")
-public class Payable implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private Long id;
-    private Integer version;
-    private Payee payee;
-    private Date estDueDate;
-    private BigDecimal estAmount;
-    private Date actDueDate;
-    private BigDecimal actAmount;
-    private String memo;
-    private Date paidDate;
-    private BigDecimal paidAmount;
-    private String confirmCode;
-    private Boolean noBill;
-    private Boolean missedBill;
-
+public class Payable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", nullable = false)
+    private Long id;
+    @Version
+    private Integer version = 0;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payee_id", nullable = false)
+    private Payee payee;
+    @Temporal(TemporalType.DATE)
+    private Date dueDate;
+    @Column(precision = 9, scale = 2)
+    private BigDecimal amountDue;
+    @Column(precision = 9, scale = 2)
+    private BigDecimal previousBalance;
+    @Column(precision = 9, scale = 2)
+    private BigDecimal previousPayments;
+    @Temporal(TemporalType.DATE)
+    private Date statementDate;
+    @Column(precision = 9, scale = 2)
+    private BigDecimal minimumPayment;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "payable")
+    private List<Payment> payments = new ArrayList<>();
+
     public Long getId() {
         return id;
     }
@@ -45,8 +39,6 @@ public class Payable implements Serializable {
         this.id = id;
     }
 
-    @Version
-    @Column(name = "VERSION")
     public Integer getVersion() {
         return version;
     }
@@ -55,8 +47,6 @@ public class Payable implements Serializable {
         this.version = version;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PAYEE_ID", nullable = false)
     public Payee getPayee() {
         return payee;
     }
@@ -65,96 +55,59 @@ public class Payable implements Serializable {
         this.payee = payee;
     }
 
-    @Column(name = "EST_DUE_DATE")
-    @Temporal(TemporalType.DATE)
-    public Date getEstDueDate() {
-        return estDueDate;
+    public Date getDueDate() {
+        return dueDate;
     }
 
-    public void setEstDueDate(Date estDueDate) {
-        this.estDueDate = estDueDate;
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
     }
 
-    @Column(name = "EST_AMOUNT", precision = 9, scale = 2)
-    public BigDecimal getEstAmount() {
-        return estAmount;
+    public BigDecimal getAmountDue() {
+        return amountDue;
     }
 
-    public void setEstAmount(BigDecimal estAmount) {
-        this.estAmount = estAmount;
+    public void setAmountDue(BigDecimal amountDue) {
+        this.amountDue = amountDue;
     }
 
-    @Column(name = "ACT_DUE_DATE")
-    @Temporal(TemporalType.DATE)
-    public Date getActDueDate() {
-        return actDueDate;
+    public BigDecimal getPreviousBalance() {
+        return previousBalance;
     }
 
-    public void setActDueDate(Date actDueDate) {
-        this.actDueDate = actDueDate;
+    public void setPreviousBalance(BigDecimal previousBalance) {
+        this.previousBalance = previousBalance;
     }
 
-    @Column(name = "ACT_AMOUNT", precision = 9, scale = 2)
-    public BigDecimal getActAmount() {
-        return actAmount;
+    public BigDecimal getPreviousPayments() {
+        return previousPayments;
     }
 
-    public void setActAmount(BigDecimal actAmount) {
-        this.actAmount = actAmount;
+    public void setPreviousPayments(BigDecimal previousPayments) {
+        this.previousPayments = previousPayments;
     }
 
-    @Column(name = "MEMO", length = 255)
-    public String getMemo() {
-        return memo;
+    public Date getStatementDate() {
+        return statementDate;
     }
 
-    public void setMemo(String memo) {
-        this.memo = memo;
+    public void setStatementDate(Date statementDate) {
+        this.statementDate = statementDate;
     }
 
-    @Column(name = "PAID_DATE")
-    @Temporal(TemporalType.DATE)
-    public Date getPaidDate() {
-        return paidDate;
+    public BigDecimal getMinimumPayment() {
+        return minimumPayment;
     }
 
-    public void setPaidDate(Date paidDate) {
-        this.paidDate = paidDate;
+    public void setMinimumPayment(BigDecimal minimumPayment) {
+        this.minimumPayment = minimumPayment;
     }
 
-    @Column(name = "PAID_AMOUNT", precision = 9, scale = 2)
-    public BigDecimal getPaidAmount() {
-        return paidAmount;
+    public List<Payment> getPayments() {
+        return payments;
     }
 
-    public void setPaidAmount(BigDecimal paidAmount) {
-        this.paidAmount = paidAmount;
-    }
-
-    @Column(name = "CONFIRM_CODE", length = 20)
-    public String getConfirmCode() {
-        return confirmCode;
-    }
-
-    public void setConfirmCode(String confirmCode) {
-        this.confirmCode = confirmCode;
-    }
-
-    @Column(name = "NO_BILL")
-    public Boolean getNoBill() {
-        return noBill;
-    }
-
-    public void setNoBill(Boolean noBill) {
-        this.noBill = noBill;
-    }
-
-    @Column(name = "MISSED_BILL")
-    public Boolean getMissedBill() {
-        return missedBill;
-    }
-
-    public void setMissedBill(Boolean missedBill) {
-        this.missedBill = missedBill;
+    public void setPayments(List<Payment> payments) {
+        this.payments = payments;
     }
 }

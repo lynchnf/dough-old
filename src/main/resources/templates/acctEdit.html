@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head::head"></head>
+<body>
+<header th:replace="fragments/header::header"></header>
+<main class="container">
+    <h1 th:text="${(acctForm.dataFileId != null)?'Account Edit from Upload':'Account Edit'}"></h1>
+    <div th:replace="fragments/alerts::alerts"></div>
+    <form th:action="@{/acctEdit}" th:object="${acctForm}" method="post">
+        <ul class="alert alert-danger" th:if="${#fields.hasAnyErrors()}">
+            <li th:each="err:${#fields.allErrors()}" th:text="${err}"></li>
+        </ul>
+        <input type="hidden" th:field="*{id}"/> <input type="hidden" th:field="*{version}"/>
+        <input type="hidden" th:field="*{oldNumber}"/> <input type="hidden" th:field="*{oldEffDate}"/>
+        <input type="hidden" th:field="*{dataFileId}"/>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Name</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{name}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Begin Date (M/d/yyyy)</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{beginDate}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Begin Balance</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{beginBalance}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Organization</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{organization}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">FID</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{fid}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Bank Id</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{bankId}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Type</label>
+            <div class="col-sm-9">
+                <select class="form-control" th:field="*{type}" th:errorclass="is-invalid">
+                    <option value="">Please select ...</option>
+                    <option th:each="acctType:${T(name.mutant.dough.domain.AcctType).values()}" th:value="${acctType}" th:text="${acctType}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Credit Limit</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{creditLimit}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Number</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{number}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row" th:if="*{id}">
+            <label class="col-sm-3 col-form-label">Eff Date (M/d/yyyy)</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{effDate}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary" th:text="${(acctForm.dataFileId != null)?'Save and Continue Upload':'Save'}"></button>
+    </form>
+</main>
+<footer th:replace="fragments/footer::footer"></footer>
+<script>
+    $("#beginDate").datepicker({uiLibrary: "bootstrap4"});
+</script>
+</body>
+</html>

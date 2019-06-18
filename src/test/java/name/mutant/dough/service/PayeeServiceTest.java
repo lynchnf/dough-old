@@ -1,100 +1,93 @@
 package name.mutant.dough.service;
 
+import name.mutant.dough.DoughNotFoundException;
+import name.mutant.dough.DoughOptimisticLockingException;
+import name.mutant.dough.FakeDataUtil;
 import name.mutant.dough.domain.Payee;
-import name.mutant.dough.service.filter.request.OrderByDirection;
-import name.mutant.dough.service.filter.request.PayeeFilterRequest;
-import name.mutant.dough.service.filter.request.PayeeOrderByField;
-import name.mutant.dough.service.filter.response.PayeeFilterResponse;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.After;
+import name.mutant.dough.repository.PayeeRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
+@RunWith(SpringRunner.class)
 public class PayeeServiceTest {
-    private static final Long READ_PAYEE_ID = Long.valueOf(748);
-    private static final String READ_PAYEE_NAME = "read dxk";
-    private static final Long SAVE_PAYEE_ID = Long.valueOf(255);
-    private static final String SAVE_PAYEE_NAME = "save jog";
-    public static final Long[] FILTER_PAYEE_ID = {Long.valueOf(6861), Long.valueOf(8818), Long.valueOf(6414)};
-    public static final String[] FILTER_PAYEE_NAME = {"filter lvy", "filter leo", "filter gsi"};
+    private Long payee1Id;
+    private Long payee2Id;
+    private Payee payee1;
+    private String payee1Name;
+
+    @TestConfiguration
+    static class PayeeServiceTestConfiguration {
+        @Bean
+        public PayeeService payeeService() {
+            return new PayeeService();
+        }
+    }
+
+    @Autowired
+    private PayeeService payeeService;
+    @MockBean
+    private PayeeRepository payeeRepository;
 
     @Before
     public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
+        payee1Id = Long.valueOf(1);
+        payee2Id = Long.valueOf(2);
+        payee1 = FakeDataUtil.buildPayee(payee1Id);
+        payee1Name = payee1.getName();
     }
 
     @Test
-    public void testReadPayee() throws Exception {
-        Payee payee2 = PayeeService.readPayee(READ_PAYEE_ID);
-        assertNotNull(payee2);
-        assertEquals(READ_PAYEE_NAME, payee2.getName());
+    public void findAllPayees() {
+        Mockito.when(payeeRepository.findAll()).thenReturn(new ArrayList<>());
+        Iterable<Payee> payees = payeeService.findAllPayees();
+        assertFalse(payees.iterator().hasNext());
     }
 
-/*
     @Test
-    public void testSavePayee() throws Exception {
-        // Start by verifying that our test payee exists.
-        Payee payee1 = PayeeService.readPayee(SAVE_PAYEE_ID);
-        assertEquals(SAVE_PAYEE_NAME, payee1.getName());
-        assertNotEquals(Integer.valueOf(0), payee1.getVersion());
-
-        // Try updating the name.
-        Payee payee2 = new Payee();
-        payee2.setId(payee1.getId());
-        payee2.setVersion(Integer.valueOf(0));
-        String newName = StringUtils.replace(SAVE_PAYEE_NAME, "save", "changed");
-        payee2.setName(newName);
-        payee2.setVersion(payee1.getVersion());
-        PayeeService.savePayee(payee2);
-
-        // Verify that our test payee has really been changed.
-        Payee payee3 = PayeeService.readPayee(SAVE_PAYEE_ID);
-        assertEquals(newName, payee3.getName());
+    public void findPayeeById() throws Exception {
+        Mockito.when(payeeRepository.findById(payee1Id)).thenReturn(Optional.of(payee1));
+        Payee payee = payeeService.findPayeeById(payee1Id);
+        assertEquals(payee1Name, payee.getName());
     }
-*/
 
     @Test
-    public void testFilterPayees() throws Exception {
-        // Set up our filter request.
-        PayeeFilterRequest request = new PayeeFilterRequest();
-        request.setMax(3); // three records per page
-        request.setFirst(3); // show second page
-        request.setOrderByField(PayeeOrderByField.NAME); // sort by name
-        request.setOrderByDirection(OrderByDirection.DESC); // sort backwards
-        request.setWhereNameLike("filter"); // select only names containing "filter"
+    public void findPayeeByIdNotFound() {
+        Mockito.when(payeeRepository.findById(payee2Id)).thenReturn(Optional.empty());
+        try {
+            Payee payee = payeeService.findPayeeById(payee2Id);
+            fail();
+        } catch (DoughNotFoundException e) {
+        }
+    }
 
-        PayeeFilterResponse response = PayeeService.filterPayees(request);
-/*
-        List<Payee> resultList = response.getResultList(); // DEBUG
-        for (int i = 0; i < resultList.size(); i++) { // DEBUG
-            System.out.println("resultList[" + i + "]=\"" +
-                    resultList.get(i).getId() + "\", \"" +
-                    resultList.get(i).getName() + "\", \"" +
-                    resultList.get(i).getAcctNbr() + "\", \"" +
-                    resultList.get(i).getType() + "\", \"" +
-                    resultList.get(i).getCronExpression() + "\", \"" +
-                    resultList.get(i).getNbrEstToCreate() + "\", \"" +
-                    resultList.get(i).getEstAmount() + "\""); // DEBUG
-        } // DEBUG
-*/
+    @Test
+    public void savePayee() throws Exception {
+        Mockito.when(payeeRepository.save(Mockito.any(Payee.class))).thenReturn(payee1);
+        Payee payee = payeeService.savePayee(payee1);
+        assertEquals(payee1Name, payee.getName());
+    }
 
-        // There should be ten records with names containing "filter".
-        assertEquals(Long.valueOf(10), response.getCount());
-
-        // We should fetch the fourth to sixth records in reverse name order.
-        assertEquals(FILTER_PAYEE_ID.length, response.getResultList().size());
-        for (int i = 0; i < response.getResultList().size(); i++) {
-            assertEquals(FILTER_PAYEE_ID[i], response.getResultList().get(i).getId());
-            assertEquals(FILTER_PAYEE_NAME[i], response.getResultList().get(i).getName());
+    @Test
+    public void savePayeeOptimisticLocking() {
+        Mockito.when(payeeRepository.save(Mockito.any(Payee.class)))
+                .thenThrow(ObjectOptimisticLockingFailureException.class);
+        try {
+            Payee payee = payeeService.savePayee(payee1);
+            fail();
+        } catch (DoughOptimisticLockingException e) {
         }
     }
 }

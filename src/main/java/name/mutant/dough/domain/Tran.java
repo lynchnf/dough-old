@@ -1,44 +1,50 @@
 package name.mutant.dough.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
-import javax.persistence.Version;
-import java.io.Serializable;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name = "tran", uniqueConstraints = {@UniqueConstraint(columnNames = {"ACCT_ID", "FITID"})})
-public class Tran implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private Long id;
-    private Integer version;
-    private Acct acct;
-    private TranType type;
-    private Date postDate;
-    private Date userDate;
-    private BigDecimal amount;
-    private String fitId;
-    private String sic;
-    private String checkNumber;
-    private String name;
-    private String memo;
-
+public class Tran {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", nullable = false)
+    private Long id;
+    @Version
+    private Integer version = 0;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "acct_id", nullable = false)
+    private Acct acct;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private TranType type;
+    @Temporal(TemporalType.DATE)
+    private Date postDate;
+    @Temporal(TemporalType.DATE)
+    private Date userDate;
+    @Column(precision = 9, scale = 2)
+    private BigDecimal amount;
+    @Column(length = 255)
+    private String fitId;
+    @Column(length = 10)
+    private String sic;
+    @Column(length = 10)
+    private String checkNumber;
+    @Column(length = 255)
+    private String correctFitId;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private CorrectAction correctAction;
+    @Column(length = 255)
+    private String name;
+    @Column(length = 10)
+    private String ofxCategory;
+    @Column(length = 255)
+    private String memo;
+    private Boolean reconciled;
+
     public Long getId() {
         return id;
     }
@@ -47,8 +53,6 @@ public class Tran implements Serializable {
         this.id = id;
     }
 
-    @Version
-    @Column(name = "VERSION")
     public Integer getVersion() {
         return version;
     }
@@ -57,8 +61,6 @@ public class Tran implements Serializable {
         this.version = version;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ACCT_ID", nullable = false)
     public Acct getAcct() {
         return acct;
     }
@@ -67,8 +69,14 @@ public class Tran implements Serializable {
         this.acct = acct;
     }
 
-    @Column(name = "TYPE")
-    @Enumerated(EnumType.STRING)
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     public TranType getType() {
         return type;
     }
@@ -77,8 +85,6 @@ public class Tran implements Serializable {
         this.type = type;
     }
 
-    @Column(name = "POST_DATE")
-    @Temporal(TemporalType.DATE)
     public Date getPostDate() {
         return postDate;
     }
@@ -87,8 +93,6 @@ public class Tran implements Serializable {
         this.postDate = postDate;
     }
 
-    @Column(name = "USER_DATE")
-    @Temporal(TemporalType.DATE)
     public Date getUserDate() {
         return userDate;
     }
@@ -97,7 +101,6 @@ public class Tran implements Serializable {
         this.userDate = userDate;
     }
 
-    @Column(name = "AMOUNT", precision = 9, scale = 2)
     public BigDecimal getAmount() {
         return amount;
     }
@@ -106,7 +109,6 @@ public class Tran implements Serializable {
         this.amount = amount;
     }
 
-    @Column(name = "FITID", length = 100, nullable = false)
     public String getFitId() {
         return fitId;
     }
@@ -115,7 +117,6 @@ public class Tran implements Serializable {
         this.fitId = fitId;
     }
 
-    @Column(name = "SIC", length = 10)
     public String getSic() {
         return sic;
     }
@@ -124,7 +125,6 @@ public class Tran implements Serializable {
         this.sic = sic;
     }
 
-    @Column(name = "CHECK_NUMBER", length = 10)
     public String getCheckNumber() {
         return checkNumber;
     }
@@ -133,7 +133,22 @@ public class Tran implements Serializable {
         this.checkNumber = checkNumber;
     }
 
-    @Column(name = "NAME", length = 255)
+    public String getCorrectFitId() {
+        return correctFitId;
+    }
+
+    public void setCorrectFitId(String correctFitId) {
+        this.correctFitId = correctFitId;
+    }
+
+    public CorrectAction getCorrectAction() {
+        return correctAction;
+    }
+
+    public void setCorrectAction(CorrectAction correctAction) {
+        this.correctAction = correctAction;
+    }
+
     public String getName() {
         return name;
     }
@@ -142,12 +157,27 @@ public class Tran implements Serializable {
         this.name = name;
     }
 
-    @Column(name = "MEMO", length = 255)
+    public String getOfxCategory() {
+        return ofxCategory;
+    }
+
+    public void setOfxCategory(String ofxCategory) {
+        this.ofxCategory = ofxCategory;
+    }
+
     public String getMemo() {
         return memo;
     }
 
     public void setMemo(String memo) {
         this.memo = memo;
+    }
+
+    public Boolean getReconciled() {
+        return reconciled;
+    }
+
+    public void setReconciled(Boolean reconciled) {
+        this.reconciled = reconciled;
     }
 }

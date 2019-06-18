@@ -5,7 +5,7 @@ public class DoughException extends Exception {
         super(message);
     }
 
-    public DoughException(String message, Throwable cause) {
-        super(message, cause);
+    public DoughException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 }

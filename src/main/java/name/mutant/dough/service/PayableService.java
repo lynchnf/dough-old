@@ -1,303 +1,114 @@
 package name.mutant.dough.service;
 
-import name.mutant.dough.DoughException;
+import name.mutant.dough.DoughNotFoundException;
+import name.mutant.dough.DoughOptimisticLockingException;
 import name.mutant.dough.domain.Payable;
-import name.mutant.dough.domain.Payable_;
-import name.mutant.dough.domain.Payee;
-import name.mutant.dough.domain.Payee_;
-import name.mutant.dough.service.dto.BillToPay;
-import name.mutant.dough.service.filter.request.OrderByDirection;
-import name.mutant.dough.service.filter.request.PayableFilterRequest;
-import name.mutant.dough.service.filter.request.PayableOrderByField;
-import name.mutant.dough.service.filter.response.PayableFilterResponse;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.quartz.CronExpression;
+import name.mutant.dough.domain.Payment;
+import name.mutant.dough.repository.PayableRepository;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.MissingResourceException;
+import java.math.BigDecimal;
+import java.util.*;
 
-public class PayableService extends BaseService {
-    private static final Logger LOG = LogManager.getLogger();
+@Service
+public class PayableService {
+    private static final int ALMOST_DUE_DAYS = 14;
+    protected static final String OVERDUE_CLASS = "table-danger";
+    protected static final String ALMOST_DUE_CLASS = "table-warning";
+    protected static final String NOT_DUE_FOR_AWHILE_YET_CLASS = "table-light";
+    protected static final String ALREADY_PAID_CLASS = "table-success";
+    private Date today;
+    private Date warning;
+    @Autowired
+    private PayableRepository payableRepository;
 
-    private PayableService() {
+    public PayableService() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        today = cal.getTime();
+        cal.add(Calendar.DATE, ALMOST_DUE_DAYS);
+        warning = cal.getTime();
     }
 
-    public static Payable readPayable(Long id) throws DoughException {
-        DaoFunction<Payable> function = new DaoFunction<Payable>() {
-            public Payable doFunction(EntityManager entityManager) throws Exception {
-                return entityManager.find(Payable.class, id);
-            }
-
-            public String getErrorMessage() {
-                return "Error reading payable id=\"" + id + "\".";
-            }
-        };
-        return doWithEntityManager(function);
+    public Iterable<Payable> findAllPayables() {
+        return payableRepository.findAll();
     }
 
-    public static List<String> validateSavePayable(Payable payable) {
-        List<String> errors = new ArrayList<>();
-
-        // TODO Business validation rules here.
-
-        return errors;
+    public Payable findPayableById(Long payableId) throws DoughNotFoundException {
+        Optional<Payable> optional = payableRepository.findById(payableId);
+        if (!optional.isPresent()) {
+            throw new DoughNotFoundException("Payable not found, payableId=\"" + payableId + "\"");
+        }
+        return optional.get();
     }
 
-    public static Payable savePayable(Payable payable) throws DoughException {
-        DaoFunction<Payable> function = new DaoFunction<Payable>() {
-            public Payable doFunction(EntityManager entityManager) throws Exception {
-                return entityManager.merge(payable);
-            }
-
-            public String getErrorMessage() {
-                return "Error saving payable=\"" + payable + "\".";
-            }
-        };
-        return doInTransaction(function);
+    public Payable savePayable(Payable payable) throws DoughOptimisticLockingException {
+        try {
+            return payableRepository.save(payable);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            throw new DoughOptimisticLockingException(
+                    "Optimistic locking failure while saving payable, payableId=\"" + payable.getId() + "\"", e);
+        }
     }
 
-    public static PayableFilterResponse filterPayables(PayableFilterRequest request) throws DoughException {
-        DaoFunction<PayableFilterResponse> function = new DaoFunction<PayableFilterResponse>() {
-            public PayableFilterResponse doFunction(EntityManager entityManager) throws Exception {
-                // Select ...
-                CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-                CriteriaQuery<Payable> cq = cb.createQuery(Payable.class);
-                CriteriaQuery<Long> cq2 = cb.createQuery(Long.class);
-                Root<Payable> payable = cq.from(Payable.class);
-                cq2.from(Payable.class);
-                Join<Payable, Payee> payee = payable.join(Payable_.payee);
-                cq.select(payable);
-                cq2.select(cb.count(payable));
-
-                // Where ...
-                Collection<Predicate> whereCollection = new HashSet<>();
-                if (request.getWherePayeeIdEq() != null) {
-                    Predicate payeeIdEq = cb.equal(payee.get(Payee_.id), request.getWherePayeeIdEq());
-                    whereCollection.add(payeeIdEq);
-                }
-                if (request.getWhereMemoLike() != null) {
-                    Expression<String> lowerMemo = cb.lower(payable.get(Payable_.memo));
-                    String pattern = "%" + request.getWhereMemoLike().toLowerCase() + "%";
-                    Predicate memoLike = cb.like(lowerMemo, pattern);
-                    whereCollection.add(memoLike);
-                }
-                if (request.getWhereDueDateAfter() != null) {
-                    Path<Date> actDueDatePath = payable.get(Payable_.actDueDate);
-                    Path<Date> estDueDatePath = payable.get(Payable_.estDueDate);
-                    Expression<Date> coalesce = cb.coalesce(actDueDatePath, estDueDatePath);
-                    Predicate dueDateAfter = cb.greaterThan(coalesce, request.getWhereDueDateAfter());
-                    whereCollection.add(dueDateAfter);
-                }
-                if (request.getWhereDueDateBefore() != null) {
-                    Path<Date> actDueDatePath = payable.get(Payable_.actDueDate);
-                    Path<Date> estDueDatePath = payable.get(Payable_.estDueDate);
-                    Expression<Date> coalesce = cb.coalesce(actDueDatePath, estDueDatePath);
-                    Predicate dueDateBefore = cb.lessThan(coalesce, request.getWhereDueDateBefore());
-                    whereCollection.add(dueDateBefore);
-                }
-                if (request.getWhereActual() != null) {
-                    Predicate actual = null;
-                    if (request.getWhereActual()) {
-                        actual = cb.isNotNull(payable.get(Payable_.actDueDate));
-                    } else {
-                        actual = cb.isNull(payable.get(Payable_.actDueDate));
-                    }
-                    whereCollection.add(actual);
-                }
-                if (request.getWherePaid() != null) {
-                    Predicate paid = null;
-                    if (request.getWherePaid()) {
-                        paid = cb.isNotNull(payable.get(Payable_.paidDate));
-                    } else {
-                        paid = cb.isNull(payable.get(Payable_.paidDate));
-                    }
-                    whereCollection.add(paid);
-                }
-                if (request.getWhereNoBill() != null) {
-                    Predicate noBillEq = cb.equal(payable.get(Payable_.noBill), request.getWhereNoBill());
-                    whereCollection.add(noBillEq);
-                }
-                if (request.getWhereMissedBill() != null) {
-                    Predicate missedBillEq = cb.equal(payable.get(Payable_.missedBill), request.getWhereMissedBill());
-                    whereCollection.add(missedBillEq);
-                }
-                attachWhereToQueries(whereCollection, cq, cq2);
-
-                // Order by ...
-                List<Expression<?>> orderByPathList = new ArrayList<>();
-                if (request.getOrderByField() == PayableOrderByField.PAYEE_NAME) {
-                    orderByPathList.add(payee.get(Payee_.name));
-                }
-                if (request.getOrderByField() == PayableOrderByField.DUE_DATE) {
-                    Path<Date> actDueDatePath = payable.get(Payable_.actDueDate);
-                    Path<Date> estDueDatePath = payable.get(Payable_.estDueDate);
-                    Expression<Date> coalesce = cb.coalesce(actDueDatePath, estDueDatePath);
-                    orderByPathList.add(coalesce);
-                }
-                // Always order by id.
-                orderByPathList.add(payable.get(Payable_.id));
-                // Ascending or Descending?
-                attachOrderByToQuery(cb, orderByPathList, request.getOrderByDirection(), cq);
-
-                PayableFilterResponse response = new PayableFilterResponse();
-
-                // Get a page of records.
-                TypedQuery<Payable> query = entityManager.createQuery(cq);
-                if (request.getFirst() > 0) query.setFirstResult(request.getFirst());
-                if (request.getMax() >= 0) query.setMaxResults(request.getMax());
-                List<Payable> resultList = query.getResultList();
-                response.setResultList(resultList);
-
-                // Get total record count.
-                TypedQuery<Long> query2 = entityManager.createQuery(cq2);
-                Long count = query2.getSingleResult();
-                response.setCount(count);
-                return response;
+    public List<PayableDueBean> findAllPayableDues() {
+        List<PayableDueBean> payableDues = new ArrayList<>();
+        Iterable<Payable> payables = payableRepository.findAllByOrderByDueDate();
+        for (Payable payable : payables) {
+            Long id = payable.getId();
+            String payeeDisplayName = payable.getPayee().getNickname();
+            if (StringUtils.isBlank(payable.getPayee().getNickname()))
+                payeeDisplayName = payable.getPayee().getName();
+            Date dueDate = payable.getDueDate();
+            BigDecimal amountDue = payable.getAmountDue();
+            BigDecimal minimumPayment = payable.getMinimumPayment();
+            Date lastPaidDate = null;
+            BigDecimal balanceDue = payable.getAmountDue();
+            BigDecimal previousBalance = payable.getPreviousBalance();
+            if (previousBalance != null) {
+                BigDecimal previousPayments = payable.getPreviousPayments();
+                if (previousPayments == null)
+                    previousPayments = BigDecimal.ZERO;
+                BigDecimal previousDue = previousBalance.add(previousPayments);
+                if (previousDue.compareTo(BigDecimal.ZERO) > 0)
+                    balanceDue = balanceDue.subtract(previousDue);
             }
-
-            public String getErrorMessage() {
-                return "Error reading payables with filter request=\"" + request + "\".";
+            List<Payment> payments = payable.getPayments();
+            for (Payment payment : payments) {
+                if (lastPaidDate == null || lastPaidDate.before(payment.getPaidDate()))
+                    lastPaidDate = payment.getPaidDate();
+                balanceDue = balanceDue.subtract(payment.getAmountPaid());
             }
-        };
-        return doWithEntityManager(function);
-    }
-
-    public static List<Payable> readAllPayablesForPayee(Long payeeId) throws DoughException {
-        DaoFunction<List<Payable>> function = new DaoFunction<List<Payable>>() {
-            public List<Payable> doFunction(EntityManager entityManager) throws Exception {
-                List<Payable> payables = new ArrayList<>();
-                Payee payee = PayeeService.readPayee(payeeId);
-                for (Payable payable : payee.getPayables()) {
-                    payables.add(payable);
+            String styleClass = null;
+            if (balanceDue.compareTo(BigDecimal.ZERO) > 0) {
+                if (dueDate.before(today)) {
+                    styleClass = OVERDUE_CLASS;
+                } else if (dueDate.before(warning)) {
+                    styleClass = ALMOST_DUE_CLASS;
+                } else {
+                    styleClass = NOT_DUE_FOR_AWHILE_YET_CLASS;
                 }
-                return payables;
-            }
-
-            public String getErrorMessage() {
-                return "Error reading all payables for payee id=\"" + payeeId + "\".";
-            }
-        };
-        return doWithEntityManager(function);
-    }
-
-    private static List<Payable> readPayablesByPayeeAndEstDueDate(Long payeeId, Date estDueDate) throws DoughException {
-        DaoFunction<List<Payable>> function = new DaoFunction<List<Payable>>() {
-            private String message = "Error reading all payables for payee id=\"" + payeeId + "\", estimated due date=\"" + estDueDate + "\",";
-
-            public List<Payable> doFunction(EntityManager entityManager) throws Exception {
-                Payee payee = PayeeService.readPayee(payeeId);
-                if (payee == null) {
-                    String message = "Payee not found for id=\"" + payeeId + "\".";
-                    throw new DoughException(message);
+            } else {
+                // If the balance is zero (or less) and the due date and the last paid date (if there is one) are both
+                // in the past, then we don't need to see this payable any more. Otherwise, show it with the
+                // already-paid style.
+                if (dueDate.equals(today) || dueDate.after(today) ||
+                        lastPaidDate != null && (lastPaidDate.equals(today) || lastPaidDate.after(today))) {
+                    styleClass = ALREADY_PAID_CLASS;
                 }
-
-                CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-                CriteriaQuery<Payable> cq = cb.createQuery(Payable.class);
-                Root<Payable> payable = cq.from(Payable.class);
-                cq.select(payable);
-                Predicate payeeEquals = cb.equal(payable.get(Payable_.payee), payee);
-                Predicate estDueDateEquals = cb.equal(payable.get(Payable_.estDueDate), estDueDate);
-                cq.where(payeeEquals, estDueDateEquals);
-                TypedQuery<Payable> query = entityManager.createQuery(cq);
-                List<Payable> resultList = query.getResultList();
-                return resultList;
             }
-
-            public String getErrorMessage() {
-                return message;
+            if (styleClass != null) {
+                PayableDueBean payableDue = new PayableDueBean(id, payeeDisplayName, dueDate, amountDue, minimumPayment,
+                        lastPaidDate, balanceDue, styleClass);
+                payableDues.add(payableDue);
             }
-        };
-        return doWithEntityManager(function);
-    }
-
-    public static void createEstimatedPayables(Long payeeId, Date afterDate) throws DoughException {
-        DaoFunction<Void> function = new DaoFunction<Void>() {
-            public Void doFunction(EntityManager entityManager) throws Exception {
-                Payee payee = PayeeService.readPayee(payeeId);
-                payee.getPayables().size(); // Instantiate payables list.
-                CronExpression cronExpression = new CronExpression(payee.getCronExpression());
-                Date nextDueDate = afterDate;
-                for (int i = 0; i < payee.getNbrEstToCreate() && nextDueDate != null; i++) {
-                    nextDueDate = cronExpression.getNextValidTimeAfter(nextDueDate);
-                    if (nextDueDate != null) {
-                        List<Payable> nextPayables = PayableService.readPayablesByPayeeAndEstDueDate(payeeId, nextDueDate);
-                        if (nextPayables == null || nextPayables.isEmpty()) {
-                            Payable newPayable = new Payable();
-                            newPayable.setPayee(payee);
-                            newPayable.setEstDueDate(nextDueDate);
-                            newPayable.setEstAmount(payee.getEstAmount());
-                            newPayable.setNoBill(Boolean.FALSE);
-                            newPayable.setMissedBill(Boolean.FALSE);
-                            payee.getPayables().add(newPayable);
-                        }
-                    }
-                }
-                PayeeService.savePayee(payee);
-                return null;
-            }
-
-            public String getErrorMessage() {
-                return "Error creating estimated payables for payee id=\"" + payeeId + "\" after=\"" + afterDate + "\".";
-            }
-        };
-        doInTransaction(function);
-    }
-
-    public static List<BillToPay> getBillsToPay(Date today) throws DoughException {
-        DaoFunction<List<BillToPay>> function = new DaoFunction<List<BillToPay>>() {
-            public List<BillToPay> doFunction(EntityManager entityManager) throws Exception {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(today);
-                try {
-                    cal.add(Calendar.DATE, Integer.parseInt(appBundle.getString("almost.due.days")));
-                } catch (NumberFormatException e) {
-                    cal.add(Calendar.DATE, 10);
-                } catch (MissingResourceException e) {
-                    cal.add(Calendar.DATE, 10);
-                }
-                Date almost = cal.getTime();
-                PayableFilterRequest request = new PayableFilterRequest();
-                request.setWherePaid(Boolean.FALSE);
-                request.setWhereNoBill(Boolean.FALSE);
-                request.setWhereMissedBill(Boolean.FALSE);
-                request.setOrderByField(PayableOrderByField.DUE_DATE);
-                request.setOrderByDirection(OrderByDirection.ASC);
-                request.setMax(-1);
-                PayableFilterResponse response = filterPayables(request);
-                List<BillToPay> billsToPay = new ArrayList<>();
-                for (Payable result : response.getResultList()) {
-                    BillToPay billToPay = new BillToPay();
-                    billToPay.setPayableId(result.getId());
-                    billToPay.setPayeeName(result.getPayee().getName());
-                    billToPay.setDueDate(result.getActDueDate() == null ? result.getEstDueDate() : result.getActDueDate());
-                    billToPay.setAmount(result.getActAmount() == null ? result.getEstAmount() : result.getActAmount());
-                    billToPay.setActual(result.getActDueDate() != null);
-                    billToPay.setOverDue(billToPay.getDueDate().before(today));
-                    billToPay.setAlmostDue(billToPay.getDueDate().before(almost));
-                    billsToPay.add(billToPay);
-                }
-                return billsToPay;
-            }
-
-            public String getErrorMessage() {
-                return "Error getting bills to pay with date =\"" + today + "\".";
-            }
-        };
-        return doWithEntityManager(function);
+        }
+        return payableDues;
     }
 }

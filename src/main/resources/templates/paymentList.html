@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head::head"></head>
+<body>
+<header th:replace="fragments/header::header"></header>
+<main class="container">
+    <h1>Payment List</h1>
+    <div th:replace="fragments/alerts::alerts"></div>
+    <table class="table table-sm table-striped">
+        <tr>
+            <th>Payee</th>
+            <th>Due Date</th>
+            <th>Amount Due</th>
+            <th>Paid Date</th>
+            <th>Amount Paid</th>
+            <th>Confirm Code</th>
+            <th>Trans Number</th>
+        </tr>
+        <tr th:each="payment:${payments}">
+            <td><a th:href="@{/payment(paymentId=${payment.id})}"
+                   th:text="${(payment.payable.payee.nickname != null)?payment.payable.payee.nickname:payment.payable.payee.name}"></a>
+            </td>
+            <td th:text="${#dates.format(payment.payable.dueDate,'M/d/yyyy')}"></td>
+            <td th:text="${#numbers.formatDecimal(payment.payable.amountDue,1,'DEFAULT',2,'DEFAULT')}"></td>
+            <td th:text="${#dates.format(payment.paidDate,'M/d/yyyy')}"></td>
+            <td th:text="${#numbers.formatDecimal(payment.amountPaid,1,'DEFAULT',2,'DEFAULT')}"></td>
+            <td th:text="${payment.confirmCode}"></td>
+            <td th:text="${payment.transNumber}"></td>
+        </tr>
+    </table>
+</main>
+<footer th:replace="fragments/footer::footer"></footer>
+</body>
+</html>

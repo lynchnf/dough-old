@@ -1,180 +1,176 @@
 package name.mutant.dough.service;
 
-import name.mutant.dough.DoughException;
+import name.mutant.dough.DoughNotFoundException;
+import name.mutant.dough.DoughOptimisticLockingException;
+import name.mutant.dough.FakeDataUtil;
 import name.mutant.dough.domain.Acct;
-import name.mutant.dough.domain.AcctType;
-import name.mutant.dough.service.dto.AcctBalance;
-import name.mutant.dough.service.filter.request.AcctFilterRequest;
-import name.mutant.dough.service.filter.request.AcctOrderByField;
-import name.mutant.dough.service.filter.request.OrderByDirection;
-import name.mutant.dough.service.filter.response.AcctFilterResponse;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.After;
+import name.mutant.dough.domain.AcctNbr;
+import name.mutant.dough.domain.Tran;
+import name.mutant.dough.repository.AcctNbrRepository;
+import name.mutant.dough.repository.AcctRepository;
+import name.mutant.dough.repository.TranRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.persistence.OptimisticLockException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+@RunWith(SpringRunner.class)
 public class AcctServiceTest {
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    private static final Long READ_ACCT_ID = Long.valueOf(3317);
-    private static final String READ_ACCT_NAME = "read ira";
-    private static final Long SAVE_ACCT_ID = Long.valueOf(2401);
-    private static final String SAVE_ACCT_NAME = "save uju";
-    private static final Long[] FILTER_ACCT_ID = {Long.valueOf(7949), Long.valueOf(6251), Long.valueOf(5621)};
-    private static final String[] FILTER_ACCT_NAME = {"filter htv", "filter sds", "filter khv"};
-    private static final String READ_FID = "1111";
-    private static final String READ_OFX_ACCT_ID = "4094";
-    private static final String VALIDATE_OFX_ACCT_ID = "9749";
-    private static final Long ACCT_BALANCE_ID = Long.valueOf(7399);
-    private static final String ACCT_BALANCE_NAME = "zzz acct balance";
-    private static final AcctType ACCT_BALANCE_TYPE = AcctType.CHECKING;
-    private static final String ACCT_BALANCE_AMT = "7118.61";
-    private static final String ACCT_BALANCE_DATE = "2015-06-09";
+    private Long acct1Id;
+    private Long acct2Id;
+    private Acct acct1;
+    private String acct1Name;
+    private String acct1Fid;
+    private Long acctNbr1Id;
+    private AcctNbr acctNbr1;
+    private String acctNbr1Number;
+    private Tran tran1;
+    private String tran1FitId;
+    private String tran1name;
+    private BigDecimal tran1Balance;
+
+    @TestConfiguration
+    static class AcctServiceTestConfiguration {
+        @Bean
+        public AcctService acctService() {
+            return new AcctService();
+        }
+    }
+
+    @Autowired
+    private AcctService acctService;
+    @MockBean
+    private AcctRepository acctRepository;
+    @MockBean
+    private AcctNbrRepository acctNbrRepository;
+    @MockBean
+    private TranRepository tranRepository;
 
     @Before
     public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    @Test
-    public void testReadAcct() throws Exception {
-        // Verify that reading a non-existing acct returns null.
-        Acct acct1 = AcctService.readAcct(Long.valueOf(9999));
-        assertNull(acct1);
-
-        // Verify reading a real acct.
-        Acct acct2 = AcctService.readAcct(READ_ACCT_ID);
-        assertNotNull(acct2);
-        assertEquals(READ_ACCT_NAME, acct2.getName());
+        acct1Id = Long.valueOf(1);
+        acct2Id = Long.valueOf(2);
+        acct1 = FakeDataUtil.buildAcct(acct1Id);
+        acct1Name = acct1.getName();
+        acct1Fid = acct1.getFid();
+        acctNbr1Id = Long.valueOf(3);
+        acctNbr1 = FakeDataUtil.buildAcctNbr(acct1, acctNbr1Id);
+        acctNbr1Number = acctNbr1.getNumber();
+        tran1 = FakeDataUtil.buildTran(acct1, 4, null);
+        tran1FitId = tran1.getFitId();
+        tran1name = tran1.getName();
+        tran1Balance = acct1.getBeginBalance().add(tran1.getAmount());
     }
 
     @Test
-    public void testValidateSaveAcct() throws Exception {
-        Acct acct = new Acct();
-        acct.setFid(READ_FID);
-        acct.setOfxAcctId(READ_OFX_ACCT_ID);
-        List<String> errors = AcctService.validateSaveAcct(acct);
-        assertFalse(errors.isEmpty());
-
-        acct.setOfxAcctId(VALIDATE_OFX_ACCT_ID);
-        List<String> errors2 = AcctService.validateSaveAcct(acct);
-        assertTrue(errors2.isEmpty());
+    public void findAllAccts() {
+        Mockito.when(acctRepository.findAll()).thenReturn(new ArrayList<>());
+        Iterable<Acct> accts = acctService.findAllAccts();
+        assertFalse(accts.iterator().hasNext());
     }
 
     @Test
-    public void testSaveAcct() throws Exception {
-        // Start by verifying that our test acct exists.
-        Acct acct1 = AcctService.readAcct(SAVE_ACCT_ID);
-        assertEquals(SAVE_ACCT_NAME, acct1.getName());
-        assertNotEquals(Integer.valueOf(0), acct1.getVersion());
+    public void findAcctById() throws Exception {
+        Mockito.when(acctRepository.findById(acct1Id)).thenReturn(Optional.of(acct1));
+        Acct acct = acctService.findAcctById(acct1Id);
+        assertEquals(acct1Name, acct.getName());
+    }
 
-        // Try updating the name with the wrong version.
-        Acct acct2 = new Acct();
-        acct2.setId(acct1.getId());
-        acct2.setVersion(Integer.valueOf(0));
-        String newName = StringUtils.replace(SAVE_ACCT_NAME, "save", "changed");
-        acct2.setName(newName);
-        acct2.setFid(acct1.getFid());
-        acct2.setOfxAcctId(acct1.getOfxAcctId());
-        boolean exceptionThrown = false;
+    @Test
+    public void findAcctByIdNotFound() {
+        Mockito.when(acctRepository.findById(acct2Id)).thenReturn(Optional.empty());
         try {
-            AcctService.saveAcct(acct2);
-        } catch (Exception e) {
-            exceptionThrown = true;
-            assertTrue(e instanceof DoughException);
-            assertTrue(e.getCause() instanceof OptimisticLockException);
-        }
-        assertTrue(exceptionThrown);
-
-        // Try again with the right version.
-        acct2.setVersion(acct1.getVersion());
-        AcctService.saveAcct(acct2);
-
-        // Verify that our test acct has really been changed.
-        Acct acct3 = AcctService.readAcct(SAVE_ACCT_ID);
-        assertEquals(newName, acct3.getName());
-    }
-
-    @Test
-    public void testFilterAccts() throws Exception {
-        // Set up our filter request.
-        AcctFilterRequest request = new AcctFilterRequest();
-        request.setMax(3); // three records per page
-        request.setFirst(3); // show second page
-        request.setOrderByField(AcctOrderByField.FID); // sort by fid
-        request.setOrderByDirection(OrderByDirection.ASC); // sort fowards
-        request.setWhereNameLike("filter"); // select only names containing "filter"
-        AcctFilterResponse response = AcctService.filterAccts(request);
-/*
-        System.out.println("Test Filter Accts"); // DEBUG
-        System.out.println("idx    id  name        fid   ofx acct"); // DEBUG
-        List<Acct> resultList = response.getResultList(); // DEBUG
-        for (int i = 0; i < resultList.size(); i++) { // DEBUG
-            System.out.printf(" %2d  %4s  %-10s  %s  %s%n",
-                    i,
-                    resultList.get(i).getId(),
-                    resultList.get(i).getName(),
-                    resultList.get(i).getFid(),
-                    resultList.get(i).getOfxAcctId()); // DEBUG
-        } // DEBUG
-*/
-
-        // There should be ten records with names containing "filter".
-        assertEquals(Long.valueOf(10), response.getCount());
-
-        // We should fetch the fourth to sixth records in fid order.
-        assertEquals(FILTER_ACCT_ID.length, response.getResultList().size());
-        for (int i = 0; i < response.getResultList().size(); i++) {
-            assertEquals(FILTER_ACCT_ID[i], response.getResultList().get(i).getId());
-            assertEquals(FILTER_ACCT_NAME[i], response.getResultList().get(i).getName());
+            Acct acct = acctService.findAcctById(acct2Id);
+            fail();
+        } catch (DoughNotFoundException e) {
         }
     }
 
     @Test
-    public void testReadAcctByFidAndOfxAcctId() throws Exception {
-        Acct acct = AcctService.readAcctByFidAndOfxAcctId(READ_FID, READ_OFX_ACCT_ID);
-        assertNotNull(acct);
-        assertEquals(READ_ACCT_NAME, acct.getName());
+    public void saveAcct() throws Exception {
+        Mockito.when(acctRepository.save(Mockito.any(Acct.class))).thenReturn(acct1);
+        Acct acct = acctService.saveAcct(acct1);
+        assertEquals(acct1Name, acct.getName());
     }
 
     @Test
-    public void testGetAcctBalances() throws Exception {
-        List<AcctBalance> resultList = AcctService.getAcctBalances();
-/*
-        System.out.println("Test Filter Accts"); // DEBUG
-        System.out.println("idx    id  name              type        balance  last"); // DEBUG
-        NumberFormat curFormat = NumberFormat.getCurrencyInstance(); // DEBUG
-        for (int i = 0; i < resultList.size(); i++) { // DEBUG
-            System.out.printf(" %2d  %4s  %-16s  %-8s  %9s  %-10s%n",
-                    i,
-                    resultList.get(i).getAcctId(),
-                    resultList.get(i).getAcctName(),
-                    resultList.get(i).getAcctType(),
-                    curFormat.format(resultList.get(i).getBalance()),
-                    resultList.get(i).getLastTranDate()); // DEBUG
-        } // DEBUG
-*/
+    public void saveAcctOptimisticLocking() {
+        Mockito.when(acctRepository.save(Mockito.any(Acct.class)))
+                .thenThrow(ObjectOptimisticLockingFailureException.class);
+        try {
+            Acct acct = acctService.saveAcct(acct1);
+            fail();
+        } catch (DoughOptimisticLockingException e) {
+        }
+    }
 
-        assertEquals(13, resultList.size());
-        AcctBalance last = resultList.get(resultList.size() - 1);
-        assertEquals(ACCT_BALANCE_ID, last.getAcctId());
-        assertEquals(ACCT_BALANCE_NAME, last.getAcctName());
-        assertEquals(ACCT_BALANCE_TYPE, last.getAcctType());
-        assertEquals(ACCT_BALANCE_AMT, last.getBalance().toPlainString());
-        assertEquals(ACCT_BALANCE_DATE, DATE_FORMAT.format(last.getLastTranDate()));
+    @Test
+    public void findAcctsByFid() {
+        List<Acct> accts1 = new ArrayList<>();
+        accts1.add(acct1);
+        Mockito.when(acctRepository.findByFid(acct1Fid)).thenReturn(accts1);
+        List<Acct> accts = acctService.findAcctsByFid(acct1Fid);
+        assertEquals(1, accts.size());
+        assertEquals(acct1Name, accts.iterator().next().getName());
+    }
+
+    @Test
+    public void findCurrentAcctNbrByAcctId() {
+        List<AcctNbr> acctNbrList = new ArrayList<>();
+        acctNbrList.add(acctNbr1);
+        Mockito.when(acctNbrRepository.findTopByAcct_IdOrderByEffDateDesc(acct1Id)).thenReturn(acctNbrList);
+        AcctNbr acctNbr = acctService.findCurrentAcctNbrByAcctId(acct1Id);
+        assertEquals(acctNbr1Number, acctNbr.getNumber());
+    }
+
+    @Test
+    public void findAcctNbrsByFidAndNumber() {
+        List<AcctNbr> acctNbrList = new ArrayList<>();
+        acctNbrList.add(acctNbr1);
+        Mockito.when(acctNbrRepository.findByAcct_FidAndNumber(acct1Fid, acctNbr1Number)).thenReturn(acctNbrList);
+        List<AcctNbr> acctNbrs = acctService.findAcctNbrsByFidAndNumber(acct1Fid, acctNbr1Number);
+        assertEquals(1, acctNbrs.size());
+        assertEquals(acctNbr1Id, acctNbrs.iterator().next().getId());
+    }
+
+    @Test
+    public void findTransByAcctIdAndFitId() {
+        List<Tran> tranList = new ArrayList<>();
+        tranList.add(tran1);
+        Mockito.when(tranRepository.findByAcct_IdAndFitId(acct1Id, tran1FitId)).thenReturn(tranList);
+        List<Tran> trans = acctService.findTransByAcctIdAndFitId(acct1Id, tran1FitId);
+        assertEquals(1, trans.size());
+        assertEquals(tran1name, trans.iterator().next().getName());
+    }
+
+    @Test
+    public void findTranBalancesByAcctId() throws Exception {
+        Mockito.when(acctRepository.findById(acct1Id)).thenReturn(Optional.of(acct1));
+        List<TranBalanceBean> beans = acctService.findTranBalancesByAcctId(acct1Id);
+        assertEquals(1, beans.size());
+        assertEquals(0, tran1Balance.compareTo(beans.iterator().next().getBalance()));
+    }
+
+    @Test
+    public void findAllAcctSummaries() {
+        List<Acct> acctsList = new ArrayList<>();
+        acctsList.add(acct1);
+        Mockito.when(acctRepository.findAll()).thenReturn(acctsList);
+        List<AcctSummaryBean> beans = acctService.findAllAcctSummaries();
+        assertEquals(1, beans.size());
+        assertEquals(0, tran1Balance.compareTo(beans.iterator().next().getBalance()));
     }
 }

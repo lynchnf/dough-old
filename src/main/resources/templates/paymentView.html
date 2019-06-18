@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head::head"></head>
+<body>
+<header th:replace="fragments/header::header"></header>
+<main class="container">
+    <h1>Payment</h1>
+    <div th:replace="fragments/alerts::alerts"></div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Payee</label>
+        <div class="col-sm-9">
+            <p class="form-control-plaintext">
+                <a th:href="@{/payee(payeeId=${payment.payable.payee.id})}"
+                   th:text="${(payment.payable.payee.nickname != null)?payment.payable.payee.nickname:payment.payable.payee.name}"></a>
+            </p>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Payment Due Date</label>
+        <div class="col-sm-9">
+            <p class="form-control-plaintext">
+                <a th:href="@{/payable(payableId=${payment.payable.id})}"
+                   th:text="${#dates.format(payment.payable.dueDate,'M/d/yyyy')}"></a>
+            </p>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">New Balance Total</label>
+        <div class="col-sm-9">
+            <p class="form-control-plaintext"
+               th:text="${#numbers.formatDecimal(payment.payable.amountDue,1,'DEFAULT',2,'DEFAULT')}"></p>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Paid Date</label>
+        <div class="col-sm-9">
+            <p class="form-control-plaintext" th:text="${#dates.format(payment.paidDate,'M/d/yyyy')}"></p>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Amount Paid</label>
+        <div class="col-sm-9">
+            <p class="form-control-plaintext"
+               th:text="${#numbers.formatDecimal(payment.amountPaid,1,'DEFAULT',2,'DEFAULT')}"></p>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Confirm Code</label>
+        <div class="col-sm-9">
+            <p class="form-control-plaintext" th:text="${payment.confirmCode}"></p>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Trans Number</label>
+        <div class="col-sm-9">
+            <p class="form-control-plaintext" th:text="${payment.transNumber}"></p>
+        </div>
+    </div>
+    <a class="btn btn-primary" th:href="@{/paymentEdit(paymentId=${payment.id})}">Edit</a>
+</main>
+<footer th:replace="fragments/footer::footer"></footer>
+</body>
+</html>

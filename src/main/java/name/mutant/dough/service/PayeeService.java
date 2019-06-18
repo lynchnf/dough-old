@@ -1,121 +1,38 @@
 package name.mutant.dough.service;
 
-import name.mutant.dough.DoughException;
+import name.mutant.dough.DoughNotFoundException;
+import name.mutant.dough.DoughOptimisticLockingException;
 import name.mutant.dough.domain.Payee;
-import name.mutant.dough.domain.Payee_;
-import name.mutant.dough.service.filter.request.PayeeFilterRequest;
-import name.mutant.dough.service.filter.request.PayeeOrderByField;
-import name.mutant.dough.service.filter.response.PayeeFilterResponse;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import name.mutant.dough.repository.PayeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Optional;
 
-public class PayeeService extends BaseService {
-    private static final Logger LOG = LogManager.getLogger();
+@Service
+public class PayeeService {
+    @Autowired
+    private PayeeRepository payeeRepository;
 
-    private PayeeService() {
+    public Iterable<Payee> findAllPayees() {
+        return payeeRepository.findAll();
     }
 
-    public static Payee readPayee(Long id) throws DoughException {
-        DaoFunction<Payee> function = new DaoFunction<Payee>() {
-            public Payee doFunction(EntityManager entityManager) throws Exception {
-                return entityManager.find(Payee.class, id);
-            }
-
-            public String getErrorMessage() {
-                return "Error reading payee id=\"" + id + "\".";
-            }
-        };
-        return doWithEntityManager(function);
+    public Payee findPayeeById(Long payeeId) throws DoughNotFoundException {
+        Optional<Payee> optional = payeeRepository.findById(payeeId);
+        if (!optional.isPresent()) {
+            throw new DoughNotFoundException("Payee not found, payeeId=\"" + payeeId + "\"");
+        }
+        return optional.get();
     }
 
-    public static List<String> validateSavePayee(Payee payee) {
-        List<String> errors = new ArrayList<>();
-
-        // TODO Business validation rules here.
-
-        return errors;
-    }
-
-    public static Payee savePayee(Payee payee) throws DoughException {
-        DaoFunction<Payee> function = new DaoFunction<Payee>() {
-            public Payee doFunction(EntityManager entityManager) throws Exception {
-                return entityManager.merge(payee);
-            }
-
-            public String getErrorMessage() {
-                return "Error saving payee=\"" + payee + "\".";
-            }
-        };
-        return doInTransaction(function);
-    }
-
-    public static PayeeFilterResponse filterPayees(PayeeFilterRequest request) throws DoughException {
-        DaoFunction<PayeeFilterResponse> function = new DaoFunction<PayeeFilterResponse>() {
-            public PayeeFilterResponse doFunction(EntityManager entityManager) throws Exception {
-                // Select ...
-                CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-                CriteriaQuery<Payee> cq = cb.createQuery(Payee.class);
-                CriteriaQuery<Long> cq2 = cb.createQuery(Long.class);
-                Root<Payee> payee = cq.from(Payee.class);
-                cq2.from(Payee.class);
-                cq.select(payee);
-                cq2.select(cb.count(payee));
-
-                // Where ...
-                Collection<Predicate> whereCollection = new HashSet<Predicate>();
-                if (request.getWhereNameLike() != null) {
-                    Expression<String> lowerName = cb.lower(payee.get(Payee_.name));
-                    String pattern = "%" + request.getWhereNameLike().toLowerCase() + "%";
-                    Predicate nameLike = cb.like(lowerName, pattern);
-                    whereCollection.add(nameLike);
-                }
-                if (request.getWhereTypeEq() != null) {
-                    Predicate typeEq = cb.equal(payee.get(Payee_.type), request.getWhereTypeEq());
-                    whereCollection.add(typeEq);
-                }
-                attachWhereToQueries(whereCollection, cq, cq2);
-
-                // Order by ...
-                List<Expression<?>> orderByPathList = new ArrayList<>();
-                if (request.getOrderByField() == PayeeOrderByField.NAME) {
-                    orderByPathList.add(payee.get(Payee_.name));
-                }
-                // Always order by id.
-                orderByPathList.add(payee.get(Payee_.id));
-                // Ascending or Descending?
-                attachOrderByToQuery(cb, orderByPathList, request.getOrderByDirection(), cq);
-
-                PayeeFilterResponse response = new PayeeFilterResponse();
-
-                // Get a page of records.
-                TypedQuery<Payee> query = entityManager.createQuery(cq);
-                if (request.getFirst() > 0) query.setFirstResult(request.getFirst());
-                if (request.getMax() >= 0) query.setMaxResults(request.getMax());
-                response.setResultList(query.getResultList());
-
-                // Get total record count.
-                TypedQuery<Long> query2 = entityManager.createQuery(cq2);
-                Long count = query2.getSingleResult();
-                response.setCount(count);
-                return response;
-            }
-
-            public String getErrorMessage() {
-                return "Error reading payees with filter request=\"" + request + "\".";
-            }
-        };
-        return doWithEntityManager(function);
+    public Payee savePayee(Payee payee) throws DoughOptimisticLockingException {
+        try {
+            return payeeRepository.save(payee);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            throw new DoughOptimisticLockingException(
+                    "Optimistic locking failure while saving payee, payeeId=\"" + payee.getId() + "\"", e);
+        }
     }
 }

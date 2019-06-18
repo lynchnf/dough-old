@@ -1,216 +1,245 @@
 package name.mutant.dough.service;
 
+import name.mutant.dough.DoughNotFoundException;
+import name.mutant.dough.DoughOptimisticLockingException;
+import name.mutant.dough.FakeDataUtil;
 import name.mutant.dough.domain.Payable;
 import name.mutant.dough.domain.Payee;
-import name.mutant.dough.service.dto.BillToPay;
-import name.mutant.dough.service.filter.request.OrderByDirection;
-import name.mutant.dough.service.filter.request.PayableFilterRequest;
-import name.mutant.dough.service.filter.request.PayableOrderByField;
-import name.mutant.dough.service.filter.response.PayableFilterResponse;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.After;
+import name.mutant.dough.domain.Payment;
+import name.mutant.dough.repository.PayableRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+@RunWith(SpringRunner.class)
 public class PayableServiceTest {
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    private static final Long READ_PAYABLE_ID = Long.valueOf(5376);
-    private static final String READ_PAYABLE_MEMO = "read ice";
-    private static final Long SAVE_PAYABLE_ID = Long.valueOf(1897);
-    private static final String SAVE_PAYABLE_MEMO = "save ehm";
-    private static final Long[] FILTER_PAYABLE_ID = {Long.valueOf(9912), Long.valueOf(5579), Long.valueOf(1171)};
-    private static final String[] FILTER_PAYABLE_MEMO = {"filter ufv", "filter nwc", "filter ssh"};
-    private static final Long SCHEDULE_PAYEE_ID = new Long(6962);
-    private static final String SCHEDULE_CRON_EXPRESSION = "0 0 0 20 * ?";
-    private static final String SCHEDULE_EST_AMOUNT = "38.59";
-    private static final String SCHEDULE_TODAY = "2016-02-15";
-    private static final String[] SCHEDULE_EST_DUE_DATE = {"2016-02-20", "2016-03-20"};
-    private static final Long PAST_PAYEE_ID = new Long(5018);
-    private static final String BILL_TO_PAY_TODAY = "2016-01-01";
-    private static final Long[] BILL_TO_PAY_ID = {Long.valueOf(6730), Long.valueOf(5376), Long.valueOf(1897), Long.valueOf(7655), Long.valueOf(1483), Long.valueOf(9912), Long.valueOf(1171), Long.valueOf(5676), Long.valueOf(2949), Long.valueOf(4577), Long.valueOf(4440), Long.valueOf(6307)};
-    private static final String[] BILL_TO_PAY_NAME = {"filter tna", "read dxk", "save jog", "filter tqi", "filter agy", "filter agy", "filter ahq", "filter gsi", "filter lvy", "cron wtp", "filter wli", "filter leo"};
-    private static final String[] BILL_TO_PAY_DUE = {"2015-12-25", "2015-12-31", "2016-01-01", "2016-01-03", "2016-01-12", "2016-01-23", "2016-01-30", "2016-02-10", "2016-02-15", "2016-02-20", "2016-02-27", "2016-03-04"};
-    private static final String[] BILL_TO_PAY_AMOUNT = {"82.64", "71.58", "42.13", "43.18", "55.99", "25.88", "98.42", "60.74", "3.58", "38.59", "60.15", "80.97"};
-    private static final Boolean[] BILL_TO_PAY_ACTUAL = {Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE};
-    private static final Boolean[] BILL_TO_PAY_OVER = {Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE};
-    private static final Boolean[] BILL_TO_PAY_ALMOST = {null, null, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE};
+    private Random random = new Random();
+    private Long payable1Id;
+    private Long payable2Id;
+    private Payee payee1;
+    private Payable payable1;
+    private BigDecimal payable1AmountDue;
+
+    @TestConfiguration
+    static class PayableServiceTestConfiguration {
+        @Bean
+        public PayableService payableService() {
+            return new PayableService();
+        }
+    }
+
+    @Autowired
+    private PayableService payableService;
+    @MockBean
+    private PayableRepository payableRepository;
 
     @Before
     public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    @Test
-    public void testReadPayable() throws Exception {
-        Payable payable = PayableService.readPayable(READ_PAYABLE_ID);
-        assertNotNull(payable);
-        assertEquals(READ_PAYABLE_MEMO, payable.getMemo());
+        payable1Id = Long.valueOf(1);
+        payable2Id = Long.valueOf(2);
+        payee1 = FakeDataUtil.buildPayee(3);
+        payable1 = FakeDataUtil.buildPayable(payee1, payable1Id, null);
+        payable1AmountDue = payable1.getAmountDue();
     }
 
     @Test
-    public void testSavePayable() throws Exception {
-        // Start by verifying that our test payable exists.
-        Payable payable1 = PayableService.readPayable(SAVE_PAYABLE_ID);
-        assertEquals(SAVE_PAYABLE_MEMO, payable1.getMemo());
-        assertNotEquals(Integer.valueOf(0), payable1.getVersion());
-
-        // Try updating the memo.
-        Payable payable2 = new Payable();
-        payable2.setId(payable1.getId());
-        payable2.setVersion(payable1.getVersion());
-
-        Long payeeId = payable1.getPayee().getId();
-        Payee payee = PayeeService.readPayee(payeeId);
-        payable2.setPayee(payee);
-
-        String newMemo = StringUtils.replace(SAVE_PAYABLE_MEMO, "save", "changed");
-        payable2.setMemo(newMemo);
-        PayableService.savePayable(payable2);
-
-        // Verify that our test payable has really been changed.
-        Payable payable3 = PayableService.readPayable(SAVE_PAYABLE_ID);
-        assertEquals(newMemo, payable3.getMemo());
+    public void findAllPayables() {
+        Mockito.when(payableRepository.findAll()).thenReturn(new ArrayList<>());
+        Iterable<Payable> payables = payableService.findAllPayables();
+        assertFalse(payables.iterator().hasNext());
     }
 
     @Test
-    public void testFilterPayables() throws Exception {
-        // Set up our filter request.
-        PayableFilterRequest request = new PayableFilterRequest();
-        request.setMax(3); // three records per page
-        request.setFirst(3); // show second page
-        request.setOrderByField(PayableOrderByField.DUE_DATE); // sort by due date
-        request.setOrderByDirection(OrderByDirection.ASC); // sort fowards
-        request.setWhereMemoLike("filter"); // select only memos containing "filter"
-        request.setWherePaid(Boolean.FALSE); // select only unpaid
-        PayableFilterResponse response = PayableService.filterPayables(request);
-/*
-        List<Payable> resultList = response.getResultList(); // DEBUG
-        System.out.println("Test Filter Payables"); // DEBUG
-        for (int i = 0; i < resultList.size(); i++) { // DEBUG
-            System.out.println("resultList[" + i + "]=\"" +
-                    resultList.get(i).getId() + "\", \"" +
-                    DATE_FORMAT.format(resultList.get(i).getEstDueDate()) + "\", \"" +
-                    resultList.get(i).getEstAmount() + "\", \"" +
-                    (resultList.get(i).getActDueDate() == null ? null : DATE_FORMAT.format(resultList.get(i).getActDueDate())) + "\", \"" +
-                    resultList.get(i).getActAmount() + "\", \"" +
-                    resultList.get(i).getMemo() + "\", \"" +
-                    (resultList.get(i).getPaidDate() == null ? null : DATE_FORMAT.format(resultList.get(i).getPaidDate())) + "\", \"" +
-                    resultList.get(i).getPaidAmount() + "\""); // DEBUG
-        } // DEBUG
-*/
+    public void findPayableById() throws Exception {
+        Mockito.when(payableRepository.findById(payable1Id)).thenReturn(Optional.of(payable1));
+        Payable payable = payableService.findPayableById(payable1Id);
+        assertEquals(0, payable1AmountDue.compareTo(payable.getAmountDue()));
+    }
 
-        // There should be ten unpaid records with names containing "filter".
-        assertEquals(Long.valueOf(10), response.getCount());
-
-        // We should fetch the fourth to sixth records in due date order.
-        assertEquals(FILTER_PAYABLE_ID.length, response.getResultList().size());
-        for (int i = 0; i < response.getResultList().size(); i++) {
-            assertEquals(FILTER_PAYABLE_ID[i], response.getResultList().get(i).getId());
-            assertEquals(FILTER_PAYABLE_MEMO[i], response.getResultList().get(i).getMemo());
-            assertNull(response.getResultList().get(i).getPaidDate());
+    @Test
+    public void findPayableByIdNotFound() {
+        Mockito.when(payableRepository.findById(payable2Id)).thenReturn(Optional.empty());
+        try {
+            Payable payable = payableService.findPayableById(payable2Id);
+            fail();
+        } catch (DoughNotFoundException e) {
         }
     }
 
     @Test
-    public void testCreateEstimatedPayables() throws Exception {
-        // Verify our account exists and has the schedule values we expect.
-        Payee payee1 = PayeeService.readPayee(SCHEDULE_PAYEE_ID);
-        assertNotNull(payee1);
-        assertEquals(SCHEDULE_CRON_EXPRESSION, payee1.getCronExpression());
-        assertEquals(SCHEDULE_EST_DUE_DATE.length, payee1.getNbrEstToCreate().intValue());
-        assertEquals(SCHEDULE_EST_AMOUNT, payee1.getEstAmount().toPlainString());
+    public void savePayable() throws Exception {
+        Mockito.when(payableRepository.save(Mockito.any(Payable.class))).thenReturn(payable1);
+        Payable payable = payableService.savePayable(payable1);
+        assertEquals(0, payable1AmountDue.compareTo(payable.getAmountDue()));
+    }
 
-        // Verify a payable already exists in the "future" and has the due date we expect.
-        List<Payable> payables1 = PayableService.readAllPayablesForPayee(SCHEDULE_PAYEE_ID);
-        assertNotNull(payables1);
-        assertEquals(1, payables1.size());
-        Payable existingPayable = payables1.iterator().next();
-        assertNotNull(existingPayable);
-        assertEquals(SCHEDULE_EST_DUE_DATE[0], DATE_FORMAT.format(existingPayable.getEstDueDate()));
-
-        // Save the id and version so we verify this payable does not change.
-        Long existingPayableId = existingPayable.getId();
-        Integer existingPayableVersion = existingPayable.getVersion();
-
-        // Fake "today" to make this easier to test.
-        Date today = DATE_FORMAT.parse(SCHEDULE_TODAY);
-        PayableService.createEstimatedPayables(SCHEDULE_PAYEE_ID, today);
-
-        // Verify we now have 2 payables.
-        List<Payable> payables2 = PayableService.readAllPayablesForPayee(SCHEDULE_PAYEE_ID);
-        assertNotNull(payables2);
-        assertEquals(SCHEDULE_EST_DUE_DATE.length, payables2.size());
-
-        for (Payable payable : payables2) {
-            // Verify the old one did not change.
-            if (payable.getId().equals(existingPayableId)) {
-                assertEquals(existingPayableVersion, payable.getVersion());
-            } else {
-                // Verify the new one has the expected values.
-                assertEquals(SCHEDULE_EST_DUE_DATE[1], DATE_FORMAT.format(payable.getEstDueDate()));
-                assertEquals(SCHEDULE_EST_AMOUNT, payable.getEstAmount().toPlainString());
-                assertFalse(payable.getNoBill().booleanValue());
-            }
+    @Test
+    public void savePayableOptimisticLocking() {
+        Mockito.when(payableRepository.save(Mockito.any(Payable.class)))
+                .thenThrow(ObjectOptimisticLockingFailureException.class);
+        try {
+            Payable payable = payableService.savePayable(payable1);
+            fail();
+        } catch (DoughOptimisticLockingException e) {
         }
     }
 
     @Test
-    public void testCreateEstimatedPayablesWithPastCronString() throws Exception {
-        Payee payee1 = PayeeService.readPayee(PAST_PAYEE_ID);
-        assertNotNull(payee1);
-        List<Payable> payables1 = PayableService.readAllPayablesForPayee(PAST_PAYEE_ID);
-        assertTrue(payables1.isEmpty());
-        Date today = DATE_FORMAT.parse(SCHEDULE_TODAY);
-        PayableService.createEstimatedPayables(PAST_PAYEE_ID, today);
-        List<Payable> payables2 = PayableService.readAllPayablesForPayee(PAST_PAYEE_ID);
-        assertTrue(payables2.isEmpty());
+    public void findAllPayableDuesFull() {
+        Payee payee = FakeDataUtil.buildPayee(1);
+        Payable payable = FakeDataUtil.buildPayable(payee, 1, null);
+        Payment payment = FakeDataUtil.buildFullPayment(payable, 1);
+        List<Payable> payables = new ArrayList<>();
+        payables.add(payable);
+        Mockito.when(payableRepository.findAllByOrderByDueDate()).thenReturn(payables);
+        List<PayableDueBean> payableDues = payableService.findAllPayableDues();
+        assertEquals(0, payableDues.size());
     }
 
     @Test
-    public void testGetBillsToPay() throws Exception {
-        Date today = DATE_FORMAT.parse(BILL_TO_PAY_TODAY);
-        List<BillToPay> billsToPay = PayableService.getBillsToPay(today);
-        assertEquals(BILL_TO_PAY_ID.length, billsToPay.size());
+    public void findAllPayableDuesPartial() {
+        Payee payee = FakeDataUtil.buildPayee(1);
+        Payable payable = FakeDataUtil.buildPayable(payee, 1, null);
+        BigDecimal expected = payable.getAmountDue();
+        Payment payment = FakeDataUtil.buildPartialPayment(payable, 1);
+        // Balance due *should* be the payable amount due minus the payment amount paid.
+        expected = expected.subtract(payment.getAmountPaid());
+        List<Payable> payables = new ArrayList<>();
+        payables.add(payable);
+        Mockito.when(payableRepository.findAllByOrderByDueDate()).thenReturn(payables);
+        List<PayableDueBean> payableDues = payableService.findAllPayableDues();
+        assertEquals(1, payableDues.size());
+        PayableDueBean payableDueBean = payableDues.iterator().next();
+        assertEquals(0, payableDueBean.getBalanceDue().compareTo(expected));
+        assertEquals(PayableService.OVERDUE_CLASS, payableDueBean.getStyleClass());
+    }
+
+    @Test
+    public void findAllPayableDuesUnpaidPreviousBalance() {
+        Payee payee = FakeDataUtil.buildPayee(1);
+        Payable payable = FakeDataUtil.buildPayable(payee, 1, null);
+        // Part of the current amount due is overdue balance from the previous payable. This should not be included in
+        // this payable's balance due.
+        //
+        // Previous balance is between $1,000 and $10,000.
+        int previousBalanceInt = random.nextInt(9000) + 1000;
+        BigDecimal previousBalance = BigDecimal.valueOf(previousBalanceInt, 2);
+        payable.setPreviousBalance(previousBalance);
+        // Previous payments is between 5% and 40% of previous balance. It is a negative number.
+        BigDecimal mult = BigDecimal.valueOf(random.nextInt(40) + 5, 2);
+        BigDecimal previousPayments = previousBalance.multiply(mult).setScale(2, RoundingMode.HALF_UP);
+        previousPayments = BigDecimal.ZERO.subtract(previousPayments);
+        payable.setPreviousPayments(previousPayments);
+        // Current charges is between $1,000 and $10,000.
+        BigDecimal currentCharges = payable.getAmountDue();
+        // The amount due is previous balance + previous payments + current charges.
+        BigDecimal amountDue = previousBalance.add(previousPayments).add(currentCharges);
+        payable.setAmountDue(amountDue);
+        // Balance due *should* just be the current charges.
+        BigDecimal expected = currentCharges;
+        List<Payable> payables = new ArrayList<>();
+        payables.add(payable);
+        Mockito.when(payableRepository.findAllByOrderByDueDate()).thenReturn(payables);
 /*
-        System.out.println("Test Get Bills To Pay"); // DEBUG
-        System.out.println("idx    id  payee       due date       amt  actual  over  almost"); // DEBUG
-        NumberFormat curFormat = NumberFormat.getCurrencyInstance(); // DEBUG
+        System.out.println("previousBalance=\"" + previousBalance + "\"");
+        System.out.println("previousPayments=\"" + previousPayments + "\"");
+        System.out.println("currentCharges=\"" + currentCharges + "\"");
+        System.out.println("amountDue=\"" + amountDue + "\"");
+        System.out.println("expected=\"" + expected + "\"");
 */
-        for (int i = 0; i < billsToPay.size(); i++) {
+        List<PayableDueBean> payableDues = payableService.findAllPayableDues();
+        assertEquals(1, payableDues.size());
+        PayableDueBean payableDueBean = payableDues.iterator().next();
+        assertEquals(0, payableDueBean.getBalanceDue().compareTo(expected));
+        assertEquals(PayableService.OVERDUE_CLASS, payableDueBean.getStyleClass());
+    }
+
+    @Test
+    public void findAllPayableDuesOverpaidPreviousBalance() {
+        Payee payee = FakeDataUtil.buildPayee(1);
+        Payable payable = FakeDataUtil.buildPayable(payee, 1, null);
+        // The previous balance was paid in full or over paid a bit. It should have no effect on this payable's balance
+        // due.
+        //
+        // Previous balance is between $1,000 and $10,000.
+        int previousBalanceInt = random.nextInt(9000) + 1000;
+        BigDecimal previousBalance = BigDecimal.valueOf(previousBalanceInt, 2);
+        payable.setPreviousBalance(previousBalance);
+        // Previous payments is between 105% and 140% of previous balance. It is a negative number.
+        BigDecimal mult = BigDecimal.valueOf(random.nextInt(40) + 105, 2);
+        BigDecimal previousPayments = previousBalance.multiply(mult).setScale(2, RoundingMode.HALF_UP);
+        previousPayments = BigDecimal.ZERO.subtract(previousPayments);
+        payable.setPreviousPayments(previousPayments);
+        // The amount due is the amount due, i.e. between $1,000 and $10,000.
+        BigDecimal amountDue = payable.getAmountDue();
+        // Current charges is the amount due - previous balance - previous payments.
+        BigDecimal currentCharges = amountDue.subtract(previousBalance).subtract(previousPayments);
+        // Balance due *should* be the amount due.
+        BigDecimal expected = amountDue;
+        List<Payable> payables = new ArrayList<>();
+        payables.add(payable);
+        Mockito.when(payableRepository.findAllByOrderByDueDate()).thenReturn(payables);
 /*
-            System.out.printf(" %2d  %4s  %-10s  %8s  %6s  %-5b  %-5b  %-5b%n",
-                    i,
-                    billsToPay.get(i).getPayableId(),
-                    billsToPay.get(i).getPayeeName(),
-                    (billsToPay.get(i).getDueDate() == null ? null : DATE_FORMAT.format(billsToPay.get(i).getDueDate())),
-                    curFormat.format(billsToPay.get(i).getAmount()),
-                    billsToPay.get(i).isActual(),
-                    billsToPay.get(i).isOverDue(),
-                    billsToPay.get(i).isAlmostDue()); // DEBUG
+        System.out.println("previousBalance=\"" + previousBalance + "\"");
+        System.out.println("previousPayments=\"" + previousPayments + "\"");
+        System.out.println("currentCharges=\"" + currentCharges + "\"");
+        System.out.println("amountDue=\"" + amountDue + "\"");
+        System.out.println("expected=\"" + expected + "\"");
 */
-            assertEquals(BILL_TO_PAY_ID[i], billsToPay.get(i).getPayableId());
-            assertEquals(BILL_TO_PAY_NAME[i], billsToPay.get(i).getPayeeName());
-            assertEquals(BILL_TO_PAY_DUE[i], DATE_FORMAT.format(billsToPay.get(i).getDueDate()));
-            assertEquals(BILL_TO_PAY_AMOUNT[i], billsToPay.get(i).getAmount().toPlainString());
-            assertEquals(BILL_TO_PAY_ACTUAL[i].booleanValue(), billsToPay.get(i).isActual());
-            assertEquals(BILL_TO_PAY_OVER[i].booleanValue(), billsToPay.get(i).isOverDue());
-            if (BILL_TO_PAY_ALMOST[i] != null)
-                assertEquals(BILL_TO_PAY_ALMOST[i].booleanValue(), billsToPay.get(i).isAlmostDue());
-        }
+        List<PayableDueBean> payableDues = payableService.findAllPayableDues();
+        assertEquals(1, payableDues.size());
+        PayableDueBean payableDueBean = payableDues.iterator().next();
+        assertEquals(0, payableDueBean.getBalanceDue().compareTo(expected));
+        assertEquals(PayableService.OVERDUE_CLASS, payableDueBean.getStyleClass());
+    }
+
+    @Test
+    public void findAllPayableDuesCredit() {
+        Payee payee = FakeDataUtil.buildPayee(1);
+        Payable payable = FakeDataUtil.buildPayable(payee, 1, null);
+        // The previous balance was overpaid by so much, we currently have a credit.
+        //
+        // Previous balance is between $1,000 and $10,000.
+        int previousBalanceInt = random.nextInt(9000) + 1000;
+        BigDecimal previousBalance = BigDecimal.valueOf(previousBalanceInt, 2);
+        payable.setPreviousBalance(previousBalance);
+        // Current charges is between $1,000 and $10,000.
+        BigDecimal currentCharges = payable.getAmountDue();
+        // Previous payments is previous balance + current charges + 5% to 40%. It is a negative number.
+        BigDecimal mult = BigDecimal.valueOf(random.nextInt(40) + 105, 2);
+        BigDecimal previousPayments = previousBalance.add(currentCharges).multiply(mult)
+                .setScale(2, RoundingMode.HALF_UP);
+        previousPayments = BigDecimal.ZERO.subtract(previousPayments);
+        payable.setPreviousPayments(previousPayments);
+        // The amount due is previous balance + previous payments + current charges. It should be a credit.
+        BigDecimal amountDue = previousBalance.add(previousPayments).add(currentCharges);
+        payable.setAmountDue(amountDue);
+        List<Payable> payables = new ArrayList<>();
+        payables.add(payable);
+        Mockito.when(payableRepository.findAllByOrderByDueDate()).thenReturn(payables);
+/*
+        System.out.println("previousBalance=\"" + previousBalance + "\"");
+        System.out.println("previousPayments=\"" + previousPayments + "\"");
+        System.out.println("currentCharges=\"" + currentCharges + "\"");
+        System.out.println("amountDue=\"" + amountDue + "\"");
+*/
+        List<PayableDueBean> payableDues = payableService.findAllPayableDues();
+        assertEquals(0, payableDues.size());
     }
 }
