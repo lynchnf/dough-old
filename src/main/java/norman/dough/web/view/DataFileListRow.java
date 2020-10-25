@@ -1,9 +1,8 @@
 package norman.dough.web.view;
 
-import norman.dough.domain.DataFile;
 import norman.dough.domain.Acct;
+import norman.dough.domain.DataFile;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 public class DataFileListRow {

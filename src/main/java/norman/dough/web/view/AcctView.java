@@ -3,7 +3,6 @@ package norman.dough.web.view;
 import norman.dough.domain.Acct;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 public class AcctView {
     private Long id;

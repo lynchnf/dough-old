@@ -1,7 +1,5 @@
 package norman.dough.domain;
 
-import org.apache.commons.lang3.StringUtils;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -226,6 +224,7 @@ public class Tran {
 
     @Override
     public String toString() {
-        return NumberFormat.getCurrencyInstance().format(amount) + " on " + DateFormat.getDateInstance().format(postDate);
+        return NumberFormat.getCurrencyInstance().format(amount) + " on " +
+                DateFormat.getDateInstance().format(postDate);
     }
 }

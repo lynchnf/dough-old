@@ -1,11 +1,11 @@
 package norman.dough.web;
 
+import norman.dough.domain.Cat;
 import norman.dough.domain.Pattern;
-    import norman.dough.domain.Cat;
 import norman.dough.exception.NotFoundException;
 import norman.dough.exception.OptimisticLockingException;
+import norman.dough.service.CatService;
 import norman.dough.service.PatternService;
-    import norman.dough.service.CatService;
 import norman.dough.web.view.PatternEditForm;
 import norman.dough.web.view.PatternListForm;
 import norman.dough.web.view.PatternView;
@@ -38,7 +38,8 @@ public class PatternController {
     private CatService catService;
 
     @GetMapping("/patternList")
-    public String loadPatternList(@RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+    public String loadPatternList(
+            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
             @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
             @RequestParam(value = "sortColumn", required = false, defaultValue = "seq") String sortColumn,
             @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") Sort.Direction sortDirection,
@@ -96,8 +97,8 @@ public class PatternController {
     }
 
     @PostMapping("/patternEdit")
-    public String processPatternEdit(@Valid @ModelAttribute("editForm") PatternEditForm editForm, BindingResult bindingResult,
-            RedirectAttributes redirectAttributes) {
+    public String processPatternEdit(@Valid @ModelAttribute("editForm") PatternEditForm editForm,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "patternEdit";
         }

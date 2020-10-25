@@ -155,7 +155,8 @@
             <tbody>
             <tr th:each="row:${listForm.rows}">
                 <td th:text="${row.ofxType}"></td>
-                <td><a th:href="@{/dataTran(id=${row.id})}" th:text="${#dates.format(row.ofxPostDate,'M/d/yyyy')}"></a></td>
+                <td><a th:href="@{/dataTran(id=${row.id})}" th:text="${#dates.format(row.ofxPostDate,'M/d/yyyy')}"></a>
+                </td>
                 <td th:text="${#dates.format(row.ofxUserDate,'M/d/yyyy')}"></td>
                 <td th:text="${#numbers.formatCurrency(row.ofxAmount)}"></td>
                 <td th:text="${row.ofxFitId}"></td>

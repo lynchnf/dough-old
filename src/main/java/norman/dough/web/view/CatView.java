@@ -2,9 +2,6 @@ package norman.dough.web.view;
 
 import norman.dough.domain.Cat;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 public class CatView {
     private Long id;
     private String name;

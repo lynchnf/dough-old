@@ -1,11 +1,11 @@
 package norman.dough.web;
 
+import norman.dough.domain.Acct;
 import norman.dough.domain.DataFile;
-    import norman.dough.domain.Acct;
 import norman.dough.exception.NotFoundException;
 import norman.dough.exception.OptimisticLockingException;
+import norman.dough.service.AcctService;
 import norman.dough.service.DataFileService;
-    import norman.dough.service.AcctService;
 import norman.dough.web.view.DataFileEditForm;
 import norman.dough.web.view.DataFileListForm;
 import norman.dough.web.view.DataFileView;
@@ -31,14 +31,17 @@ import java.util.Arrays;
 public class DataFileController {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataFileController.class);
     private static final String defaultSortColumn = "id";
-    private static final String[] sortableColumns = {"originalFilename", "contentType", "size", "uploadTimestamp", "status", "ofxOrganization", "ofxFid", "ofxBankId", "ofxAcctId", "ofxType", "acct"};
+    private static final String[] sortableColumns =
+            {"originalFilename", "contentType", "size", "uploadTimestamp", "status", "ofxOrganization", "ofxFid",
+                    "ofxBankId", "ofxAcctId", "ofxType", "acct"};
     @Autowired
     private DataFileService service;
     @Autowired
     private AcctService acctService;
 
     @GetMapping("/dataFileList")
-    public String loadDataFileList(@RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+    public String loadDataFileList(
+            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
             @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
             @RequestParam(value = "sortColumn", required = false, defaultValue = "originalFilename") String sortColumn,
             @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") Sort.Direction sortDirection,
@@ -96,8 +99,8 @@ public class DataFileController {
     }
 
     @PostMapping("/dataFileEdit")
-    public String processDataFileEdit(@Valid @ModelAttribute("editForm") DataFileEditForm editForm, BindingResult bindingResult,
-            RedirectAttributes redirectAttributes) {
+    public String processDataFileEdit(@Valid @ModelAttribute("editForm") DataFileEditForm editForm,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "dataFileEdit";
         }

@@ -1,7 +1,7 @@
 package norman.dough.web.view;
 
-import norman.dough.domain.Stmt;
 import norman.dough.domain.Acct;
+import norman.dough.domain.Stmt;
 
 import java.math.BigDecimal;
 import java.util.Date;

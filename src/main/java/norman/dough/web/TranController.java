@@ -1,11 +1,11 @@
 package norman.dough.web;
 
+import norman.dough.domain.Stmt;
 import norman.dough.domain.Tran;
-    import norman.dough.domain.Stmt;
 import norman.dough.exception.NotFoundException;
 import norman.dough.exception.OptimisticLockingException;
+import norman.dough.service.StmtService;
 import norman.dough.service.TranService;
-    import norman.dough.service.StmtService;
 import norman.dough.web.view.TranEditForm;
 import norman.dough.web.view.TranListForm;
 import norman.dough.web.view.TranView;
@@ -31,7 +31,10 @@ import java.util.Arrays;
 public class TranController {
     private static final Logger LOGGER = LoggerFactory.getLogger(TranController.class);
     private static final String defaultSortColumn = "id";
-    private static final String[] sortableColumns = {"stmt", "status", "postDate", "manualPostDate", "uploadedPostDate", "amount", "manualAmount", "uploadedAmount", "checkNumber", "manualCheckNumber", "uploadedCheckNumber", "name", "manualName", "uploadedName", "memo", "manualMemo", "uploadedMemo", "voided"};
+    private static final String[] sortableColumns =
+            {"stmt", "status", "postDate", "manualPostDate", "uploadedPostDate", "amount", "manualAmount",
+                    "uploadedAmount", "checkNumber", "manualCheckNumber", "uploadedCheckNumber", "name", "manualName",
+                    "uploadedName", "memo", "manualMemo", "uploadedMemo", "voided"};
     @Autowired
     private TranService service;
     @Autowired

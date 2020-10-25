@@ -73,7 +73,8 @@
             </thead>
             <tbody>
             <tr th:each="row:${listForm.rows}">
-                <td><a th:href="@{/pattern(id=${row.id})}" th:text="${#numbers.formatInteger(row.seq,1,'DEFAULT')}"></a></td>
+                <td><a th:href="@{/pattern(id=${row.id})}" th:text="${#numbers.formatInteger(row.seq,1,'DEFAULT')}"></a>
+                </td>
                 <td th:text="${row.regex}"></td>
                 <td th:text="${row.cat}"></td>
             </tr>

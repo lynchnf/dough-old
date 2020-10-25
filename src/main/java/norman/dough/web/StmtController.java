@@ -1,11 +1,11 @@
 package norman.dough.web;
 
+import norman.dough.domain.Acct;
 import norman.dough.domain.Stmt;
-    import norman.dough.domain.Acct;
 import norman.dough.exception.NotFoundException;
 import norman.dough.exception.OptimisticLockingException;
+import norman.dough.service.AcctService;
 import norman.dough.service.StmtService;
-    import norman.dough.service.AcctService;
 import norman.dough.web.view.StmtEditForm;
 import norman.dough.web.view.StmtListForm;
 import norman.dough.web.view.StmtView;
@@ -31,7 +31,9 @@ import java.util.Arrays;
 public class StmtController {
     private static final Logger LOGGER = LoggerFactory.getLogger(StmtController.class);
     private static final String defaultSortColumn = "id";
-    private static final String[] sortableColumns = {"acct", "openBalance", "credits", "debits", "fees", "interest", "closeBalance", "minimumDue", "dueDate", "closeDate"};
+    private static final String[] sortableColumns =
+            {"acct", "openBalance", "credits", "debits", "fees", "interest", "closeBalance", "minimumDue", "dueDate",
+                    "closeDate"};
     @Autowired
     private StmtService service;
     @Autowired

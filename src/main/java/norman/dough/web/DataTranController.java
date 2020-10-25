@@ -1,11 +1,11 @@
 package norman.dough.web;
 
+import norman.dough.domain.DataFile;
 import norman.dough.domain.DataTran;
-    import norman.dough.domain.DataFile;
 import norman.dough.exception.NotFoundException;
 import norman.dough.exception.OptimisticLockingException;
+import norman.dough.service.DataFileService;
 import norman.dough.service.DataTranService;
-    import norman.dough.service.DataFileService;
 import norman.dough.web.view.DataTranEditForm;
 import norman.dough.web.view.DataTranListForm;
 import norman.dough.web.view.DataTranView;
@@ -31,14 +31,17 @@ import java.util.Arrays;
 public class DataTranController {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataTranController.class);
     private static final String defaultSortColumn = "id";
-    private static final String[] sortableColumns = {"dataFile", "ofxType", "ofxPostDate", "ofxUserDate", "ofxAmount", "ofxFitId", "ofxSic", "ofxCheckNumber", "ofxCorrectFitId", "ofxCorrectAction", "ofxName", "ofxCategory", "ofxMemo"};
+    private static final String[] sortableColumns =
+            {"dataFile", "ofxType", "ofxPostDate", "ofxUserDate", "ofxAmount", "ofxFitId", "ofxSic", "ofxCheckNumber",
+                    "ofxCorrectFitId", "ofxCorrectAction", "ofxName", "ofxCategory", "ofxMemo"};
     @Autowired
     private DataTranService service;
     @Autowired
     private DataFileService dataFileService;
 
     @GetMapping("/dataTranList")
-    public String loadDataTranList(@RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+    public String loadDataTranList(
+            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
             @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
             @RequestParam(value = "sortColumn", required = false, defaultValue = "ofxPostDate") String sortColumn,
             @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") Sort.Direction sortDirection,
@@ -96,8 +99,8 @@ public class DataTranController {
     }
 
     @PostMapping("/dataTranEdit")
-    public String processDataTranEdit(@Valid @ModelAttribute("editForm") DataTranEditForm editForm, BindingResult bindingResult,
-            RedirectAttributes redirectAttributes) {
+    public String processDataTranEdit(@Valid @ModelAttribute("editForm") DataTranEditForm editForm,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "dataTranEdit";
         }

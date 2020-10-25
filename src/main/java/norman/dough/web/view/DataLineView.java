@@ -1,10 +1,7 @@
 package norman.dough.web.view;
 
-import norman.dough.domain.DataLine;
 import norman.dough.domain.DataFile;
-
-import java.math.BigDecimal;
-import java.util.Date;
+import norman.dough.domain.DataLine;
 
 public class DataLineView {
     private Long id;

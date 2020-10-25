@@ -29,7 +29,9 @@ import java.util.Arrays;
 public class AcctController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AcctController.class);
     private static final String defaultSortColumn = "id";
-    private static final String[] sortableColumns = {"name", "nickname", "type", "addressName", "address1", "address2", "city", "state", "zipCode", "phoneNumber", "creditLimit", "active"};
+    private static final String[] sortableColumns =
+            {"name", "nickname", "type", "addressName", "address1", "address2", "city", "state", "zipCode",
+                    "phoneNumber", "creditLimit", "active"};
     @Autowired
     private AcctService service;
 

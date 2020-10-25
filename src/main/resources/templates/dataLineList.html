@@ -64,7 +64,8 @@
             </thead>
             <tbody>
             <tr th:each="row:${listForm.rows}">
-                <td><a th:href="@{/dataLine(id=${row.id})}" th:text="${#numbers.formatInteger(row.seq,1,'DEFAULT')}"></a></td>
+                <td><a th:href="@{/dataLine(id=${row.id})}"
+                       th:text="${#numbers.formatInteger(row.seq,1,'DEFAULT')}"></a></td>
                 <td th:text="${row.text}"></td>
             </tr>
             </tbody>

@@ -2,9 +2,6 @@ package norman.dough.web.view;
 
 import norman.dough.domain.DataLine;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 public class DataLineListRow {
     private Long id;
     private Integer seq;

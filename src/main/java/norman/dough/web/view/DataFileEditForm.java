@@ -1,18 +1,16 @@
 package norman.dough.web.view;
 
-import norman.dough.domain.DataFile;
 import norman.dough.domain.Acct;
+import norman.dough.domain.DataFile;
 import norman.dough.exception.NotFoundException;
 import norman.dough.service.AcctService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
 
-import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.math.BigDecimal;
 import java.util.Date;
 
 public class DataFileEditForm {

@@ -1,11 +1,11 @@
 package norman.dough.web;
 
+import norman.dough.domain.DataFile;
 import norman.dough.domain.DataLine;
-    import norman.dough.domain.DataFile;
 import norman.dough.exception.NotFoundException;
 import norman.dough.exception.OptimisticLockingException;
+import norman.dough.service.DataFileService;
 import norman.dough.service.DataLineService;
-    import norman.dough.service.DataFileService;
 import norman.dough.web.view.DataLineEditForm;
 import norman.dough.web.view.DataLineListForm;
 import norman.dough.web.view.DataLineView;
@@ -38,7 +38,8 @@ public class DataLineController {
     private DataFileService dataFileService;
 
     @GetMapping("/dataLineList")
-    public String loadDataLineList(@RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+    public String loadDataLineList(
+            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
             @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
             @RequestParam(value = "sortColumn", required = false, defaultValue = "seq") String sortColumn,
             @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") Sort.Direction sortDirection,
@@ -96,8 +97,8 @@ public class DataLineController {
     }
 
     @PostMapping("/dataLineEdit")
-    public String processDataLineEdit(@Valid @ModelAttribute("editForm") DataLineEditForm editForm, BindingResult bindingResult,
-            RedirectAttributes redirectAttributes) {
+    public String processDataLineEdit(@Valid @ModelAttribute("editForm") DataLineEditForm editForm,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "dataLineEdit";
         }

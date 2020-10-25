@@ -1,14 +1,14 @@
 package norman.dough;
 
 import norman.dough.domain.Acct;
-import norman.dough.domain.Cat;
 import norman.dough.domain.AcctNbr;
-import norman.dough.domain.Stmt;
+import norman.dough.domain.Cat;
 import norman.dough.domain.DataFile;
-import norman.dough.domain.Pattern;
-import norman.dough.domain.Tran;
 import norman.dough.domain.DataLine;
 import norman.dough.domain.DataTran;
+import norman.dough.domain.Pattern;
+import norman.dough.domain.Stmt;
+import norman.dough.domain.Tran;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +37,12 @@ public class FakeDataUtil {
     private static final DateFormat YYMD = new SimpleDateFormat("yyyy-MM-dd");
     private static final String[] NONSENSE_WORDS =
             {"acaer", "ahalty", "aquents", "aturned", "baxtoy", "bilkons", "boycher", "carlds", "corrot", "corsarm",
-                "cortmum", "defas", "deferts", "dialks", "dignate", "distard", "diveher", "expuls", "famongs",
-                "fierer", "gogogox", "griled", "heddies", "hoddlen", "holize", "houshia", "ifringe", "immegap",
-                "lammour", "liledge", "marsons", "merint", "mistial", "morior", "mouruge", "nekmit", "novaly",
-                "oclate", "onama", "partia", "posion", "pricall", "qiameth", "rention", "sementa", "skimat",
-                "skizzle", "specons", "stally", "stictic", "sweeds", "sweeds", "twenbat", "walrie", "winfirn",
-                "yoffa"};
+                    "cortmum", "defas", "deferts", "dialks", "dignate", "distard", "diveher", "expuls", "famongs",
+                    "fierer", "gogogox", "griled", "heddies", "hoddlen", "holize", "houshia", "ifringe", "immegap",
+                    "lammour", "liledge", "marsons", "merint", "mistial", "morior", "mouruge", "nekmit", "novaly",
+                    "oclate", "onama", "partia", "posion", "pricall", "qiameth", "rention", "sementa", "skimat",
+                    "skizzle", "specons", "stally", "stictic", "sweeds", "sweeds", "twenbat", "walrie", "winfirn",
+                    "yoffa"};
 
     public static class ReturnTypeAndValue {
         private Class<?> returnType;

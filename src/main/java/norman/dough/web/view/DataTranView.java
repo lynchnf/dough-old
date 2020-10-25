@@ -1,7 +1,7 @@
 package norman.dough.web.view;
 
-import norman.dough.domain.DataTran;
 import norman.dough.domain.DataFile;
+import norman.dough.domain.DataTran;
 
 import java.math.BigDecimal;
 import java.util.Date;

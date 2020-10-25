@@ -1,7 +1,5 @@
 package norman.dough.domain;
 
-import org.apache.commons.lang3.StringUtils;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,9 +11,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.util.Date;
 
 @Entity

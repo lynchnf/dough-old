@@ -1,7 +1,5 @@
 package norman.dough.domain;
 
-import org.apache.commons.lang3.StringUtils;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -176,6 +174,7 @@ public class DataTran {
 
     @Override
     public String toString() {
-        return NumberFormat.getCurrencyInstance().format(ofxAmount) + " on " + DateFormat.getDateInstance().format(ofxPostDate);
+        return NumberFormat.getCurrencyInstance().format(ofxAmount) + " on " +
+                DateFormat.getDateInstance().format(ofxPostDate);
     }
 }

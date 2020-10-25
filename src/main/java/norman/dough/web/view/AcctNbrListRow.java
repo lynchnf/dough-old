@@ -2,7 +2,6 @@ package norman.dough.web.view;
 
 import norman.dough.domain.AcctNbr;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 public class AcctNbrListRow {

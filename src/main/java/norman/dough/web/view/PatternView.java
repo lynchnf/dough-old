@@ -1,10 +1,7 @@
 package norman.dough.web.view;
 
-import norman.dough.domain.Pattern;
 import norman.dough.domain.Cat;
-
-import java.math.BigDecimal;
-import java.util.Date;
+import norman.dough.domain.Pattern;
 
 public class PatternView {
     private Long id;
