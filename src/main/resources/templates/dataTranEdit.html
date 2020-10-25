@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head::head"></head>
+<body>
+<header th:replace="fragments/menu::menu"></header>
+<main class="container">
+    <h1>Data Transaction Edit</h1>
+    <div th:replace="fragments/alerts::alerts"></div>
+
+    <form action="#" method="post" th:action="@{/dataTranEdit}" th:object="${editForm}">
+        <ul class="alert alert-danger" th:if="${#fields.hasAnyErrors()}">
+            <li th:each="err:${#fields.allErrors()}" th:text="${err}"></li>
+        </ul>
+        <input type="hidden" th:field="*{id}"/>
+        <input type="hidden" th:field="*{version}"/>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Data File</label>
+            <div class="col-sm-9">
+                <select class="form-control" th:field="*{dataFileId}" th:errorclass="is-invalid">
+                    <option value="">Please select ...</option>
+                    <option th:each="dataFile:${allDataFile}" th:value="${dataFile.id}" th:text="${dataFile}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Type</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxType}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Post Date (M/d/yyyy)</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxPostDate}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">User Date (M/d/yyyy)</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxUserDate}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Amount</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxAmount}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Fit Id</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxFitId}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Sic</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxSic}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Check Number</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxCheckNumber}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Correct Fit Id</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxCorrectFitId}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Correct Action</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxCorrectAction}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Name</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxName}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Category</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxCategory}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Memo</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxMemo}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</main>
+<footer th:replace="fragments/footer::footer"></footer>
+<script>
+    $("#ofxPostDate").datepicker({uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome'});
+    $("#ofxUserDate").datepicker({uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome'});
+</script>
+</body>
+</html>

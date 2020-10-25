@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head::head"></head>
+<body>
+<header th:replace="fragments/menu::menu"></header>
+<main class="container">
+    <h1>Transaction Edit</h1>
+    <div th:replace="fragments/alerts::alerts"></div>
+
+    <form action="#" method="post" th:action="@{/tranEdit}" th:object="${editForm}">
+        <ul class="alert alert-danger" th:if="${#fields.hasAnyErrors()}">
+            <li th:each="err:${#fields.allErrors()}" th:text="${err}"></li>
+        </ul>
+        <input type="hidden" th:field="*{id}"/>
+        <input type="hidden" th:field="*{version}"/>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Statement</label>
+            <div class="col-sm-9">
+                <select class="form-control" th:field="*{stmtId}" th:errorclass="is-invalid">
+                    <option value="">Please select ...</option>
+                    <option th:each="stmt:${allStmt}" th:value="${stmt.id}" th:text="${stmt}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Status</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{status}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Post Date (M/d/yyyy)</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{postDate}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Manual Post Date (M/d/yyyy)</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{manualPostDate}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Uploaded Post Date (M/d/yyyy)</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{uploadedPostDate}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Amount</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{amount}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Manual Amount</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{manualAmount}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Uploaded Amount</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{uploadedAmount}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Check Number</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{checkNumber}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Manual Check Number</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{manualCheckNumber}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Uploaded Check Number</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{uploadedCheckNumber}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Name</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{name}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Manual Name</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{manualName}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Uploaded Name</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{uploadedName}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Memo</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{memo}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Manual Memo</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{manualMemo}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Uploaded Memo</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{uploadedMemo}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Void</label>
+            <div class="col-sm-9">
+                <select class="form-control" th:field="*{voided}" th:errorclass="is-invalid">
+                    <option value="">Please select ...</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</main>
+<footer th:replace="fragments/footer::footer"></footer>
+<script>
+    $("#postDate").datepicker({uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome'});
+    $("#manualPostDate").datepicker({uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome'});
+    $("#uploadedPostDate").datepicker({uiLibrary: 'bootstrap4', iconsLibrary: 'fontawesome'});
+</script>
+</body>
+</html>
