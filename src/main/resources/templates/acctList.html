@@ -79,6 +79,15 @@
                     </a>
                 </th>
                 <th>
+                    <a class="changeSort" data-list-form="listForm" data-sort-column="cronString" href="#">
+                        Cron String
+                        <span th:if="${listForm.sortColumn=='cronString'}">
+                            <span th:if="${listForm.ascending}"><i class="fas fa-caret-up"></i></span>
+                            <span th:if="${listForm.descending}"><i class="fas fa-caret-down"></i></span>
+                        </span>
+                    </a>
+                </th>
+                <th>
                     <a class="changeSort" data-list-form="listForm" data-sort-column="active" href="#">
                         Active
                         <span th:if="${listForm.sortColumn=='active'}">
@@ -95,6 +104,7 @@
                 <td th:text="${row.nickname}"></td>
                 <td th:text="${row.type}"></td>
                 <td th:text="${#numbers.formatCurrency(row.creditLimit)}"></td>
+                <td th:text="${row.cronString}"></td>
                 <td th:text="${row.active}"></td>
             </tr>
             </tbody>

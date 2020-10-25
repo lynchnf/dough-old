@@ -37,6 +37,8 @@ public class Acct {
     private String phoneNumber;
     @Column(precision = 9, scale = 2)
     private BigDecimal creditLimit;
+    @Column(length = 20)
+    private String cronString;
     @Column(nullable = false)
     private Boolean active;
 
@@ -142,6 +144,14 @@ public class Acct {
 
     public void setCreditLimit(BigDecimal creditLimit) {
         this.creditLimit = creditLimit;
+    }
+
+    public String getCronString() {
+        return cronString;
+    }
+
+    public void setCronString(String cronString) {
+        this.cronString = cronString;
     }
 
     public Boolean getActive() {

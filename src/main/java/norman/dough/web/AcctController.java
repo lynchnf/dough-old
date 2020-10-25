@@ -31,7 +31,7 @@ public class AcctController {
     private static final String defaultSortColumn = "id";
     private static final String[] sortableColumns =
             {"name", "nickname", "type", "addressName", "address1", "address2", "city", "state", "zipCode",
-                    "phoneNumber", "creditLimit", "active"};
+                    "phoneNumber", "creditLimit", "cronString", "active"};
     @Autowired
     private AcctService service;
 

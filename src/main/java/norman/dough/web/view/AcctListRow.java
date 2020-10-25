@@ -10,6 +10,7 @@ public class AcctListRow {
     private String nickname;
     private String type;
     private BigDecimal creditLimit;
+    private String cronString;
     private Boolean active;
 
     public AcctListRow(Acct entity) {
@@ -18,6 +19,7 @@ public class AcctListRow {
         nickname = entity.getNickname();
         type = entity.getType();
         creditLimit = entity.getCreditLimit();
+        cronString = entity.getCronString();
         active = entity.getActive();
     }
 
@@ -39,6 +41,10 @@ public class AcctListRow {
 
     public BigDecimal getCreditLimit() {
         return creditLimit;
+    }
+
+    public String getCronString() {
+        return cronString;
     }
 
     public Boolean getActive() {

@@ -10,6 +10,7 @@ acct,state,state code,String,2,,,,,,true,true,,
 acct,zipCode,zip code,String,10,,,,,,true,true,,
 acct,phoneNumber,phone number,String,20,,,,,,true,true,,
 acct,creditLimit,credit limit,BigDecimal,,9,2,,,true,true,true,100,99999
+acct,cronString,cron string,String,20,,,,,true,true,true,,
 acct,active,active,Boolean,,,,,false,true,true,true,,
 cat,name,name,String,100,,,,false,true,true,true,,
 acctNbr,acct,account,Acct,,,,acct_id,false,,true,true,,

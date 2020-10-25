@@ -17,6 +17,7 @@ public class AcctView {
     private String zipCode;
     private String phoneNumber;
     private BigDecimal creditLimit;
+    private String cronString;
     private Boolean active;
 
     public AcctView(Acct entity) {
@@ -32,6 +33,7 @@ public class AcctView {
         zipCode = entity.getZipCode();
         phoneNumber = entity.getPhoneNumber();
         creditLimit = entity.getCreditLimit();
+        cronString = entity.getCronString();
         active = entity.getActive();
     }
 
@@ -81,6 +83,10 @@ public class AcctView {
 
     public BigDecimal getCreditLimit() {
         return creditLimit;
+    }
+
+    public String getCronString() {
+        return cronString;
     }
 
     public Boolean getActive() {

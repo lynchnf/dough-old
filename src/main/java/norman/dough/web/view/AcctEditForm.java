@@ -39,6 +39,8 @@ public class AcctEditForm {
     @Digits(integer = 9, fraction = 2, message = "Credit Limit value out of bounds. (<{integer} digits>.<{fraction} digits> expected)")
     @NumberFormat(style = NumberFormat.Style.CURRENCY)
     private BigDecimal creditLimit;
+    @Size(max = 20, message = "Cron String may not be over {max} characters long.")
+    private String cronString;
     @NotNull(message = "Active may not be blank.")
     private Boolean active;
 
@@ -59,6 +61,7 @@ public class AcctEditForm {
         zipCode = entity.getZipCode();
         phoneNumber = entity.getPhoneNumber();
         creditLimit = entity.getCreditLimit();
+        cronString = entity.getCronString();
         active = entity.getActive();
     }
 
@@ -77,6 +80,7 @@ public class AcctEditForm {
         entity.setZipCode(StringUtils.trimToNull(zipCode));
         entity.setPhoneNumber(StringUtils.trimToNull(phoneNumber));
         entity.setCreditLimit(creditLimit);
+        entity.setCronString(StringUtils.trimToNull(cronString));
         entity.setActive(active);
         return entity;
     }
@@ -183,6 +187,14 @@ public class AcctEditForm {
 
     public void setCreditLimit(BigDecimal creditLimit) {
         this.creditLimit = creditLimit;
+    }
+
+    public String getCronString() {
+        return cronString;
+    }
+
+    public void setCronString(String cronString) {
+        this.cronString = cronString;
     }
 
     public Boolean getActive() {

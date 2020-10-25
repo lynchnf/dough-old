@@ -87,6 +87,7 @@ public class FakeDataUtil {
             record.setZipCode(nextRandomString(10));
             record.setPhoneNumber(nextRandomString(20));
             record.setCreditLimit(nextRandomBigDecimal(100, 99999, 2));
+            record.setCronString(nextRandomString(20));
             record.setActive(nextRandomBoolean());
             acctList.add(record);
         }
