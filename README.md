@@ -1,3 +1,0 @@
-# Dough
-
-Personal finance software.
