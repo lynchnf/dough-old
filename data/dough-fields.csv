@@ -1,0 +1,76 @@
+entityName,fieldName,label,type,length,precision,scale,temporal,enumerated,joinColumn,nullable,onList,sortable,onView,onEdit,lowFakeValue,highFakeValue
+acct,name,name,String,50,,,,,,false,true,true,true,edit,,
+acct,nickname,nickname,String,50,,,,,,,true,true,true,edit,,
+acct,type,type,String,10,,,,,,false,true,true,true,edit,,
+acct,addressName,address name,String,50,,,,,,,,,true,edit,,
+acct,address1,address line 1,String,50,,,,,,,,,true,edit,,
+acct,address2,address line 2,String,50,,,,,,,,,true,edit,,
+acct,city,city,String,50,,,,,,,,,true,edit,,
+acct,state,state code,String,2,,,,,,,,,true,edit,,
+acct,zipCode,zip code,String,10,,,,,,,,,true,edit,,
+acct,phoneNumber,phone number,String,20,,,,,,,,,true,edit,,
+acct,creditLimit,credit limit,BigDecimal,,9,2,,,,,true,true,true,edit,100,99999
+acct,cronString,cron string,String,20,,,,,,,true,true,true,edit,,
+acct,active,active,Boolean,,,,,,,false,true,true,true,edit,,
+cat,name,name,String,100,,,,,,false,true,true,true,edit,,
+acctNbr,acct,account,Acct,,,,,,acct_id,false,,,true,edit,,
+acctNbr,number,number,String,50,,,,,,false,true,true,true,edit,,
+acctNbr,effDate,effective date,Date,,,,DATE,,,false,true,true,true,edit,-300,0
+stmt,acct,account,Acct,,,,,,acct_id,false,,,true,edit,,
+stmt,openBalance,open balance,BigDecimal,,9,2,,,,,,,true,edit,-9999,9999
+stmt,credits,credits,BigDecimal,,9,2,,,,,,,true,edit,-9999,9999
+stmt,debits,debits,BigDecimal,,9,2,,,,,,,true,edit,-9999,9999
+stmt,fees,fees,BigDecimal,,9,2,,,,,,,true,edit,-9999,9999
+stmt,interest,interest,BigDecimal,,9,2,,,,,,,true,edit,-9999,9999
+stmt,closeBalance,close balance,BigDecimal,,9,2,,,,false,true,true,true,edit,-9999,9999
+stmt,minimumDue,minimum due,BigDecimal,,9,2,,,,,true,true,true,edit,-9999,9999
+stmt,dueDate,due date,Date,,,,DATE,,,,true,true,true,edit,-300,90
+stmt,closeDate,close date,Date,,,,DATE,,,false,true,true,true,edit,-300,90
+dataFile,originalFilename,original file name,String,100,,,,,,false,true,true,true,edit,,
+dataFile,contentType,content type,String,100,,,,,,false,true,true,true,edit,,
+dataFile,size,size,Long,,,,,,,false,true,true,true,edit,1,9999
+dataFile,uploadTimestamp,upload timestamp,Date,,,,TIMESTAMP,,,false,true,true,true,edit,-300,90
+dataFile,status,status,DataFileStatus,10,,,,STRING,,,true,true,true,edit,,
+dataFile,ofxOrganization,organization,String,50,,,,,,,true,true,true,edit,,
+dataFile,ofxFid,fid,String,10,,,,,,,true,true,true,edit,,
+dataFile,ofxBankId,bank id,String,10,,,,,,,true,true,true,edit,,
+dataFile,ofxAcctId,account id,String,20,,,,,,,true,true,true,edit,,
+dataFile,ofxType,type,String,10,,,,,,,true,true,true,edit,,
+dataFile,acct,account,Acct,,,,,,acct_id,,true,true,true,edit,,
+pattern,seq,sequence,Integer,,,,,,,false,true,true,true,edit,1,9999
+pattern,regex,regular expression,String,255,,,,,,false,true,true,true,edit,,
+pattern,cat,category,Cat,,,,,,cat_id,false,true,true,true,edit,,
+tran,stmt,statement,Stmt,,,,,,stmt_id,false,,,true,edit,,
+tran,status,status,String,10,,,,,,,true,true,true,edit,,
+tran,postDate,post date,Date,,,,DATE,,,false,true,true,true,edit,-300,90
+tran,manualPostDate,manual post date,Date,,,,DATE,,,,,,true,edit,-300,90
+tran,uploadedPostDate,uploaded post date,Date,,,,DATE,,,,,,true,edit,-300,90
+tran,amount,amount,BigDecimal,,9,2,,,,false,true,true,true,edit,-9999,9999
+tran,manualAmount,manual amount,BigDecimal,,9,2,,,,,,,true,edit,-9999,9999
+tran,uploadedAmount,uploaded amount,BigDecimal,,9,2,,,,,,,true,edit,-9999,9999
+tran,checkNumber,check number,String,10,,,,,,,true,true,true,edit,,
+tran,manualCheckNumber,manual check number,String,10,,,,,,,,,true,edit,,
+tran,uploadedCheckNumber,uploaded check number,String,10,,,,,,,,,true,edit,,
+tran,name,name,String,100,,,,,,false,true,true,true,edit,,
+tran,manualName,manual name,String,100,,,,,,,,,true,edit,,
+tran,uploadedName,uploaded name,String,100,,,,,,,,,true,edit,,
+tran,memo,memo,String,100,,,,,,,,,true,edit,,
+tran,manualMemo,manual memo,String,100,,,,,,,,,true,edit,,
+tran,uploadedMemo,uploaded memo,String,100,,,,,,,,,true,edit,,
+tran,voided,void,Boolean,,,,,,,false,true,true,true,edit,,
+dataLine,dataFile,data file,DataFile,,,,,,data_file_id,false,,,true,edit,,
+dataLine,seq,sequence,Integer,,,,,,,false,true,true,true,edit,1,9999
+dataLine,text,text,String,255,,,,,,false,true,true,true,edit,,
+dataTran,dataFile,data file,DataFile,,,,,,data_file_id,false,,,true,edit,,
+dataTran,ofxType,type,String,10,,,,,,,true,true,true,edit,,
+dataTran,ofxPostDate,post date,Date,,,,DATE,,,false,true,true,true,edit,-300,90
+dataTran,ofxUserDate,user date,Date,,,,DATE,,,,true,true,true,edit,-300,90
+dataTran,ofxAmount,amount,BigDecimal,,9,2,,,,false,true,true,true,edit,-9999,9999
+dataTran,ofxFitId,fit id,String,50,,,,,,,true,true,true,edit,,
+dataTran,ofxSic,sic,String,10,,,,,,,true,true,true,edit,,
+dataTran,ofxCheckNumber,check number,String,10,,,,,,,true,true,true,edit,,
+dataTran,ofxCorrectFitId,correct fit id,String,10,,,,,,,true,true,true,edit,,
+dataTran,ofxCorrectAction,correct action,String,10,,,,,,,true,true,true,edit,,
+dataTran,ofxName,name,String,100,,,,,,,true,true,true,edit,,
+dataTran,ofxCategory,category,String,10,,,,,,,true,true,true,edit,,
+dataTran,ofxMemo,memo,String,100,,,,,,,true,true,true,edit,,

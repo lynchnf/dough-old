@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head::head"></head>
+<body>
+<header th:replace="fragments/menu::menu"></header>
+<main class="container">
+    <h1>Data Line Edit</h1>
+    <div th:replace="fragments/alerts::alerts"></div>
+
+    <form action="#" method="post" th:action="@{/dataLineEdit}" th:object="${editForm}">
+        <ul class="alert alert-danger" th:if="${#fields.hasAnyErrors()}">
+            <li th:each="err:${#fields.allErrors()}" th:text="${err}"></li>
+        </ul>
+        <input type="hidden" th:field="*{id}"/>
+        <input type="hidden" th:field="*{version}"/>
+
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Data File</label>
+            <div class="col-sm-9">
+                <select class="form-control" th:field="*{dataFileId}" th:errorclass="is-invalid">
+                    <option value="">Please select ...</option>
+                    <option th:each="dataFile:${allDataFile}" th:value="${dataFile.id}" th:text="${dataFile}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Sequence</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{seq}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Text</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{text}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</main>
+<footer th:replace="fragments/footer::footer"></footer>
+</body>
+</html>

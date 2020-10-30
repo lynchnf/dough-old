@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head::head"></head>
+<body>
+<header th:replace="fragments/menu::menu"></header>
+<main class="container">
+    <h1>Data File Edit</h1>
+    <div th:replace="fragments/alerts::alerts"></div>
+
+    <form action="#" method="post" th:action="@{/dataFileEdit}" th:object="${editForm}">
+        <ul class="alert alert-danger" th:if="${#fields.hasAnyErrors()}">
+            <li th:each="err:${#fields.allErrors()}" th:text="${err}"></li>
+        </ul>
+        <input type="hidden" th:field="*{id}"/>
+        <input type="hidden" th:field="*{version}"/>
+
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Original File Name</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{originalFilename}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Content Type</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{contentType}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Size</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{size}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Upload Timestamp (m/d/y h:m am/pm)</label>
+            <div class="input-group date col-sm-9" id="uploadTimestampPicker" data-target-input="nearest">
+                <input type="text" class="form-control datetimepicker-input" data-target="#uploadTimestampPicker"
+                       th:field="*{uploadTimestamp}" th:errorclass="is-invalid"/>
+                <div class="input-group-append" data-target="#uploadTimestampPicker" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fas fa-calendar"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Status</label>
+            <div class="col-sm-9">
+                <select class="form-control" th:field="*{status}" th:errorclass="is-invalid">
+                    <option value="">Please select ...</option>
+                    <option th:each="value:${T(norman.dough.domain.DataFileStatus).values()}"
+                            th:value="${value}" th:text="${value}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Organization</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxOrganization}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Fid</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxFid}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Bank Id</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxBankId}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Account Id</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxAcctId}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Type</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{ofxType}" th:errorclass="is-invalid"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Account</label>
+            <div class="col-sm-9">
+                <select class="form-control" th:field="*{acctId}" th:errorclass="is-invalid">
+                    <option value="">Please select ...</option>
+                    <option th:each="acct:${allAcct}" th:value="${acct.id}" th:text="${acct}"></option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</main>
+<footer th:replace="fragments/footer::footer"></footer>
+<script>
+    $("#uploadTimestampPicker").datetimepicker({
+        icons: {
+            time: "fas fa-clock",
+            date: "fas fa-calendar",
+            up: "fas fa-arrow-up",
+            down: "fas fa-arrow-down"
+        }
+    });
+</script>
+</body>
+</html>

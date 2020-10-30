@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head::head"></head>
+<body>
+<header th:replace="fragments/menu::menu"></header>
+<main class="container">
+    <h1>Account Number</h1>
+    <div th:replace="fragments/alerts::alerts"></div>
+
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Account</label>
+        <div class="col-sm-9">
+            <p class="form-control-plaintext" th:text="${view.acct}"></p>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Number</label>
+        <div class="col-sm-9">
+            <p class="form-control-plaintext" th:text="${view.number}"></p>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Effective Date</label>
+        <div class="col-sm-9">
+            <p class="form-control-plaintext" th:text="${#dates.format(view.effDate,'M/d/yyyy')}"></p>
+        </div>
+    </div>
+
+    <a class="btn btn-primary" th:href="@{/acctNbrEdit(id=${view.id})}">Edit</a>
+</main>
+<footer th:replace="fragments/footer::footer"></footer>
+</body>
+</html>
