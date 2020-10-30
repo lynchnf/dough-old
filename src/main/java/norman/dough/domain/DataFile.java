@@ -46,13 +46,16 @@ public class DataFile {
     private String ofxBankId;
     @Column(length = 20)
     private String ofxAcctId;
+    @Enumerated(EnumType.STRING)
     @Column(length = 10)
-    private String ofxType;
+    private AcctType ofxType;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "acct_id")
     private Acct acct;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "dataFile")
     private List<DataLine> dataLines = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "dataFile")
+    private List<DataTran> dataTrans = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -142,11 +145,11 @@ public class DataFile {
         this.ofxAcctId = ofxAcctId;
     }
 
-    public String getOfxType() {
+    public AcctType getOfxType() {
         return ofxType;
     }
 
-    public void setOfxType(String ofxType) {
+    public void setOfxType(AcctType ofxType) {
         this.ofxType = ofxType;
     }
 
@@ -164,6 +167,14 @@ public class DataFile {
 
     public void setDataLines(List<DataLine> dataLines) {
         this.dataLines = dataLines;
+    }
+
+    public List<DataTran> getDataTrans() {
+        return dataTrans;
+    }
+
+    public void setDataTrans(List<DataTran> dataTrans) {
+        this.dataTrans = dataTrans;
     }
 
     @Override

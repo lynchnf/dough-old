@@ -1,2 +1,5 @@
 enumName,values
-dataFileStatus,UPLOADED
+acctType,CHECKING CC BILL
+correctAction,REPLACE
+dataFileStatus,UPLOADED PARSED AC_MATCHED TR_MATCHED
+tranType,DEBIT CREDIT CHECK PAYMENT FEE

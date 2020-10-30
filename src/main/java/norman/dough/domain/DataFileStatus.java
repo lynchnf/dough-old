@@ -1,5 +1,5 @@
 package norman.dough.domain;
 
 public enum DataFileStatus {
-    UPLOADED
+    UPLOADED, PARSED, AC_MATCHED, TR_MATCHED
 }

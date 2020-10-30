@@ -35,7 +35,7 @@ dataFile,ofxOrganization,organization,String,50,,,,,,,true,true,true,edit,,
 dataFile,ofxFid,fid,String,10,,,,,,,true,true,true,edit,,
 dataFile,ofxBankId,bank id,String,10,,,,,,,true,true,true,edit,,
 dataFile,ofxAcctId,account id,String,20,,,,,,,true,true,true,edit,,
-dataFile,ofxType,type,String,10,,,,,,,true,true,true,edit,,
+dataFile,ofxType,type,AcctType,10,,,,STRING,,,true,true,true,edit,,
 dataFile,acct,account,Acct,,,,,,acct_id,,true,true,true,edit,,
 pattern,seq,sequence,Integer,,,,,,,false,true,true,true,edit,1,9999
 pattern,regex,regular expression,String,255,,,,,,false,true,true,true,edit,,
@@ -62,7 +62,7 @@ dataLine,dataFile,data file,DataFile,,,,,,data_file_id,false,,,true,edit,,
 dataLine,seq,sequence,Integer,,,,,,,false,true,true,true,edit,1,9999
 dataLine,text,text,String,255,,,,,,false,true,true,true,edit,,
 dataTran,dataFile,data file,DataFile,,,,,,data_file_id,false,,,true,edit,,
-dataTran,ofxType,type,String,10,,,,,,,true,true,true,edit,,
+dataTran,ofxType,type,TranType,10,,,,STRING,,,true,true,true,edit,,
 dataTran,ofxPostDate,post date,Date,,,,DATE,,,false,true,true,true,edit,-300,90
 dataTran,ofxUserDate,user date,Date,,,,DATE,,,,true,true,true,edit,-300,90
 dataTran,ofxAmount,amount,BigDecimal,,9,2,,,,false,true,true,true,edit,-9999,9999
@@ -70,7 +70,7 @@ dataTran,ofxFitId,fit id,String,50,,,,,,,true,true,true,edit,,
 dataTran,ofxSic,sic,String,10,,,,,,,true,true,true,edit,,
 dataTran,ofxCheckNumber,check number,String,10,,,,,,,true,true,true,edit,,
 dataTran,ofxCorrectFitId,correct fit id,String,10,,,,,,,true,true,true,edit,,
-dataTran,ofxCorrectAction,correct action,String,10,,,,,,,true,true,true,edit,,
+dataTran,ofxCorrectAction,correct action,CorrectAction,10,,,,STRING,,,true,true,true,edit,,
 dataTran,ofxName,name,String,100,,,,,,,true,true,true,edit,,
 dataTran,ofxCategory,category,String,10,,,,,,,true,true,true,edit,,
 dataTran,ofxMemo,memo,String,100,,,,,,,true,true,true,edit,,

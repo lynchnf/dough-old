@@ -1,13 +1,15 @@
 package norman.dough.web.view;
 
+import norman.dough.domain.CorrectAction;
 import norman.dough.domain.DataTran;
+import norman.dough.domain.TranType;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class DataTranListRow {
     private Long id;
-    private String ofxType;
+    private TranType ofxType;
     private Date ofxPostDate;
     private Date ofxUserDate;
     private BigDecimal ofxAmount;
@@ -15,7 +17,7 @@ public class DataTranListRow {
     private String ofxSic;
     private String ofxCheckNumber;
     private String ofxCorrectFitId;
-    private String ofxCorrectAction;
+    private CorrectAction ofxCorrectAction;
     private String ofxName;
     private String ofxCategory;
     private String ofxMemo;
@@ -40,7 +42,7 @@ public class DataTranListRow {
         return id;
     }
 
-    public String getOfxType() {
+    public TranType getOfxType() {
         return ofxType;
     }
 
@@ -72,7 +74,7 @@ public class DataTranListRow {
         return ofxCorrectFitId;
     }
 
-    public String getOfxCorrectAction() {
+    public CorrectAction getOfxCorrectAction() {
         return ofxCorrectAction;
     }
 

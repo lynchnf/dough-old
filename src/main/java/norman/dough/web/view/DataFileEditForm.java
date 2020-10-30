@@ -1,6 +1,7 @@
 package norman.dough.web.view;
 
 import norman.dough.domain.Acct;
+import norman.dough.domain.AcctType;
 import norman.dough.domain.DataFile;
 import norman.dough.domain.DataFileStatus;
 import norman.dough.exception.NotFoundException;
@@ -41,7 +42,7 @@ public class DataFileEditForm {
     @Size(max = 20, message = "Account Id may not be over {max} characters long.")
     private String ofxAcctId;
     @Size(max = 10, message = "Type may not be over {max} characters long.")
-    private String ofxType;
+    private AcctType ofxType;
     private Long acctId;
 
     public DataFileEditForm() {
@@ -78,7 +79,7 @@ public class DataFileEditForm {
         entity.setOfxFid(StringUtils.trimToNull(ofxFid));
         entity.setOfxBankId(StringUtils.trimToNull(ofxBankId));
         entity.setOfxAcctId(StringUtils.trimToNull(ofxAcctId));
-        entity.setOfxType(StringUtils.trimToNull(ofxType));
+        entity.setOfxType(ofxType);
         if (acctId != null) {
             Acct acct = acctService.findById(acctId);
             entity.setAcct(acct);
@@ -178,11 +179,11 @@ public class DataFileEditForm {
         this.ofxAcctId = ofxAcctId;
     }
 
-    public String getOfxType() {
+    public AcctType getOfxType() {
         return ofxType;
     }
 
-    public void setOfxType(String ofxType) {
+    public void setOfxType(AcctType ofxType) {
         this.ofxType = ofxType;
     }
 

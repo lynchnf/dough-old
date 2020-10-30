@@ -1,7 +1,9 @@
 package norman.dough.web.view;
 
+import norman.dough.domain.CorrectAction;
 import norman.dough.domain.DataFile;
 import norman.dough.domain.DataTran;
+import norman.dough.domain.TranType;
 import norman.dough.exception.NotFoundException;
 import norman.dough.service.DataFileService;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +23,7 @@ public class DataTranEditForm {
     @NotNull(message = "Data File may not be blank.")
     private Long dataFileId;
     @Size(max = 10, message = "Type may not be over {max} characters long.")
-    private String ofxType;
+    private TranType ofxType;
     @NotNull(message = "Post Date may not be blank.")
     @DateTimeFormat(pattern = "M/d/yyyy")
     private Date ofxPostDate;
@@ -40,7 +42,7 @@ public class DataTranEditForm {
     @Size(max = 10, message = "Correct Fit Id may not be over {max} characters long.")
     private String ofxCorrectFitId;
     @Size(max = 10, message = "Correct Action may not be over {max} characters long.")
-    private String ofxCorrectAction;
+    private CorrectAction ofxCorrectAction;
     @Size(max = 100, message = "Name may not be over {max} characters long.")
     private String ofxName;
     @Size(max = 10, message = "Category may not be over {max} characters long.")
@@ -79,7 +81,7 @@ public class DataTranEditForm {
             DataFile dataFile = dataFileService.findById(dataFileId);
             entity.setDataFile(dataFile);
         }
-        entity.setOfxType(StringUtils.trimToNull(ofxType));
+        entity.setOfxType(ofxType);
         entity.setOfxPostDate(ofxPostDate);
         entity.setOfxUserDate(ofxUserDate);
         entity.setOfxAmount(ofxAmount);
@@ -87,7 +89,7 @@ public class DataTranEditForm {
         entity.setOfxSic(StringUtils.trimToNull(ofxSic));
         entity.setOfxCheckNumber(StringUtils.trimToNull(ofxCheckNumber));
         entity.setOfxCorrectFitId(StringUtils.trimToNull(ofxCorrectFitId));
-        entity.setOfxCorrectAction(StringUtils.trimToNull(ofxCorrectAction));
+        entity.setOfxCorrectAction(ofxCorrectAction);
         entity.setOfxName(StringUtils.trimToNull(ofxName));
         entity.setOfxCategory(StringUtils.trimToNull(ofxCategory));
         entity.setOfxMemo(StringUtils.trimToNull(ofxMemo));
@@ -122,11 +124,11 @@ public class DataTranEditForm {
         this.dataFileId = dataFileId;
     }
 
-    public String getOfxType() {
+    public TranType getOfxType() {
         return ofxType;
     }
 
-    public void setOfxType(String ofxType) {
+    public void setOfxType(TranType ofxType) {
         this.ofxType = ofxType;
     }
 
@@ -186,11 +188,11 @@ public class DataTranEditForm {
         this.ofxCorrectFitId = ofxCorrectFitId;
     }
 
-    public String getOfxCorrectAction() {
+    public CorrectAction getOfxCorrectAction() {
         return ofxCorrectAction;
     }
 
-    public void setOfxCorrectAction(String ofxCorrectAction) {
+    public void setOfxCorrectAction(CorrectAction ofxCorrectAction) {
         this.ofxCorrectAction = ofxCorrectAction;
     }
 

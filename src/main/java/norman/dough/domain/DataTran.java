@@ -2,6 +2,8 @@ package norman.dough.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -26,8 +28,9 @@ public class DataTran {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "data_file_id", nullable = false)
     private DataFile dataFile;
+    @Enumerated(EnumType.STRING)
     @Column(length = 10)
-    private String ofxType;
+    private TranType ofxType;
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
     private Date ofxPostDate;
@@ -43,8 +46,9 @@ public class DataTran {
     private String ofxCheckNumber;
     @Column(length = 10)
     private String ofxCorrectFitId;
+    @Enumerated(EnumType.STRING)
     @Column(length = 10)
-    private String ofxCorrectAction;
+    private CorrectAction ofxCorrectAction;
     @Column(length = 100)
     private String ofxName;
     @Column(length = 10)
@@ -76,11 +80,11 @@ public class DataTran {
         this.dataFile = dataFile;
     }
 
-    public String getOfxType() {
+    public TranType getOfxType() {
         return ofxType;
     }
 
-    public void setOfxType(String ofxType) {
+    public void setOfxType(TranType ofxType) {
         this.ofxType = ofxType;
     }
 
@@ -140,11 +144,11 @@ public class DataTran {
         this.ofxCorrectFitId = ofxCorrectFitId;
     }
 
-    public String getOfxCorrectAction() {
+    public CorrectAction getOfxCorrectAction() {
         return ofxCorrectAction;
     }
 
-    public void setOfxCorrectAction(String ofxCorrectAction) {
+    public void setOfxCorrectAction(CorrectAction ofxCorrectAction) {
         this.ofxCorrectAction = ofxCorrectAction;
     }
 

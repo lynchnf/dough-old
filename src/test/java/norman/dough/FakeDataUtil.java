@@ -2,7 +2,9 @@ package norman.dough;
 
 import norman.dough.domain.Acct;
 import norman.dough.domain.AcctNbr;
+import norman.dough.domain.AcctType;
 import norman.dough.domain.Cat;
+import norman.dough.domain.CorrectAction;
 import norman.dough.domain.DataFile;
 import norman.dough.domain.DataFileStatus;
 import norman.dough.domain.DataLine;
@@ -10,6 +12,7 @@ import norman.dough.domain.DataTran;
 import norman.dough.domain.Pattern;
 import norman.dough.domain.Stmt;
 import norman.dough.domain.Tran;
+import norman.dough.domain.TranType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,7 +137,7 @@ public class FakeDataUtil {
             record.setOfxFid(nextRandomString(10));
             record.setOfxBankId(nextRandomString(10));
             record.setOfxAcctId(nextRandomString(20));
-            record.setOfxType(nextRandomString(10));
+            record.setOfxType(nextRandomEnum(AcctType.values()));
             record.setAcct(nextRandomEntity(acctList));
             dataFileList.add(record);
         }
@@ -181,7 +184,7 @@ public class FakeDataUtil {
         for (int i = 0; i < 10; i++) {
             DataTran record = new DataTran();
             record.setDataFile(nextRandomEntity(dataFileList));
-            record.setOfxType(nextRandomString(10));
+            record.setOfxType(nextRandomEnum(TranType.values()));
             record.setOfxPostDate(nextRandomDate(-300, 90));
             record.setOfxUserDate(nextRandomDate(-300, 90));
             record.setOfxAmount(nextRandomBigDecimal(-9999, 9999, 2));
@@ -189,7 +192,7 @@ public class FakeDataUtil {
             record.setOfxSic(nextRandomString(10));
             record.setOfxCheckNumber(nextRandomString(10));
             record.setOfxCorrectFitId(nextRandomString(10));
-            record.setOfxCorrectAction(nextRandomString(10));
+            record.setOfxCorrectAction(nextRandomEnum(CorrectAction.values()));
             record.setOfxName(nextRandomString(100));
             record.setOfxCategory(nextRandomString(10));
             record.setOfxMemo(nextRandomString(100));

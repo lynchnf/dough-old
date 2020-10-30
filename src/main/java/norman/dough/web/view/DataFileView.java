@@ -1,6 +1,7 @@
 package norman.dough.web.view;
 
 import norman.dough.domain.Acct;
+import norman.dough.domain.AcctType;
 import norman.dough.domain.DataFile;
 import norman.dough.domain.DataFileStatus;
 
@@ -17,7 +18,7 @@ public class DataFileView {
     private String ofxFid;
     private String ofxBankId;
     private String ofxAcctId;
-    private String ofxType;
+    private AcctType ofxType;
     private Acct acct;
 
     public DataFileView(DataFile entity) {
@@ -75,7 +76,7 @@ public class DataFileView {
         return ofxAcctId;
     }
 
-    public String getOfxType() {
+    public AcctType getOfxType() {
         return ofxType;
     }
 

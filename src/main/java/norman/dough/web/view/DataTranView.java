@@ -1,7 +1,9 @@
 package norman.dough.web.view;
 
+import norman.dough.domain.CorrectAction;
 import norman.dough.domain.DataFile;
 import norman.dough.domain.DataTran;
+import norman.dough.domain.TranType;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -9,7 +11,7 @@ import java.util.Date;
 public class DataTranView {
     private Long id;
     private DataFile dataFile;
-    private String ofxType;
+    private TranType ofxType;
     private Date ofxPostDate;
     private Date ofxUserDate;
     private BigDecimal ofxAmount;
@@ -17,7 +19,7 @@ public class DataTranView {
     private String ofxSic;
     private String ofxCheckNumber;
     private String ofxCorrectFitId;
-    private String ofxCorrectAction;
+    private CorrectAction ofxCorrectAction;
     private String ofxName;
     private String ofxCategory;
     private String ofxMemo;
@@ -47,7 +49,7 @@ public class DataTranView {
         return dataFile;
     }
 
-    public String getOfxType() {
+    public TranType getOfxType() {
         return ofxType;
     }
 
@@ -79,7 +81,7 @@ public class DataTranView {
         return ofxCorrectFitId;
     }
 
-    public String getOfxCorrectAction() {
+    public CorrectAction getOfxCorrectAction() {
         return ofxCorrectAction;
     }
 

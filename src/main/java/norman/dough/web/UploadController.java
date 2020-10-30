@@ -3,8 +3,16 @@ package norman.dough.web;
 import norman.dough.domain.DataFile;
 import norman.dough.domain.DataFileStatus;
 import norman.dough.domain.DataLine;
+import norman.dough.domain.DataTran;
+import norman.dough.exception.NotFoundException;
+import norman.dough.exception.OfxParseException;
 import norman.dough.exception.OptimisticLockingException;
 import norman.dough.service.DataFileService;
+import norman.dough.service.OfxService;
+import norman.dough.service.response.OfxAcct;
+import norman.dough.service.response.OfxInst;
+import norman.dough.service.response.OfxParseResponse;
+import norman.dough.service.response.OfxStmtTran;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +33,8 @@ public class UploadController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UploadController.class);
     @Autowired
     private DataFileService dataFileService;
+    @Autowired
+    private OfxService ofxService;
 
     @PostMapping("/dataUpload")
     public String processDataUpload(@RequestParam(value = "multipartFile") MultipartFile multipartFile, Model model,
@@ -70,6 +80,56 @@ public class UploadController {
         } catch (OptimisticLockingException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Data File was updated by another user.");
             return "redirect:/";
+        }
+    }
+
+    @PostMapping("/dataParse")
+    public String processDataParse(@RequestParam("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            DataFile dataFile = dataFileService.findById(id);
+            OfxParseResponse response = ofxService.parseDataFile(dataFile);
+
+            OfxInst ofxInst = response.getOfxInst();
+            dataFile.setOfxOrganization(ofxInst.getOrganization());
+            dataFile.setOfxFid(ofxInst.getFid());
+
+            OfxAcct ofxAcct = response.getOfxAcct();
+            dataFile.setOfxBankId(ofxAcct.getBankId());
+            dataFile.setOfxAcctId(ofxAcct.getAcctId());
+            dataFile.setOfxType(ofxAcct.getType());
+
+            for (OfxStmtTran ofxStmtTran : response.getOfxStmtTrans()) {
+                DataTran dataTran = new DataTran();
+                dataTran.setOfxType(ofxStmtTran.getType());
+                dataTran.setOfxPostDate(ofxStmtTran.getPostDate());
+                dataTran.setOfxUserDate(ofxStmtTran.getUserDate());
+                dataTran.setOfxAmount(ofxStmtTran.getAmount());
+                dataTran.setOfxFitId(ofxStmtTran.getFitId());
+                dataTran.setOfxSic(ofxStmtTran.getSic());
+                dataTran.setOfxCheckNumber(ofxStmtTran.getCheckNumber());
+                dataTran.setOfxCorrectFitId(ofxStmtTran.getCorrectFitId());
+                dataTran.setOfxCorrectAction(ofxStmtTran.getCorrectAction());
+                dataTran.setOfxName(ofxStmtTran.getName());
+                dataTran.setOfxCategory(ofxStmtTran.getCategory());
+                dataTran.setOfxMemo(ofxStmtTran.getMemo());
+                dataTran.setDataFile(dataFile);
+                dataFile.getDataTrans().add(dataTran);
+            }
+            dataFile.setStatus(DataFileStatus.PARSED);
+
+            DataFile save = dataFileService.save(dataFile);
+            redirectAttributes.addFlashAttribute("successMessage", "Data File successfully updated");
+            redirectAttributes.addAttribute("id", save.getId());
+            return "redirect:/dataFile?id={id}";
+        } catch (NotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Data File not found.");
+            return "redirect:/dataFileList";
+        } catch (OfxParseException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Data File could not be parsed.");
+            return "redirect:/dataFileList";
+        } catch (OptimisticLockingException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Data File was updated by another user.");
+            return "redirect:/dataFileList";
         }
     }
 }
