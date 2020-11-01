@@ -112,7 +112,7 @@ public class TranController {
             Tran save = service.save(entity);
             String successMessage = "Transaction successfully added.";
             if (id != null) {
-                successMessage = "Transaction successfully updated";
+                successMessage = "Transaction successfully updated.";
             }
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
             redirectAttributes.addAttribute("id", save.getId());

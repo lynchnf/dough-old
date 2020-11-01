@@ -113,7 +113,7 @@ public class DataLineController {
             DataLine save = service.save(entity);
             String successMessage = "Data line successfully added.";
             if (id != null) {
-                successMessage = "Data line successfully updated";
+                successMessage = "Data line successfully updated.";
             }
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
             redirectAttributes.addAttribute("id", save.getId());

@@ -74,7 +74,11 @@
         </div>
     </div>
 
-    <a class="btn btn-primary" th:href="@{/dataFileEdit(id=${view.id})}">Edit</a>
+    <form th:if="${view.status.name()=='UPLOADED'}" action="#" method="post" th:action="@{/dataParse}">
+        <input type="hidden" name="id" th:value="${view.id}"/>
+        <input type="hidden" name="version" th:value="${view.version}"/>
+        <button type="submit" class="btn btn-primary">Parse</button>
+    </form>
 </main>
 <footer th:replace="fragments/footer::footer"></footer>
 </body>

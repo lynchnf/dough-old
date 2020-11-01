@@ -107,7 +107,7 @@ public class AcctController {
             Acct save = service.save(entity);
             String successMessage = "Account successfully added.";
             if (id != null) {
-                successMessage = "Account successfully updated";
+                successMessage = "Account successfully updated.";
             }
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
             redirectAttributes.addAttribute("id", save.getId());

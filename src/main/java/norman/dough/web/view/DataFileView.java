@@ -9,6 +9,7 @@ import java.util.Date;
 
 public class DataFileView {
     private Long id;
+    private Integer version;
     private String originalFilename;
     private String contentType;
     private Long size;
@@ -23,6 +24,7 @@ public class DataFileView {
 
     public DataFileView(DataFile entity) {
         id = entity.getId();
+        version = entity.getVersion();
         originalFilename = entity.getOriginalFilename();
         contentType = entity.getContentType();
         size = entity.getSize();
@@ -38,6 +40,10 @@ public class DataFileView {
 
     public Long getId() {
         return id;
+    }
+
+    public Integer getVersion() {
+        return version;
     }
 
     public String getOriginalFilename() {

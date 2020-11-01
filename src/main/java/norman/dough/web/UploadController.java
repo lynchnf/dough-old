@@ -68,7 +68,7 @@ public class UploadController {
 
             // Save the file.
             DataFile save = dataFileService.save(dataFile);
-            String successMessage = "Data File successfully added.";
+            String successMessage = "Data File successfully uploaded.";
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
             redirectAttributes.addAttribute("id", save.getId());
             return "redirect:/dataFile?id={id}";
@@ -84,7 +84,8 @@ public class UploadController {
     }
 
     @PostMapping("/dataParse")
-    public String processDataParse(@RequestParam("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String processDataParse(@RequestParam("id") Long id, @RequestParam("version") Integer version,
+            RedirectAttributes redirectAttributes) {
         try {
             DataFile dataFile = dataFileService.findById(id);
             OfxParseResponse response = ofxService.parseDataFile(dataFile);
@@ -118,7 +119,7 @@ public class UploadController {
             dataFile.setStatus(DataFileStatus.PARSED);
 
             DataFile save = dataFileService.save(dataFile);
-            redirectAttributes.addFlashAttribute("successMessage", "Data File successfully updated");
+            redirectAttributes.addFlashAttribute("successMessage", "Data File successfully parsed.");
             redirectAttributes.addAttribute("id", save.getId());
             return "redirect:/dataFile?id={id}";
         } catch (NotFoundException e) {

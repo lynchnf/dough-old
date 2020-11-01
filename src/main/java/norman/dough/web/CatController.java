@@ -107,7 +107,7 @@ public class CatController {
             Cat save = service.save(entity);
             String successMessage = "Category successfully added.";
             if (id != null) {
-                successMessage = "Category successfully updated";
+                successMessage = "Category successfully updated.";
             }
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
             redirectAttributes.addAttribute("id", save.getId());

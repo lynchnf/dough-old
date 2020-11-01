@@ -115,7 +115,7 @@ public class DataTranController {
             DataTran save = service.save(entity);
             String successMessage = "Data transaction successfully added.";
             if (id != null) {
-                successMessage = "Data transaction successfully updated";
+                successMessage = "Data transaction successfully updated.";
             }
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
             redirectAttributes.addAttribute("id", save.getId());

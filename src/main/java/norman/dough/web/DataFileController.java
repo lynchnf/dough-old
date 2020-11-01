@@ -115,7 +115,7 @@ public class DataFileController {
             DataFile save = service.save(entity);
             String successMessage = "Data file successfully added.";
             if (id != null) {
-                successMessage = "Data file successfully updated";
+                successMessage = "Data file successfully updated.";
             }
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
             redirectAttributes.addAttribute("id", save.getId());

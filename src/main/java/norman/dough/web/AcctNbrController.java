@@ -113,7 +113,7 @@ public class AcctNbrController {
             AcctNbr save = service.save(entity);
             String successMessage = "Account number successfully added.";
             if (id != null) {
-                successMessage = "Account number successfully updated";
+                successMessage = "Account number successfully updated.";
             }
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
             redirectAttributes.addAttribute("id", save.getId());

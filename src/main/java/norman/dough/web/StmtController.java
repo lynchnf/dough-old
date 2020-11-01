@@ -112,7 +112,7 @@ public class StmtController {
             Stmt save = service.save(entity);
             String successMessage = "Statement successfully added.";
             if (id != null) {
-                successMessage = "Statement successfully updated";
+                successMessage = "Statement successfully updated.";
             }
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
             redirectAttributes.addAttribute("id", save.getId());

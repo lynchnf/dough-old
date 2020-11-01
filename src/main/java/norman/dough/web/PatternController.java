@@ -113,7 +113,7 @@ public class PatternController {
             Pattern save = service.save(entity);
             String successMessage = "Pattern successfully added.";
             if (id != null) {
-                successMessage = "Pattern successfully updated";
+                successMessage = "Pattern successfully updated.";
             }
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
             redirectAttributes.addAttribute("id", save.getId());
