@@ -88,6 +88,11 @@ public class UploadController {
             RedirectAttributes redirectAttributes) {
         try {
             DataFile dataFile = dataFileService.findById(id);
+            if (dataFile.getStatus() != DataFileStatus.UPLOADED) {
+                redirectAttributes
+                        .addFlashAttribute("errorMessage", "Invalid Status. Data File must have a status of UPDATED.");
+                return "redirect:/dataFileList";
+            }
             OfxParseResponse response = ofxService.parseDataFile(dataFile);
 
             OfxInst ofxInst = response.getOfxInst();
@@ -95,6 +100,7 @@ public class UploadController {
             dataFile.setOfxFid(ofxInst.getFid());
 
             OfxAcct ofxAcct = response.getOfxAcct();
+            dataFile.setVersion(version);
             dataFile.setOfxBankId(ofxAcct.getBankId());
             dataFile.setOfxAcctId(ofxAcct.getAcctId());
             dataFile.setOfxType(ofxAcct.getType());
